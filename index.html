@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BodyPlan">
+  <title>BodyPlan · 75kg · 10% KF</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#080808">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #080808;
+      font-family: 'DM Sans', sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      background: #080808;
+      border-bottom: 1px solid #181818;
+      padding: 52px 20px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .wordmark {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      letter-spacing: 4px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .wordmark em { color: #d4a853; font-style: normal; }
+
+    .split-tag {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: #ffffff;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .badge {
+      background: #d4a853;
+      color: #080808;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 11px;
+      border-radius: 2px;
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+
+    .tabs { display: flex; }
+
+    .tab {
+      flex: 1;
+      padding: 12px 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .tab.active { color: #d4a853; border-bottom-color: #d4a853; }
+
+    .page {
+      padding: 22px 18px 80px;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .hidden { display: none; }
+
+    .section-label {
+      font-size: 9px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin-bottom: 10px;
+      margin-top: 26px;
+    }
+
+    /* Daily */
+    .daily {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .daily-item {
+      background: #0f0d07;
+      border: 1px solid #d4a85330;
+      border-top: 2px solid #d4a853;
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .daily-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      color: #d4a853;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    .daily-lbl { font-size: 12px; color: #ffffff; margin-top: 3px; }
+    .daily-note { font-size: 11px; color: #ffffff; margin-top: 6px; font-style: italic; }
+
+    /* Week */
+    .week-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 9px 13px;
+      margin-bottom: 4px;
+      background: #0e0e0e;
+      border-radius: 6px;
+    }
+
+    .week-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .week-day { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #ffffff; min-width: 76px; }
+    .week-name { font-size: 13px; color: #ffffff; }
+
+    /* Cards */
+    .card {
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      border: 1px solid #161616;
+    }
+
+    .card-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 17px;
+      background: #0e0e0e;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      border-left: 3px solid;
+    }
+
+    .card-type { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 3px; }
+
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .card-sub { font-size: 11px; color: #ffffff; margin-top: 3px; }
+    .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .card-dur { font-size: 11px; color: #ffffff; }
+    .chevron { color: #ffffff; font-size: 12px; transition: transform 0.18s; display: inline-block; }
+    .chevron.open { transform: rotate(180deg); }
+
+    .card-body { background: #0a0a0a; padding: 0 17px 16px; display: none; }
+    .card-body.open { display: block; }
+
+    .ex-header {
+      display: grid;
+      grid-template-columns: 1fr 48px 68px;
+      gap: 8px;
+      padding: 9px 0 6px;
+      border-top: 1px solid #161616;
+    }
+
+    .ex-col { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #ffffff; }
+    .ex-col.c { text-align: center; }
+    .ex-col.r { text-align: right; }
+
+    .ex-row {
+      display: grid;
+      grid-template-columns: 1fr 48px 68px;
+      gap: 8px;
+      padding: 10px 0;
+      border-top: 1px solid #131313;
+      align-items: start;
+    }
+
+    .ex-name { font-size: 13px; color: #fff; font-weight: 500; }
+    .ex-note { font-size: 11px; color: #ffffff; margin-top: 2px; }
+    .ex-sets { font-size: 16px; font-weight: 700; text-align: center; }
+    .ex-reps { font-size: 12px; color: #ffffff; text-align: right; padding-top: 1px; }
+
+    .card-footer {
+      margin-top: 12px;
+      padding: 10px 13px;
+      background: #0d0d0d;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #ffffff;
+      line-height: 1.65;
+      border-left: 2px solid #1e1e1e;
+    }
+
+    /* Nutrition */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .stat {
+      background: #0e0e0e;
+      border-radius: 8px;
+      padding: 13px 10px;
+      text-align: center;
+      border-top: 2px solid;
+    }
+
+    .stat-n { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; line-height: 1; }
+    .stat-l { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; margin-top: 3px; }
+
+    .meal {
+      background: #0e0e0e;
+      border-radius: 9px;
+      padding: 15px 17px;
+      margin-bottom: 7px;
+      border: 1px solid #161616;
+    }
+
+    .meal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 11px; }
+    .meal-l { display: flex; align-items: center; gap: 10px; }
+    .meal-emoji { font-size: 22px; }
+    .meal-name { font-size: 14px; color: #fff; font-weight: 600; }
+    .meal-time { font-size: 11px; color: #ffffff; margin-top: 1px; }
+    .meal-p { font-size: 12px; color: #4ade80; font-weight: 500; }
+    .meal-k { font-size: 11px; color: #ffffff; margin-top: 1px; text-align: right; }
+
+    .meal-item {
+      font-size: 12px;
+      color: #ffffff;
+      padding: 5px 0 5px 14px;
+      border-top: 1px solid #131313;
+      position: relative;
+    }
+
+    .meal-item:before { content: "—"; position: absolute; left: 0; color: #888888; }
+
+    .cheat {
+      background: #0d0808;
+      border: 1px solid #f4433625;
+      border-left: 3px solid #f44336;
+      border-radius: 8px;
+      padding: 15px 17px;
+      margin-bottom: 7px;
+    }
+
+    .cheat-head {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #f44336;
+      margin-bottom: 9px;
+    }
+
+    .cheat-rule {
+      font-size: 12px;
+      color: #ffffff;
+      padding: 5px 0;
+      border-top: 1px solid #160d0d;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .must {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 13px;
+      background: #0e0e0e;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #ffffff;
+    }
+
+    .must-icon { font-size: 17px; }
+
+    .prep-box {
+      margin-top: 8px;
+      padding: 13px 15px;
+      background: #0c0a04;
+      border: 1px solid #d4a85322;
+      border-left: 3px solid #d4a853;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #ffffff;
+      line-height: 1.7;
+    }
+
+    .prep-box strong { color: #d4a853; }
+
+
+    /* PWA Progress */
+    .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tracker-card { background:#0e0e0e; border:1px solid #161616; border-radius:9px; padding:14px 15px; }
+    .tracker-label { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:#ffffff; margin-bottom:7px; }
+    .tracker-input { width:100%; background:#080808; border:1px solid #252525; border-radius:6px; padding:10px; color:#fff; font-size:16px; font-family:'DM Sans', sans-serif; }
+    .tracker-note { font-size:11px; color:#ffffff; margin-top:8px; line-height:1.5; }
+    .check-row { display:flex; align-items:center; justify-content:space-between; background:#0e0e0e; border:1px solid #161616; border-radius:8px; padding:12px 14px; margin-bottom:6px; }
+    .check-row span { font-size:13px; color:#fff; }
+    .check-row input { width:22px; height:22px; accent-color:#d4a853; }
+    .reset-btn { margin-top:10px; width:100%; background:#d4a853; color:#080808; border:0; border-radius:7px; padding:12px; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-family:'DM Sans', sans-serif; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="wordmark">BODY<em>PLAN</em></div>
+      <div class="split-tag">Push · Pull · Legs · Upper</div>
+    </div>
+    <div class="badge">75 kg · 10% KF</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('training', this)">🏋️ Training</button>
+    <button class="tab" onclick="switchTab('ernaehrung', this)">🥗 Ernährung</button>
+  </div>
+</div>
+
+<!-- TRAINING -->
+<div id="tab-training" class="page">
+
+  <div class="section-label">Täglich — jeden Tag</div>
+  <div class="daily">
+    <div class="daily-item">
+      <div class="daily-num">25–30</div>
+      <div class="daily-lbl">Liegestütze</div>
+      <div class="daily-note">Morgens oder abends</div>
+    </div>
+    <div class="daily-item">
+      <div class="daily-num">10–15</div>
+      <div class="daily-lbl">Klimmzüge</div>
+      <div class="daily-note">Kein Ersatz für Training</div>
+    </div>
+  </div>
+
+  <div class="section-label">Wochenstruktur</div>
+  <div class="week-item"><div class="week-pip" style="background:#ef4444"></div><div class="week-day">Montag</div><div class="week-name">Push — Brust · Schultern · Trizeps</div></div>
+  <div class="week-item"><div class="week-pip" style="background:#2a2a2a"></div><div class="week-day">Dienstag</div><div class="week-name">Ruhetag + Daily Bodyweight</div></div>
+  <div class="week-item"><div class="week-pip" style="background:#3b82f6"></div><div class="week-day">Mittwoch</div><div class="week-name">Pull — Rücken · Bizeps</div></div>
+  <div class="week-item"><div class="week-pip" style="background:#2a2a2a"></div><div class="week-day">Donnerstag</div><div class="week-name">Ruhetag + Daily Bodyweight</div></div>
+  <div class="week-item"><div class="week-pip" style="background:#22c55e"></div><div class="week-day">Freitag</div><div class="week-name">Legs — Beine · Core</div></div>
+  <div class="week-item"><div class="week-pip" style="background:#a855f7"></div><div class="week-day">Samstag</div><div class="week-name">Upper — Schultern · Rücken · Core</div></div>
+  <div class="week-item"><div class="week-pip" style="background:#f97316"></div><div class="week-day">Sonntag</div><div class="week-name">Cheat Day & Erholung</div></div>
+
+
+
+  <div class="section-label">Fortschritt</div>
+  <div class="tracker-grid">
+    <div class="tracker-card">
+      <div class="tracker-label">Gewicht</div>
+      <input class="tracker-input" id="weightInput" type="number" inputmode="decimal" placeholder="kg">
+      <div class="tracker-note">Wird lokal auf deinem iPhone gespeichert.</div>
+    </div>
+    <div class="tracker-card">
+      <div class="tracker-label">Körperfett</div>
+      <input class="tracker-input" id="bodyfatInput" type="number" inputmode="decimal" placeholder="%">
+      <div class="tracker-note">Ziel: 75 kg · 10% KF.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Workout Check</div>
+  <div class="check-row"><span>Push erledigt</span><input type="checkbox" data-check="pushDone"></div>
+  <div class="check-row"><span>Pull erledigt</span><input type="checkbox" data-check="pullDone"></div>
+  <div class="check-row"><span>Legs erledigt</span><input type="checkbox" data-check="legsDone"></div>
+  <div class="check-row"><span>Upper erledigt</span><input type="checkbox" data-check="upperDone"></div>
+  <button class="reset-btn" onclick="resetWeeklyChecks()">Woche zurücksetzen</button>
+
+  <div class="section-label">Trainingseinheiten</div>
+
+  <!-- PUSH -->
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#ef4444" onclick="toggleCard('push')">
+      <div>
+        <div class="card-type" style="color:#ef4444">Tag A · Montag</div>
+        <div class="card-title">PUSH</div>
+        <div class="card-sub">Brust · Schultern · Trizeps</div>
+      </div>
+      <div class="card-right">
+        <div class="card-dur">~65 Min</div>
+        <span class="chevron" id="chev-push">▼</span>
+      </div>
+    </button>
+    <div class="card-body" id="body-push">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Bankdrücken</div><div class="ex-note">Hauptbewegung – schwer</div></div><div class="ex-sets" style="color:#ef4444">4</div><div class="ex-reps">6–8</div></div>
+      <div class="ex-row"><div><div class="ex-name">Schulterdrücken (KH)</div><div class="ex-note">Stehend oder sitzend</div></div><div class="ex-sets" style="color:#ef4444">3</div><div class="ex-reps">8–10</div></div>
+      <div class="ex-row"><div><div class="ex-name">Schrägbank KH (oben)</div><div class="ex-note">Obere Brust + Schulter</div></div><div class="ex-sets" style="color:#ef4444">3</div><div class="ex-reps">10–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Seitheben</div><div class="ex-note">Schultern formen – kein Schwung</div></div><div class="ex-sets" style="color:#ef4444">3</div><div class="ex-reps">12–15</div></div>
+      <div class="ex-row"><div><div class="ex-name">Dips</div><div class="ex-note">Trizeps + untere Brust – vor Pushdown</div></div><div class="ex-sets" style="color:#ef4444">2</div><div class="ex-reps">8–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Trizeps Pushdown</div><div class="ex-note">Lieblingsübung – Ellenbogen fixiert, ausbelastern</div></div><div class="ex-sets" style="color:#ef4444">3</div><div class="ex-reps">12–15</div></div>
+      <div class="card-footer">⚡ Pause: Grundübungen 2–3 Min · Isolation 60 Sek · Letzter Satz: 1–2 RIR</div>
+    </div>
+  </div>
+
+  <!-- PULL -->
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#3b82f6" onclick="toggleCard('pull')">
+      <div>
+        <div class="card-type" style="color:#3b82f6">Tag B · Mittwoch</div>
+        <div class="card-title">PULL</div>
+        <div class="card-sub">Rücken · Bizeps · hintere Schulter</div>
+      </div>
+      <div class="card-right">
+        <div class="card-dur">~55 Min</div>
+        <span class="chevron" id="chev-pull">▼</span>
+      </div>
+    </button>
+    <div class="card-body" id="body-pull">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Klimmzüge (Zusatzgewicht)</div><div class="ex-note">Volle Amplitude, Lats aktiv</div></div><div class="ex-sets" style="color:#3b82f6">4</div><div class="ex-reps">5–7</div></div>
+      <div class="ex-row"><div><div class="ex-name">Trap Bar Kreuzheben</div><div class="ex-note">Rücken + hintere Kette</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">5–7</div></div>
+      <div class="ex-row"><div><div class="ex-name">Latzug weit</div><div class="ex-note">V-Taper Fokus</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">10–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Face Pulls</div><div class="ex-note">Hintere Schulter & Gesundheit</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">15–20</div></div>
+      <div class="ex-row"><div><div class="ex-name">Bizeps Curls (KH)</div><div class="ex-note">Supination am Ende</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">12–15</div></div>
+      <div class="card-footer">⚡ Pause: Grundübungen 2–3 Min · Isolation 60 Sek · Fokus auf Latzug & Breite</div>
+    </div>
+  </div>
+
+  <!-- LEGS -->
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#22c55e" onclick="toggleCard('legs')">
+      <div>
+        <div class="card-type" style="color:#22c55e">Tag C · Freitag</div>
+        <div class="card-title">LEGS</div>
+        <div class="card-sub">Quadrizeps · Hamstrings · Waden · Core</div>
+      </div>
+      <div class="card-right">
+        <div class="card-dur">~55 Min</div>
+        <span class="chevron" id="chev-legs">▼</span>
+      </div>
+    </button>
+    <div class="card-body" id="body-legs">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Kniebeuge</div><div class="ex-note">Tief – aufrechter Oberkörper</div></div><div class="ex-sets" style="color:#22c55e">4</div><div class="ex-reps">6–8</div></div>
+      <div class="ex-row"><div><div class="ex-name">Romanian Deadlift</div><div class="ex-note">Dehnung im Hamstring spüren</div></div><div class="ex-sets" style="color:#22c55e">4</div><div class="ex-reps">8–10</div></div>
+      <div class="ex-row"><div><div class="ex-name">Beinbeuger liegend</div><div class="ex-note">Langsam exzentrisch</div></div><div class="ex-sets" style="color:#22c55e">3</div><div class="ex-reps">10–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Wadenheben stehend</div><div class="ex-note">Volle Amplitude – kein Hüpfen</div></div><div class="ex-sets" style="color:#22c55e">4</div><div class="ex-reps">15–20</div></div>
+      <div class="ex-row"><div><div class="ex-name">Hanging Leg Raises</div><div class="ex-note">Core – kein Schwingen</div></div><div class="ex-sets" style="color:#22c55e">3</div><div class="ex-reps">12–15</div></div>
+      <div class="card-footer">⚡ Pause: Kniebeuge / RDL 2–3 Min · Rest 60–90 Sek · Beine ernst nehmen!</div>
+    </div>
+  </div>
+
+  <!-- UPPER -->
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#a855f7" onclick="toggleCard('upper')">
+      <div>
+        <div class="card-type" style="color:#a855f7">Tag D · Samstag</div>
+        <div class="card-title">UPPER</div>
+        <div class="card-sub">Schultern · Rücken · Core — V-Taper Fokus</div>
+      </div>
+      <div class="card-right">
+        <div class="card-dur">~55 Min</div>
+        <span class="chevron" id="chev-upper">▼</span>
+      </div>
+    </button>
+    <div class="card-body" id="body-upper">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Schulterdrücken (SZ/KH)</div><div class="ex-note">V-Taper Haupthebel</div></div><div class="ex-sets" style="color:#a855f7">4</div><div class="ex-reps">8–10</div></div>
+      <div class="ex-row"><div><div class="ex-name">Seitheben Kabel</div><div class="ex-note">Schulterbreite formen</div></div><div class="ex-sets" style="color:#a855f7">4</div><div class="ex-reps">12–15</div></div>
+      <div class="ex-row"><div><div class="ex-name">Einarmiges KH-Rudern</div><div class="ex-note">Rückendicke & -breite</div></div><div class="ex-sets" style="color:#a855f7">3</div><div class="ex-reps">10–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Dips (Zusatzgewicht)</div><div class="ex-note">Trizeps & Brust – vorneigen für Brust-Fokus</div></div><div class="ex-sets" style="color:#a855f7">3</div><div class="ex-reps">8–10</div></div>
+      <div class="ex-row"><div><div class="ex-name">Ab Wheel Rollout</div><div class="ex-note">Langsam vor & zurück – Core total</div></div><div class="ex-sets" style="color:#a855f7">3</div><div class="ex-reps">8–12</div></div>
+      <div class="card-footer">⚡ Pause: 60–90 Sek · Volumenarbeit – Schultern & Breite maximieren</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ERNÄHRUNG -->
+<div id="tab-ernaehrung" class="page hidden">
+
+  <div class="section-label">Tagesziele</div>
+  <div class="stats">
+    <div class="stat" style="border-top-color:#f97316"><div class="stat-n" style="color:#f97316">~2020</div><div class="stat-l">kcal / Tag</div></div>
+    <div class="stat" style="border-top-color:#4ade80"><div class="stat-n" style="color:#4ade80">~172g</div><div class="stat-l">Protein</div></div>
+    <div class="stat" style="border-top-color:#d4a853"><div class="stat-n" style="color:#d4a853">75 kg</div><div class="stat-l">Ziel · 10% KF</div></div>
+  </div>
+
+  <div class="section-label">Tagesplan</div>
+
+  <div class="meal">
+    <div class="meal-top">
+      <div class="meal-l"><div class="meal-emoji">🍳</div><div><div class="meal-name">Frühstück</div><div class="meal-time">07:00 Uhr</div></div></div>
+      <div><div class="meal-p">35g Protein</div><div class="meal-k">480 kcal</div></div>
+    </div>
+    <div class="meal-item">5 Eier – Rührei oder Omelette</div>
+    <div class="meal-item">2 Scheiben Vollkornbrot</div>
+    <div class="meal-item">Kaffee schwarz / Wasser</div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-top">
+      <div class="meal-l"><div class="meal-emoji">🍗</div><div><div class="meal-name">Mittagessen</div><div class="meal-time">12:30 Uhr</div></div></div>
+      <div><div class="meal-p">45g Protein</div><div class="meal-k">620 kcal</div></div>
+    </div>
+    <div class="meal-item">200g Hähnchen / Rinderhack / Lachs</div>
+    <div class="meal-item">200g Reis oder Kartoffeln</div>
+    <div class="meal-item">Gemüse nach Wahl (TK okay)</div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-top">
+      <div class="meal-l"><div class="meal-emoji">🥛</div><div><div class="meal-name">Pre-Workout Snack</div><div class="meal-time">16:00 Uhr</div></div></div>
+      <div><div class="meal-p">28g Protein</div><div class="meal-k">260 kcal</div></div>
+    </div>
+    <div class="meal-item">250g Magerquark</div>
+    <div class="meal-item">Handvoll Beeren oder Apfel</div>
+    <div class="meal-item">Optional: 1 Reiswaffel</div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-top">
+      <div class="meal-l"><div class="meal-emoji">🥩</div><div><div class="meal-name">Post-Workout Abendessen</div><div class="meal-time">19:30 Uhr</div></div></div>
+      <div><div class="meal-p">42g Protein</div><div class="meal-k">480 kcal</div></div>
+    </div>
+    <div class="meal-item">200g Fleisch / Fisch / Hüttenkäse</div>
+    <div class="meal-item">Brokkoli, Zucchini oder Paprika</div>
+    <div class="meal-item">Kleiner Salat mit Olivenöl</div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-top">
+      <div class="meal-l"><div class="meal-emoji">🥄</div><div><div class="meal-name">Abend-Protein</div><div class="meal-time">21:30 Uhr</div></div></div>
+      <div><div class="meal-p">22g Protein</div><div class="meal-k">180 kcal</div></div>
+    </div>
+    <div class="meal-item">200g Magerquark oder griech. Joghurt</div>
+    <div class="meal-item">Optional: 1 EL Mandelmus</div>
+  </div>
+
+  <div class="section-label">Cheat Day</div>
+  <div class="cheat">
+    <div class="cheat-head">Sonntag — Cheat Day</div>
+    <div class="cheat-rule"><span>🔴</span>1× pro Woche — Sonntag empfohlen</div>
+    <div class="cheat-rule"><span>🔴</span>Protein trotzdem ~120g halten</div>
+    <div class="cheat-rule"><span>🔴</span>1 freie Mahlzeit, nicht der ganze Tag</div>
+    <div class="cheat-rule"><span>🔴</span>Trainingstage immer sauber ernähren</div>
+    <div class="cheat-rule"><span>🔴</span>Alkohol max. 1–2 Drinks — senkt Testosteron & Regeneration</div>
+  </div>
+
+  <div class="section-label">Must-Dos</div>
+  <div class="must"><span class="must-icon">💧</span><span>3 Liter Wasser täglich — nicht verhandelbar</span></div>
+  <div class="must"><span class="must-icon">😴</span><span>7–8h Schlaf — Muskelaufbau passiert nachts</span></div>
+  <div class="must"><span class="must-icon">📊</span><span>Protein täglich tracken — App: Cronometer</span></div>
+  <div class="must"><span class="must-icon">⚖️</span><span>Wöchentlich wiegen — morgens nüchtern</span></div>
+  <div class="must"><span class="must-icon">🔥</span><span>+200–300 kcal an Trainingstagen</span></div>
+
+  <div class="prep-box">
+    <strong>Zeiteffizienz-Tipp:</strong> Sonntags Meal Prep — Fleisch für 3 Tage vorkochen, Reis in großer Menge, Eier hartkochen. Spart täglich 30+ Minuten und verhindert schlechte Entscheidungen unter Zeitdruck.
+  </div>
+
+</div>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.remove('hidden');
+    btn.classList.add('active');
+  }
+
+  function toggleCard(id) {
+    const body = document.getElementById('body-' + id);
+    const chev = document.getElementById('chev-' + id);
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chev.classList.toggle('open', !isOpen);
+  }
+
+
+  function saveInput(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = localStorage.getItem(id) || '';
+    el.addEventListener('input', () => localStorage.setItem(id, el.value));
+  }
+
+  function initProgressStorage() {
+    saveInput('weightInput');
+    saveInput('bodyfatInput');
+    document.querySelectorAll('[data-check]').forEach(box => {
+      const key = box.dataset.check;
+      box.checked = localStorage.getItem(key) === 'true';
+      box.addEventListener('change', () => localStorage.setItem(key, box.checked));
+    });
+  }
+
+  function resetWeeklyChecks() {
+    document.querySelectorAll('[data-check]').forEach(box => {
+      box.checked = false;
+      localStorage.setItem(box.dataset.check, 'false');
+    });
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js'));
+  }
+
+  initProgressStorage();
+
+</script>
+
+</body>
+</html>
