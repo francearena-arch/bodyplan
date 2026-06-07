@@ -1,2 +1,3 @@
-BodyPlan PWA - updated with per-set weight tracking and alternative bodyweight workouts.
-Upload all files to the root of your GitHub Pages repository.
+# BodyPlan Pro v3
+
+Neue Version mit Dashboard, Trainingshistorie, Gewichts-/KFA-Verlauf, Trainingsmodus, Reptracking, Progressionsempfehlungen und Protein-Tracker.
