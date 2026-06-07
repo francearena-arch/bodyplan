@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bodyplan-v1';
+const CACHE_NAME = 'bodyplan-v3';
 const FILES_TO_CACHE = [
   './',
   './index.html',

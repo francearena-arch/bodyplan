@@ -335,6 +335,40 @@
     .check-row span { font-size:13px; color:#fff; }
     .check-row input { width:22px; height:22px; accent-color:#d4a853; }
     .reset-btn { margin-top:10px; width:100%; background:#d4a853; color:#080808; border:0; border-radius:7px; padding:12px; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-family:'DM Sans', sans-serif; }
+
+
+    /* Weight tracker per exercise */
+    .weight-grid {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 9px;
+    }
+    .weight-input {
+      width: 100%;
+      background: #111111;
+      border: 1px solid #242424;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 11px;
+      padding: 8px 6px;
+      text-align: center;
+      outline: none;
+    }
+    .weight-input:focus { border-color: #d4a853; }
+    .weight-input::placeholder { color: #666666; }
+    .alt-note {
+      background: #0c0a04;
+      border: 1px solid #d4a85322;
+      border-left: 3px solid #d4a853;
+      border-radius: 8px;
+      padding: 13px 15px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #ffffff;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -501,6 +535,72 @@
     </div>
   </div>
 
+
+  <div class="section-label">Alternative Trainingseinheiten — Urlaub & Zuhause</div>
+  <div class="alt-note">Ziel: Muskelreiz erhalten, nicht Gym-Training perfekt ersetzen. Arbeite langsam, kontrolliert und nahe ans Muskelversagen: letzter Satz pro Übung bei ca. 0–2 RIR.</div>
+
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#ef4444" onclick="toggleCard('altpush')">
+      <div><div class="card-type" style="color:#ef4444">Alternative · Push</div><div class="card-title">BODYWEIGHT PUSH</div><div class="card-sub">Brust · Schultern · Trizeps</div></div>
+      <div class="card-right"><div class="card-dur">~35–45 Min</div><span class="chevron" id="chev-altpush">▼</span></div>
+    </button>
+    <div class="card-body" id="body-altpush">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Deficit Push-ups</div><div class="ex-note">Hände erhöht auf Büchern/Stühlen, tiefe Dehnung</div></div><div class="ex-sets" style="color:#ef4444">4</div><div class="ex-reps">8–15</div></div>
+      <div class="ex-row"><div><div class="ex-name">Pike Push-ups</div><div class="ex-note">Schulterdrücken-Ersatz</div></div><div class="ex-sets" style="color:#ef4444">4</div><div class="ex-reps">6–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Diamond Push-ups</div><div class="ex-note">Trizeps-Fokus</div></div><div class="ex-sets" style="color:#ef4444">3</div><div class="ex-reps">8–15</div></div>
+      <div class="ex-row"><div><div class="ex-name">Push-up Hold unten</div><div class="ex-note">20–30 Sekunden Spannung halten</div></div><div class="ex-sets" style="color:#ef4444">2</div><div class="ex-reps">20–30s</div></div>
+      <div class="card-footer">Progression: Füße erhöhen, langsamer ablassen, unten 1–2 Sek halten.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#3b82f6" onclick="toggleCard('altpull')">
+      <div><div class="card-type" style="color:#3b82f6">Alternative · Pull</div><div class="card-title">BODYWEIGHT PULL</div><div class="card-sub">Rücken · Bizeps · hintere Schulter</div></div>
+      <div class="card-right"><div class="card-dur">~35–45 Min</div><span class="chevron" id="chev-altpull">▼</span></div>
+    </button>
+    <div class="card-body" id="body-altpull">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Klimmzüge</div><div class="ex-note">Volle Amplitude, sauberer Stretch</div></div><div class="ex-sets" style="color:#3b82f6">5</div><div class="ex-reps">Max -1</div></div>
+      <div class="ex-row"><div><div class="ex-name">Negative Klimmzüge</div><div class="ex-note">3–5 Sekunden ablassen</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">3–6</div></div>
+      <div class="ex-row"><div><div class="ex-name">Scapular Pull-ups</div><div class="ex-note">Schulterblätter aktivieren</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">8–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Towel Curls isometrisch</div><div class="ex-note">Handtuch gegen Fuß ziehen</div></div><div class="ex-sets" style="color:#3b82f6">3</div><div class="ex-reps">20–30s</div></div>
+      <div class="card-footer">Ohne Klimmzugstange ist Pull der limitierende Tag. Mit Stange ist der Reiz solide.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#22c55e" onclick="toggleCard('altlegs')">
+      <div><div class="card-type" style="color:#22c55e">Alternative · Legs</div><div class="card-title">BODYWEIGHT LEGS</div><div class="card-sub">Beine · Gesäß · Core</div></div>
+      <div class="card-right"><div class="card-dur">~40–50 Min</div><span class="chevron" id="chev-altlegs">▼</span></div>
+    </button>
+    <div class="card-body" id="body-altlegs">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Bulgarian Split Squats</div><div class="ex-note">Langsam, tief, pro Bein</div></div><div class="ex-sets" style="color:#22c55e">4</div><div class="ex-reps">10–15</div></div>
+      <div class="ex-row"><div><div class="ex-name">Single-leg RDL</div><div class="ex-note">Hamstrings + Balance</div></div><div class="ex-sets" style="color:#22c55e">4</div><div class="ex-reps">10–15</div></div>
+      <div class="ex-row"><div><div class="ex-name">Wall Sit</div><div class="ex-note">Quadrizeps brutal ausbelasten</div></div><div class="ex-sets" style="color:#22c55e">3</div><div class="ex-reps">45–90s</div></div>
+      <div class="ex-row"><div><div class="ex-name">Einbeinige Wadenheben</div><div class="ex-note">Pause unten und oben</div></div><div class="ex-sets" style="color:#22c55e">4</div><div class="ex-reps">15–25</div></div>
+      <div class="ex-row"><div><div class="ex-name">Hanging / Lying Leg Raises</div><div class="ex-note">Core, kein Schwung</div></div><div class="ex-sets" style="color:#22c55e">3</div><div class="ex-reps">12–20</div></div>
+      <div class="card-footer">Progression: Tempo 4 Sekunden abwärts, unten halten, mehr Range of Motion.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="card-btn" style="border-left-color:#a855f7" onclick="toggleCard('altupper')">
+      <div><div class="card-type" style="color:#a855f7">Alternative · Upper</div><div class="card-title">BODYWEIGHT UPPER</div><div class="card-sub">V-Taper · Schulter · Core</div></div>
+      <div class="card-right"><div class="card-dur">~35–45 Min</div><span class="chevron" id="chev-altupper">▼</span></div>
+    </button>
+    <div class="card-body" id="body-altupper">
+      <div class="ex-header"><span class="ex-col">Übung</span><span class="ex-col c">Sätze</span><span class="ex-col r">Wdh</span></div>
+      <div class="ex-row"><div><div class="ex-name">Pull-ups</div><div class="ex-note">Breite, sauber bis knapp vor Failure</div></div><div class="ex-sets" style="color:#a855f7">4</div><div class="ex-reps">Max -1</div></div>
+      <div class="ex-row"><div><div class="ex-name">Pike Push-ups</div><div class="ex-note">Schulter-Fokus</div></div><div class="ex-sets" style="color:#a855f7">4</div><div class="ex-reps">6–12</div></div>
+      <div class="ex-row"><div><div class="ex-name">Wide Push-ups</div><div class="ex-note">Brust + Schulter</div></div><div class="ex-sets" style="color:#a855f7">3</div><div class="ex-reps">10–20</div></div>
+      <div class="ex-row"><div><div class="ex-name">Reverse Snow Angels</div><div class="ex-note">Hintere Schulter / oberer Rücken</div></div><div class="ex-sets" style="color:#a855f7">3</div><div class="ex-reps">12–20</div></div>
+      <div class="ex-row"><div><div class="ex-name">Plank to Push-up</div><div class="ex-note">Core + Schulterstabilität</div></div><div class="ex-sets" style="color:#a855f7">3</div><div class="ex-reps">8–12</div></div>
+      <div class="card-footer">Gleicher Effekt wie Gym? Nicht vollständig. Aber als Urlaubs-/Zuhause-Ersatz stark genug, um Muskulatur zu halten und Reize zu setzen.</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ERNÄHRUNG -->
@@ -604,6 +704,34 @@
   }
 
 
+
+  function initWeightInputs() {
+    document.querySelectorAll('.ex-row').forEach((row, rowIndex) => {
+      if (row.querySelector('.weight-grid')) return;
+      const nameEl = row.querySelector('.ex-name');
+      const setsEl = row.querySelector('.ex-sets');
+      if (!nameEl || !setsEl) return;
+      const cardBody = row.closest('.card-body');
+      const bodyId = cardBody ? cardBody.id.replace('body-', '') : 'training';
+      const exercise = nameEl.textContent.trim().toLowerCase().replace(/[^a-z0-9äöüß]+/gi, '-');
+      const sets = parseInt(setsEl.textContent.trim(), 10) || 3;
+      const grid = document.createElement('div');
+      grid.className = 'weight-grid';
+      for (let i = 1; i <= sets; i++) {
+        const input = document.createElement('input');
+        input.className = 'weight-input';
+        input.type = 'number';
+        input.inputMode = 'decimal';
+        input.placeholder = `S${i} kg`;
+        const key = `weight_${bodyId}_${exercise}_set${i}`;
+        input.value = localStorage.getItem(key) || '';
+        input.addEventListener('input', () => localStorage.setItem(key, input.value));
+        grid.appendChild(input);
+      }
+      row.appendChild(grid);
+    });
+  }
+
   function saveInput(id) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -633,6 +761,7 @@
   }
 
   initProgressStorage();
+  initWeightInputs();
 
 </script>
 
