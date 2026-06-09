@@ -37,7 +37,7 @@
 @media(max-width:420px){.metric-actions{grid-template-columns:1fr}.metric-row{grid-template-columns:1fr auto}.metric-row .delta{grid-column:1/-1}.dashboard{grid-template-columns:1fr}}
 
 
-/* BodyPlan v8 refinements */
+/* BodyPlan v7 refinements */
 .date-input{width:100%;display:block;box-sizing:border-box;margin-top:8px}
 .session-sticky{position:sticky;top:0;z-index:8;background:#0b0b0bf2;backdrop-filter:blur(12px);padding:4px 0 12px;margin-bottom:8px}
 .workout-duration-box{display:flex;align-items:center;justify-content:space-between;background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:12px 14px;margin:8px 0 10px}
@@ -45,8 +45,27 @@
 .timer-box{position:relative}.session-summary{display:none;background:#0f0d07;border:1px solid #d4a85344;border-left:3px solid #d4a853;border-radius:12px;padding:14px 16px;margin:12px 0;line-height:1.6}.session-summary.open{display:block}
 .summary-num{font-family:'Bebas Neue';font-size:34px;color:#d4a853;letter-spacing:1px}.volume-chart-wrap{display:grid;gap:10px;margin-bottom:12px}.volume-card{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:14px}.volume-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.volume-title strong{font-size:14px}.volume-delta{font-size:12px;color:#d4a853}.volume-chart{height:92px;background:#0a0a0a;border:1px solid #181818;border-radius:10px;padding:8px;overflow:hidden}.volume-chart svg{width:100%;height:100%;display:block}.volume-chart .line{fill:none;stroke:#d4a853;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.volume-chart .point{fill:#d4a853;stroke:#080808;stroke-width:2}.volume-chart .grid{stroke:#222;stroke-width:1}.volume-chart text{font-family:'DM Sans';font-size:9px;fill:#888}
 
-/* BodyPlan v8 layout fixes */
-.dash-card{min-width:0}.dash-card .set-input,.dash-card .date-input{width:100%;max-width:100%;box-sizing:border-box}.session-detail,.exercise-analytics{margin-top:12px}.session-detail summary,.exercise-analytics summary{cursor:pointer;color:#d4a853;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}.exercise-chart{background:#0a0a0a;border:1px solid #181818;border-radius:10px;padding:10px;margin-top:10px}.exercise-chart-head{display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:6px}.exercise-chart-head span{color:#d4a853}.exercise-chart svg{width:100%;height:72px;display:block}.exercise-chart .grid,.volume-chart .grid{stroke:#222;stroke-width:1}.exercise-chart .line,.volume-chart .line{fill:none;stroke:#d4a853;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.exercise-chart .point,.volume-chart .point{fill:#d4a853;stroke:#080808;stroke-width:2}.active-session-hint{background:#0f0d07;border:1px solid #d4a85344;border-radius:10px;padding:11px 12px;margin:8px 0;color:#d4a853;font-weight:700}
+
+/* ===== BodyPlan v8: persistent active sessions + exercise-level analytics ===== */
+.dash-card .date-input{width:100%;max-width:100%;min-width:0;display:block;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+.active-session-banner{background:#0f0d07;border:1px solid #d4a85344;border-left:3px solid #d4a853;border-radius:12px;padding:13px 15px;margin:12px 0;display:none}.active-session-banner.open{display:block}.active-session-banner .row{display:flex;align-items:center;justify-content:space-between;gap:12px}.active-session-banner strong{font-family:'Bebas Neue';font-size:24px;letter-spacing:1px;color:#d4a853}.active-session-banner span{font-size:12px;color:#ddd}.exercise-chart-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.exercise-chart-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:10px}.exercise-chart-title{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px}.exercise-chart-title strong{font-size:13px;color:#fff}.exercise-chart-title span{font-size:11px;color:#d4a853}.session-history-card details{margin-top:10px}.session-history-card summary{cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;padding:10px 0}.session-sticky{top:0}.modal-sheet{scroll-padding-top:230px}
+
+
+/* BodyPlan v9 refinements */
+.danger-outline{border-color:#f4433655!important;color:#ff6b63!important;background:#0b0b0b!important;margin-top:8px!important;}
+.dash-card{min-width:0;overflow:hidden;}
+.dash-card input.set-input,.dash-card input.date-input{width:100%!important;max-width:100%!important;min-width:0!important;display:block!important;box-sizing:border-box!important;}
+input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-height:1.2;}
+.history-collapsible{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:0;margin-top:0;}
+.history-collapsible>summary{cursor:pointer;list-style:none;padding:16px 18px;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:12px;}
+.history-collapsible>summary::-webkit-details-marker{display:none;}
+.history-collapsible>summary::after{content:'▼';float:right;color:#fff;letter-spacing:0;}
+.history-collapsible[open]>summary::after{content:'▲';}
+.history-collapsible-inner{padding:0 18px 18px;}
+.exercise-chart-card .dash-sub{font-size:11px;color:#ddd;}
+.session-history-card.compact-session{margin-top:12px;}
+@media(max-width:420px){.metric-actions{grid-template-columns:1fr;}.dash-card input.set-input,.dash-card input.date-input{font-size:15px;padding-left:8px;padding-right:8px;}}
+
 </style>
 </head>
 <body>
@@ -69,7 +88,7 @@
   <div class="section-label">Cheat Day</div><div class="cheat"><div class="cheat-head">Sonntag — Cheat Day</div><div class="cheat-rule"><span>🔴</span>1× pro Woche — Sonntag empfohlen</div><div class="cheat-rule"><span>🔴</span>Protein trotzdem ~120g halten</div><div class="cheat-rule"><span>🔴</span>1 freie Mahlzeit, nicht der ganze Tag</div><div class="cheat-rule"><span>🔴</span>Trainingstage immer sauber ernähren</div><div class="cheat-rule"><span>🔴</span>Alkohol max. 1–2 Drinks — senkt Regeneration</div></div>
   <div class="section-label">Must-Dos</div><div class="must"><span class="must-icon">💧</span><span>3 Liter Wasser täglich — nicht verhandelbar</span></div><div class="must"><span class="must-icon">😴</span><span>7–8h Schlaf — Muskelaufbau passiert nachts</span></div><div class="must"><span class="must-icon">📊</span><span>Protein täglich tracken — App: Cronometer</span></div><div class="must"><span class="must-icon">⚖️</span><span>Wöchentlich wiegen — morgens nüchtern</span></div><div class="must"><span class="must-icon">🔥</span><span>+200–300 kcal an Trainingstagen</span></div><div class="prep-box"><strong>Zeiteffizienz-Tipp:</strong> Sonntags Meal Prep — Fleisch für 3 Tage vorkochen, Reis in großer Menge, Eier hartkochen. Spart täglich 30+ Minuten und verhindert schlechte Entscheidungen unter Zeitdruck.</div>
 </div>
-<div class="modal" id="sessionModal"><div class="modal-sheet"><button class="close-btn" onclick="closeSession()">×</button><div class="modal-title" id="sessionTitle">Training</div><div class="modal-sub" id="sessionSub"></div><div class="session-sticky"><div class="workout-duration-box"><div><div class="timer-label">Trainingsdauer</div><div class="dash-sub">Orientiere dich an der geplanten Gesamtdauer.</div></div><div class="workout-duration-value" id="sessionElapsed">00:00</div></div><div class="timer-box"><div class="timer-label" id="timerLabel">Pausen-Timer</div><div class="timer-display" id="timerDisplay">00:00</div><div class="timer-controls"><button class="small-btn" onclick="startRest(60)">60s</button><button class="small-btn" onclick="startRest(90)">90s</button><button class="small-btn" onclick="startRest(120)">120s</button><button class="small-btn" onclick="startRest(180)">180s</button></div><button class="small-btn danger timer-stop-full" onclick="stopRest()">Timer stoppen</button></div></div><div id="sessionContent"></div><div id="sessionSummary" class="session-summary"></div><button id="finishSessionBtn" class="primary-btn" onclick="finishSession()">Training speichern</button></div></div>
+<div class="modal" id="sessionModal"><div class="modal-sheet"><button class="close-btn" onclick="closeSession()">×</button><div class="modal-title" id="sessionTitle">Training</div><div class="modal-sub" id="sessionSub"></div><div class="session-sticky"><div class="workout-duration-box"><div><div class="timer-label">Trainingsdauer</div><div class="dash-sub">Orientiere dich an der geplanten Gesamtdauer.</div></div><div class="workout-duration-value" id="sessionElapsed">00:00</div></div><div class="timer-box"><div class="timer-label" id="timerLabel">Pausen-Timer</div><div class="timer-display" id="timerDisplay">00:00</div><div class="timer-controls"><button class="small-btn" onclick="startRest(60)">60s</button><button class="small-btn" onclick="startRest(90)">90s</button><button class="small-btn" onclick="startRest(120)">120s</button><button class="small-btn" onclick="startRest(180)">180s</button></div><button class="small-btn danger timer-stop-full" onclick="stopRest()">Timer stoppen</button></div></div><div id="sessionContent"></div><div id="sessionSummary" class="session-summary"></div><button id="finishSessionBtn" class="primary-btn" onclick="finishSession()">Training speichern</button><button id="abortSessionBtn" class="secondary-btn danger-outline" onclick="abortSession()">Training abbrechen</button></div></div>
 <script>
 const colors={push:'#ef4444',pull:'#3b82f6',legs:'#22c55e',upper:'#a855f7'};
 const workouts=[{id:'push',day:'Tag A · Montag',title:'Push',sub:'Brust · Schultern · Trizeps',dur:'~65 Min',color:colors.push,footer:'⚡ Pause: Grundübungen 2–3 Min · Isolation 60 Sek · Letzter Satz: 1–2 RIR',ex:[['Bankdrücken','Hauptbewegung – schwer',4,'6–8'],['Schulterdrücken (KH)','Stehend oder sitzend',3,'8–10'],['Schrägbank KH (oben)','Obere Brust + Schulter',3,'10–12'],['Schulter Standing Multi Flight','Schultern formen – kontrollierte Führung',3,'12–15'],['Dips','Trizeps + untere Brust – vor Pushdown',2,'8–12'],['Trizeps Pushdown','Lieblingsübung – Ellenbogen fixiert, ausbelastern',3,'12–15']]},{id:'pull',day:'Tag B · Mittwoch',title:'Pull',sub:'Rücken · Bizeps · hintere Schulter',dur:'~55 Min',color:colors.pull,footer:'⚡ Pause: Grundübungen 2–3 Min · Isolation 60 Sek · Fokus auf Latzug & Breite',ex:[['Klimmzüge (Zusatzgewicht)','Volle Amplitude, Lats aktiv',4,'5–7'],['Trap Bar Kreuzheben','Rücken + hintere Kette',3,'5–7'],['Latzug weit','V-Taper Fokus',3,'10–12'],['Face Pulls','Hintere Schulter & Gesundheit',3,'15–20'],['Bizeps Curls (KH)','Supination am Ende',3,'12–15']]},{id:'legs',day:'Tag C · Freitag',title:'Legs',sub:'Quadrizeps · Hamstrings · Waden · Core',dur:'~55 Min',color:colors.legs,footer:'⚡ Pause: Kniebeuge / RDL 2–3 Min · Rest 60–90 Sek · Beine ernst nehmen.',ex:[['Kniebeuge','Tief – aufrechter Oberkörper',4,'6–8'],['Romanian Deadlift','Dehnung im Hamstring spüren',4,'8–10'],['Beinbeuger liegend','Langsam exzentrisch',3,'10–12'],['Wadenheben stehend','Volle Amplitude – kein Hüpfen',4,'15–20'],['Hanging Leg Raises','Core – kein Schwingen',3,'12–15']]},{id:'upper',day:'Tag D · Samstag',title:'Upper',sub:'Schultern · Rücken · Core — V-Taper Fokus',dur:'~55 Min',color:colors.upper,footer:'⚡ Pause: 60–90 Sek · Volumenarbeit – Schultern & Breite maximieren',ex:[['Schulterdrücken (SZ/KH)','V-Taper Haupthebel',4,'8–10'],['Seitheben Kabel','Schulterbreite formen',4,'12–15'],['Einarmiges KH-Rudern','Rückendicke & -breite',3,'10–12'],['Dips (Zusatzgewicht)','Trizeps & Brust – vorneigen für Brust-Fokus',3,'8–10'],['Ab Wheel Rollout','Langsam vor & zurück – Core total',3,'8–12']]}];
@@ -133,7 +152,7 @@ function finishSession(){if(!activeSession)return;const iso=todayISO();const dat
 function renderSessionHistory(){const el=document.getElementById('sessionHistory');if(!el)return;const hist=get('history',[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10);if(!hist.length){el.innerHTML='<div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div>';return}el.innerHTML=hist.map((sess,idx)=>{const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,6).map(e=>`<div class="session-ex"><b>${e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}<div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`}).join('')}
 function deleteSession(renderedIndex){let hist=get('history',[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));const target=hist[renderedIndex];if(!target)return;if(!confirm('Diese Trainingseinheit löschen?'))return;let original=get('history',[]);original=original.filter(x=>x.ts!==target.ts);set('history',original);render()}
 
-// ===== BodyPlan v8 upgrades =====
+// ===== BodyPlan v7 upgrades =====
 function startSessionElapsed(){stopSessionElapsed(false);sessionStartTs=Date.now();tickSessionElapsed();sessionInterval=setInterval(tickSessionElapsed,1000)}
 function tickSessionElapsed(){const el=document.getElementById('sessionElapsed');if(!el||!sessionStartTs)return;el.textContent=formatTime(Math.floor((Date.now()-sessionStartTs)/1000))}
 function stopSessionElapsed(reset=true){if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}if(reset){const el=document.getElementById('sessionElapsed');if(el)el.textContent='00:00'}sessionStartTs=0}
@@ -144,43 +163,46 @@ function renderVolumeMiniChart(arr){arr=arr.slice(-8);if(!arr.length)return'';co
 function renderSessionHistory(){const el=document.getElementById('sessionHistory');if(!el)return;const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));if(!all.length){el.innerHTML='<div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div>';return}const ids=[...new Set(all.map(x=>x.wid))];const charts=ids.map(id=>{const items=all.filter(x=>x.wid===id).map(x=>({...x,totalVolume:Number(x.totalVolume||calcSessionVolume(x.exercises)||0)}));const last=items[items.length-1];const prev=items[items.length-2];const d=prev?last.totalVolume-prev.totalVolume:null;const delta=d==null?'Erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${delta}</span></div>${renderVolumeMiniChart(items)}<div class="dash-sub">Letzte Einheit: ${Math.round(last.totalVolume).toLocaleString('de-CH')} kg · ${last.date||''}</div></div>`}).join('');const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,6).map(e=>`<div class="session-ex"><b>${e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');const vol=Number(sess.totalVolume||calcSessionVolume(sess.exercises)||0);return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-num" style="font-size:26px">${Math.round(vol).toLocaleString('de-CH')} kg</div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}<div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`}).join('');el.innerHTML=`<div class="volume-chart-wrap">${charts}</div>${latest}`}
 function restoreCollapsibleSections(){[{id:'vacationSection',chev:'vacationChevron',def:'collapsed'},{id:'weekSection',chev:'weekChevron',def:'collapsed'}].forEach(x=>{const state=get('section_'+x.id,x.def);const el=document.getElementById(x.id);const c=document.getElementById(x.chev);if(!el)return;const collapsed=state!=='open';el.classList.toggle('collapsed',collapsed);if(c)c.textContent=collapsed?'▶':'▼';});}
 
-const oldRender=render;render=function(){oldRender();restoreCollapsibleSections();renderSessionHistory();};
 
 
-// ===== BodyPlan v8 fixes: persistent active session + exercise analytics =====
-function normalizeExerciseName(name){return name==='Seitheben'?'Schulter Standing Multi Flight':name}
-function findWorkoutById(id){return [...workouts,...altWorkouts].find(x=>x.id===id)}
-function collectCurrentSessionData(){
-  if(!activeSession)return null;
-  const exercises=activeSession.ex.map((ex,ei)=>({
-    name:normalizeExerciseName(ex[0]),
-    sets:Array.from({length:ex[2]},(_,s)=>({
-      kg:(document.getElementById(`sess_${ei}_${s}_kg`)||{}).value||'',
-      reps:(document.getElementById(`sess_${ei}_${s}_reps`)||{}).value||'',
-      done:(document.getElementById(`sess_${ei}_${s}_done`)||{}).checked||false
-    }))
-  }));
-  return {wid:activeSession.id,startTs:sessionStartTs||Date.now(),startedAt:Date.now(),exercises};
+// ===== BodyPlan v8 runtime overrides =====
+const ACTIVE_SESSION_KEY='activeSessionV8';
+const REST_KEY='activeRestV8';
+function getWorkoutByIdV8(id){return [...workouts,...altWorkouts].find(x=>x.id===id)}
+function getActiveDraft(){return get(ACTIVE_SESSION_KEY,null)}
+function setActiveDraft(d){set(ACTIVE_SESSION_KEY,d)}
+function clearActiveDraft(){localStorage.removeItem(ACTIVE_SESSION_KEY);localStorage.removeItem(REST_KEY)}
+function collectSessionDraftFromDOM(){
+  if(!activeSession)return getActiveDraft();
+  const d=getActiveDraft()||{wid:activeSession.id,startedAt:sessionStartTs||Date.now(),checks:{},values:{}};
+  d.wid=activeSession.id; d.startedAt=sessionStartTs||d.startedAt||Date.now(); d.updatedAt=Date.now(); d.values=d.values||{}; d.checks=d.checks||{};
+  activeSession.ex.forEach((ex,ei)=>{for(let s=0;s<ex[2];s++){
+    const kgEl=document.getElementById(`sess_${ei}_${s}_kg`), repEl=document.getElementById(`sess_${ei}_${s}_reps`), chk=document.getElementById(`sess_${ei}_${s}_done`);
+    if(kgEl)d.values[`${ei}_${s}_kg`]=kgEl.value;
+    if(repEl)d.values[`${ei}_${s}_reps`]=repEl.value;
+    if(chk)d.checks[`${ei}_${s}`]=chk.checked;
+  }});
+  setActiveDraft(d);return d;
 }
-function persistActiveSession(){const data=collectCurrentSessionData();if(data)set('activeSessionState',data)}
-function clearActiveSessionState(){localStorage.removeItem('activeSessionState')}
-function applySessionState(state){
-  if(!state||!state.exercises)return;
-  state.exercises.forEach((ex,ei)=>{(ex.sets||[]).forEach((setObj,s)=>{
-    const kg=document.getElementById(`sess_${ei}_${s}_kg`), reps=document.getElementById(`sess_${ei}_${s}_reps`), done=document.getElementById(`sess_${ei}_${s}_done`);
-    if(kg)kg.value=setObj.kg||''; if(reps)reps.value=setObj.reps||''; if(done)done.checked=!!setObj.done;
-  })})
+function hydrateSessionDraftToDOM(d){
+  if(!activeSession||!d)return;
+  activeSession.ex.forEach((ex,ei)=>{for(let s=0;s<ex[2];s++){
+    const kgEl=document.getElementById(`sess_${ei}_${s}_kg`), repEl=document.getElementById(`sess_${ei}_${s}_reps`), chk=document.getElementById(`sess_${ei}_${s}_done`);
+    const k=`${ei}_${s}_kg`, r=`${ei}_${s}_reps`, c=`${ei}_${s}`;
+    if(kgEl && d.values && d.values[k]!=null)kgEl.value=d.values[k];
+    if(repEl && d.values && d.values[r]!=null)repEl.value=d.values[r];
+    if(chk && d.checks && d.checks[c]!=null)chk.checked=!!d.checks[c];
+  }});
 }
-function startSessionElapsedFrom(ts){
-  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
-  sessionStartTs=ts||Date.now();
-  tickSessionElapsed();
-  sessionInterval=setInterval(()=>{tickSessionElapsed();persistActiveSession()},1000)
+function buildSessionContent(w){
+  document.getElementById('sessionContent').innerHTML=w.ex.map((ex,ei)=>`<div class="session-card"><div class="session-head">${ei+1}. ${ex[0]}</div>${Array.from({length:ex[2]},(_,s)=>`<div class="session-set"><label>Satz ${s+1}</label><input inputmode="decimal" class="set-input" placeholder="kg" id="sess_${ei}_${s}_kg"><input inputmode="numeric" class="set-input" placeholder="Wdh" id="sess_${ei}_${s}_reps"><input class="done" id="sess_${ei}_${s}_done" type="checkbox" onchange="completeSet(${ei},${s},this.checked);collectSessionDraftFromDOM()"></div>`).join('')}</div>`).join('');
+  document.querySelectorAll('#sessionContent input').forEach(el=>el.addEventListener('input',collectSessionDraftFromDOM));
 }
 function openSession(id){
-  const saved=get('activeSessionState',null);
-  const chosenId=saved&&saved.wid?saved.wid:id;
-  const w=findWorkoutById(chosenId); if(!w)return;
+  const existing=getActiveDraft();
+  let resume=false;
+  if(existing&&existing.wid){id=existing.wid;resume=true}
+  const w=getWorkoutByIdV8(id);if(!w)return;
   activeSession=w;
   document.getElementById('sessionTitle').textContent=w.title;
   document.getElementById('sessionSub').textContent=w.sub+' · '+w.dur;
@@ -188,80 +210,143 @@ function openSession(id){
   document.getElementById('sessionSummary').innerHTML='';
   document.getElementById('finishSessionBtn').disabled=false;
   document.getElementById('finishSessionBtn').textContent='Training speichern';
-  document.getElementById('sessionContent').innerHTML=w.ex.map((ex,ei)=>`<div class="session-card"><div class="session-head">${ei+1}. ${normalizeExerciseName(ex[0])}</div>${Array.from({length:ex[2]},(_,s)=>`<div class="session-set"><label>Satz ${s+1}</label><input inputmode="decimal" class="set-input" placeholder="kg" id="sess_${ei}_${s}_kg"><input inputmode="numeric" class="set-input" placeholder="Wdh" id="sess_${ei}_${s}_reps"><input class="done" id="sess_${ei}_${s}_done" type="checkbox" onchange="completeSet(${ei},${s},this.checked);persistActiveSession()"></div>`).join('')}</div>`).join('');
-  const stateToApply=saved&&saved.wid===w.id?saved:null;
-  if(stateToApply){applySessionState(stateToApply)}else{
-    w.ex.forEach((ex,ei)=>{for(let s=0;s<ex[2];s++){const kg=get('field_'+fieldId(w.id,ei,s,'kg'),'');const reps=get('field_'+fieldId(w.id,ei,s,'reps'),'');const kgEl=document.getElementById(`sess_${ei}_${s}_kg`), repsEl=document.getElementById(`sess_${ei}_${s}_reps`); if(kgEl)kgEl.value=kg; if(repsEl)repsEl.value=reps;}});
-  }
-  document.querySelectorAll('#sessionContent input').forEach(el=>el.addEventListener('input',persistActiveSession));
+  buildSessionContent(w);
+  const draft=existing&&existing.wid===w.id?existing:{wid:w.id,startedAt:Date.now(),values:{},checks:{},updatedAt:Date.now()};
+  // If this is a fresh session, preload last entered values from the normal exercise fields.
+  if(!resume){w.ex.forEach((ex,ei)=>{for(let s=0;s<ex[2];s++){
+    draft.values[`${ei}_${s}_kg`]=get('field_'+fieldId(w.id,ei,s,'kg'),'');
+    draft.values[`${ei}_${s}_reps`]=get('field_'+fieldId(w.id,ei,s,'reps'),'');
+  }});}
+  sessionStartTs=draft.startedAt||Date.now();
+  setActiveDraft(draft);
+  hydrateSessionDraftToDOM(draft);
   document.getElementById('sessionModal').classList.add('open');
-  startSessionElapsedFrom(stateToApply&&stateToApply.startTs?stateToApply.startTs:Date.now());
-  persistActiveSession();
+  startSessionElapsedV8();
+  resumeRestIfAny();
+  updateActiveSessionBanner();
 }
 function closeSession(){
-  persistActiveSession();
+  collectSessionDraftFromDOM();
   document.getElementById('sessionModal').classList.remove('open');
-  // Training läuft bewusst weiter, bis es gespeichert oder manuell beendet wird.
+  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
+  // Training bleibt aktiv: keine Daten, keine Trainingsdauer und kein Pausentimer werden gelöscht.
+  updateActiveSessionBanner();
 }
+function startSessionElapsedV8(){
+  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
+  tickSessionElapsed();
+  sessionInterval=setInterval(tickSessionElapsed,1000);
+}
+function startRest(sec,label='Pausen-Timer'){
+  restEnd=Date.now()+sec*1000;set(REST_KEY,{end:restEnd,label});
+  document.getElementById('timerLabel').textContent=label;
+  tickRest();
+  if(restInterval)clearInterval(restInterval);
+  restInterval=setInterval(tickRest,250);
+}
+function tickRest(){
+  const el=document.getElementById('timerDisplay');if(!el)return;
+  const rest=get(REST_KEY,null);if(rest&&rest.end)restEnd=rest.end;
+  const left=Math.max(0,Math.ceil((restEnd-Date.now())/1000));
+  el.textContent=formatTime(left);
+  if(left<=0&&restInterval){clearInterval(restInterval);restInterval=null;localStorage.removeItem(REST_KEY)}
+}
+function stopRest(){if(restInterval){clearInterval(restInterval);restInterval=null}restEnd=0;localStorage.removeItem(REST_KEY);const el=document.getElementById('timerDisplay');if(el)el.textContent='00:00'}
+function resumeRestIfAny(){const rest=get(REST_KEY,null);if(rest&&rest.end&&rest.end>Date.now()){restEnd=rest.end;const label=document.getElementById('timerLabel');if(label)label.textContent=rest.label||'Pausen-Timer';tickRest();if(restInterval)clearInterval(restInterval);restInterval=setInterval(tickRest,250)}else{localStorage.removeItem(REST_KEY)}}
+function completeSet(ei,s,checked){collectSessionDraftFromDOM(); /* Haken startet bewusst keinen Timer. */}
 function finishSession(){
   if(!activeSession)return;
-  persistActiveSession();
-  const state=get('activeSessionState',null);
-  const iso=todayISO();
-  const date=new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const durationSec=sessionStartTs?Math.floor((Date.now()-sessionStartTs)/1000):(state&&state.startTs?Math.floor((Date.now()-state.startTs)/1000):0);
-  const exercises=activeSession.ex.map((ex,ei)=>({name:normalizeExerciseName(ex[0]),sets:Array.from({length:ex[2]},(_,s)=>{
-    const kg=document.getElementById(`sess_${ei}_${s}_kg`).value; const reps=document.getElementById(`sess_${ei}_${s}_reps`).value;
-    set('field_'+fieldId(activeSession.id,ei,s,'kg'),kg); set('field_'+fieldId(activeSession.id,ei,s,'reps'),reps);
-    return {kg,reps}
+  const draft=collectSessionDraftFromDOM();
+  const iso=todayISO();const date=new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const durationSec=draft&&draft.startedAt?Math.floor((Date.now()-draft.startedAt)/1000):(sessionStartTs?Math.floor((Date.now()-sessionStartTs)/1000):0);
+  const exercises=activeSession.ex.map((ex,ei)=>({name:ex[0],sets:Array.from({length:ex[2]},(_,s)=>{
+    const kg=(draft.values||{})[`${ei}_${s}_kg`]||'';const reps=(draft.values||{})[`${ei}_${s}_reps`]||'';
+    set('field_'+fieldId(activeSession.id,ei,s,'kg'),kg);set('field_'+fieldId(activeSession.id,ei,s,'reps'),reps);return{kg,reps}
   })}));
   const totalVolume=calcSessionVolume(exercises);
   const previousSame=get('history',[]).filter(x=>x.wid===activeSession.id).slice(-1)[0];
   const prevVol=previousSame?Number(previousSame.totalVolume||calcSessionVolume(previousSame.exercises)):null;
   const delta=prevVol==null?null:totalVolume-prevVol;
-  const hist=get('history',[]);
-  hist.push({wid:activeSession.id,title:activeSession.title,date,iso,ts:Date.now(),durationSec,totalVolume,exercises});
-  set('history',hist.slice(-160));
+  const hist=get('history',[]);hist.push({wid:activeSession.id,title:activeSession.title,date,iso,ts:Date.now(),durationSec,totalVolume,exercises});set('history',hist.slice(-120));
   if(workouts.some(w=>w.id===activeSession.id)){const done=get('done',{});done[activeSession.id]=true;set('done',done);set('sessionStreak',(get('sessionStreak',0)||0)+1)}
-  stopRest(); stopSessionElapsed(false); clearActiveSessionState();
-  document.getElementById('finishSessionBtn').disabled=true; document.getElementById('finishSessionBtn').textContent='Training gespeichert';
-  const deltaTxt=delta==null?'Erste gespeicherte Einheit dieser Art.':`${delta>0?'+':''}${Math.round(delta).toLocaleString('de-CH')} kg vs. letzte ${activeSession.title}-Einheit`;
+  stopRest();if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}clearActiveDraft();
+  const deltaTxt=delta==null?'Erste gespeicherte Einheit dieser Art.':`${delta>0?'+':''}${Math.round(delta)} kg vs. letzte ${activeSession.title}-Einheit`;
   document.getElementById('sessionSummary').innerHTML=`<div class="dash-label">Zusammenfassung</div><div class="summary-num">${totalVolume.toLocaleString('de-CH')} kg</div><div>Gesamt bewegtes Volumen: Gewicht × Wiederholungen über alle eingetragenen Sätze.</div><div class="dash-sub">Dauer: ${formatTime(durationSec)} · ${deltaTxt}</div>`;
   document.getElementById('sessionSummary').classList.add('open');
-  activeSession=null; render();
+  document.getElementById('finishSessionBtn').disabled=true;document.getElementById('finishSessionBtn').textContent='Training gespeichert';
+  activeSession=null;sessionStartTs=0;updateActiveSessionBanner();render();
 }
-function exerciseVolume(ex){return Math.round((ex.sets||[]).reduce((sum,s)=>{const kg=normalizeNumber(s.kg);const reps=parseInt(s.reps);return sum+((!Number.isNaN(kg)&&!Number.isNaN(reps))?kg*reps:0)},0))}
-function renderExerciseMiniChart(items,exerciseName){
-  const series=items.map(sess=>{const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===exerciseName);return {date:sess.date||'',v:ex?exerciseVolume(ex):0}}).filter(x=>x.v>0).slice(-8);
-  if(!series.length)return '<div class="dash-sub">Noch keine Daten.</div>';
-  const vals=series.map(x=>x.v), last=series[series.length-1], prev=series[series.length-2];
-  const delta=prev?last.v-prev.v:null;
-  const w=300,h=72,pad=16;let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min-=1;max+=1}else{const m=(max-min)*.15;min-=m;max+=m}
-  const pts=vals.map((v,i)=>({x:pad+(series.length===1?(w-2*pad)/2:i*(w-2*pad)/(series.length-1)),y:h-pad-((v-min)/(max-min))*(h-2*pad)}));
-  const poly=pts.map(p=>`${p.x},${p.y}`).join(' ');
-  return `<div class="exercise-chart"><div class="exercise-chart-head"><strong>${exerciseName}</strong><span>${delta==null?'Erste Messung':(delta>0?'+':'')+Math.round(delta).toLocaleString('de-CH')+' kg'}</span></div><svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><line class="grid" x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}"/><polyline class="line" points="${poly}"/>${pts.map(p=>`<circle class="point" cx="${p.x}" cy="${p.y}" r="3"/>`).join('')}</svg><div class="dash-sub">Letzte Messung: ${last.v.toLocaleString('de-CH')} kg · ${last.date}</div></div>`
+function updateActiveSessionBanner(){
+  const dash=document.querySelector('.dashboard');if(!dash)return;
+  let banner=document.getElementById('activeSessionBanner');
+  if(!banner){banner=document.createElement('div');banner.id='activeSessionBanner';banner.className='active-session-banner wide';dash.insertAdjacentElement('afterend',banner)}
+  const d=getActiveDraft();
+  if(!d||!d.wid){banner.classList.remove('open');banner.innerHTML='';return}
+  const w=getWorkoutByIdV8(d.wid);const elapsed=Math.floor((Date.now()-(d.startedAt||Date.now()))/1000);
+  banner.innerHTML=`<div class="row"><div><span>Aktives Training</span><br><strong>${w?w.title:d.wid}</strong><div class="dash-sub">läuft seit ${formatTime(elapsed)}</div></div><button class="small-btn accent" onclick="openSession('${d.wid}')">Fortsetzen</button></div>`;
+  banner.classList.add('open');
+}
+setInterval(updateActiveSessionBanner,1000);
+function exerciseVolumeForSession(sess,name){const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(name));return ex?calcSessionVolume([ex]):0}
+function normalizeExerciseName(n){return (n||'').replace(/^Seitheben$/,'Schulter Standing Multi Flight').toLowerCase().trim()}
+function renderExerciseMiniChart(items,exName){
+  const vals=items.map(x=>exerciseVolumeForSession(x,exName));
+  if(vals.every(v=>!v))return'';
+  const arr=items.map((x,i)=>({...x,totalVolume:vals[i]}));
+  const last=vals[vals.length-1]||0, prev=vals.length>1?vals[vals.length-2]:null;
+  const d=prev==null?null:last-prev;const delta=d==null?'erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;
+  return `<div class="exercise-chart-card"><div class="exercise-chart-title"><strong>${exName}</strong><span>${delta}</span></div>${renderVolumeMiniChart(arr)}<div class="dash-sub">Letzte Einheit: ${Math.round(last).toLocaleString('de-CH')} kg</div></div>`;
 }
 function renderSessionHistory(){
-  const el=document.getElementById('sessionHistory'); if(!el)return;
+  const el=document.getElementById('sessionHistory');if(!el)return;
   const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
   if(!all.length){el.innerHTML='<div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div>';return}
   const ids=[...new Set(all.map(x=>x.wid))];
-  const charts=ids.map(id=>{
-    const items=all.filter(x=>x.wid===id).map(x=>({...x,totalVolume:Number(x.totalVolume||calcSessionVolume(x.exercises)||0)}));
-    const last=items[items.length-1]; const prev=items[items.length-2]; const d=prev?last.totalVolume-prev.totalVolume:null;
-    const delta=d==null?'Erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;
-    const exerciseNames=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>normalizeExerciseName(e.name))))];
-    return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${delta}</span></div>${renderVolumeMiniChart(items)}<div class="dash-sub">Letzte Einheit: ${Math.round(last.totalVolume).toLocaleString('de-CH')} kg · ${last.date||''}</div><details class="exercise-analytics"><summary>Übungen visuell vergleichen</summary>${exerciseNames.map(n=>renderExerciseMiniChart(items,n)).join('')}</details></div>`
-  }).join('');
-  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{
-    const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${normalizeExerciseName(e.name)}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');
-    const vol=Number(sess.totalVolume||calcSessionVolume(sess.exercises)||0);
-    return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-num" style="font-size:26px">${Math.round(vol).toLocaleString('de-CH')} kg</div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details class="session-detail"><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSessionByTs(${sess.ts||0})">Session löschen</button></div></div>`
-  }).join('');
+  const charts=ids.map(id=>{const items=all.filter(x=>x.wid===id).map(x=>({...x,totalVolume:Number(x.totalVolume||calcSessionVolume(x.exercises)||0)}));const last=items[items.length-1];const prev=items[items.length-2];const d=prev?last.totalVolume-prev.totalVolume:null;const delta=d==null?'Erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;const names=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name)))];return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${delta}</span></div>${renderVolumeMiniChart(items)}<div class="dash-sub">Letzte Einheit: ${Math.round(last.totalVolume).toLocaleString('de-CH')} kg · ${last.date||''}</div><details open><summary>Übungsentwicklung</summary><div class="exercise-chart-grid">${names.map(n=>renderExerciseMiniChart(items,n)).join('')||'<div class="dash-sub">Noch keine Übungsdaten.</div>'}</div></details></div>`}).join('');
+  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');const vol=Number(sess.totalVolume||calcSessionVolume(sess.exercises)||0);return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-num" style="font-size:26px">${Math.round(vol).toLocaleString('de-CH')} kg</div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`}).join('');
   el.innerHTML=`<div class="volume-chart-wrap">${charts}</div>${latest}`;
 }
-function deleteSessionByTs(ts){if(!ts)return;if(!confirm('Diese Trainingseinheit löschen?'))return;set('history',get('history',[]).filter(x=>x.ts!==ts));render()}
-function deleteSession(renderedIndex){const hist=get('history',[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));const target=hist[renderedIndex];if(target)deleteSessionByTs(target.ts)}
+const renderBaseV8=render;
+render=function(){renderBaseV8();restoreCollapsibleSections();renderSessionHistory();updateActiveSessionBanner();};
+
+const oldRender=render;render=function(){oldRender();restoreCollapsibleSections();renderSessionHistory();updateActiveSessionBanner();};
+
+
+
+/* BodyPlan v9: abort active session, collapsed exercise analytics, aligned progress date inputs */
+function abortSession(){
+  if(!confirm('Laufendes Training wirklich abbrechen? Nicht gespeicherte Satzdaten werden verworfen.')) return;
+  stopRest();
+  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
+  clearActiveDraft();
+  activeSession=null;
+  sessionStartTs=0;
+  const modal=document.getElementById('sessionModal');
+  if(modal) modal.classList.remove('open');
+  const summary=document.getElementById('sessionSummary');
+  if(summary){summary.classList.remove('open');summary.innerHTML=''}
+  updateActiveSessionBanner();
+  render();
+}
+
+function renderSessionHistory(){
+  const el=document.getElementById('sessionHistory');if(!el)return;
+  const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
+  if(!all.length){el.innerHTML='<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner"><div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div></div></details>';return}
+  const ids=[...new Set(all.map(x=>x.wid))];
+  const charts=ids.map(id=>{
+    const items=all.filter(x=>x.wid===id);
+    const last=items[items.length-1];
+    const names=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name)))];
+    const exerciseCharts=names.map(n=>renderExerciseMiniChart(items,n)).join('')||'<div class="dash-sub">Noch keine Übungsdaten.</div>';
+    return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${items.length} Einheit${items.length===1?'':'en'}</span></div><div class="exercise-chart-grid">${exerciseCharts}</div></div>`
+  }).join('');
+  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{
+    const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');
+    return `<div class="session-history-card compact-session"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`
+  }).join('');
+  el.innerHTML=`<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner">${charts}<details><summary style="cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-top:14px;padding:12px 0">Gespeicherte Sessions anzeigen</summary>${latest}</details></div></details>`;
+}
 
 if('serviceWorker'in navigator){navigator.serviceWorker.register('service-worker.js')}
 render();
