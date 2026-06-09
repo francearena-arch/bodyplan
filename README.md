@@ -1,1 +1,24 @@
-BodyPlan PWA v5 – Pausen-Timer, Trainingsstreak, Zielstatus, PR-Tracker und Progress-Fotos. Dateien in GitHub Pages hochladen und bestehende Version ersetzen.
+{
+  "name": "BodyPlan",
+  "short_name": "BodyPlan",
+  "description": "Training, Ernährung und Fortschrittstracking für iPhone.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
