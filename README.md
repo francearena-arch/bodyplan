@@ -1,24 +1,3 @@
-{
-  "name": "BodyPlan",
-  "short_name": "BodyPlan",
-  "description": "Training, Ernährung und Fortschrittstracking für iPhone.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#080808",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+# BodyPlan PWA v7
+
+Update: training duration timer, sticky rest timer, manual rest control, session volume summary, collapsed week structure, visual workout history, aligned progress inputs, and exercise rename.
