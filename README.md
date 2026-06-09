@@ -1,6 +1,24 @@
-BodyPlan PWA v6.1 – Fortschritt mit Datum, Einzel-Löschung, Trainingshistorie, 3-Minuten-Pausentimer, einklappbare Wochenstruktur.
-
-
-## v6.1
-- Alternative Trainingseinheiten als einklappbare Sektion ergänzt.
-- Auf-/Zuklapp-Zustand wird lokal gespeichert.
+{
+  "name": "BodyPlan",
+  "short_name": "BodyPlan",
+  "description": "Training, Ernährung und Fortschrittstracking für iPhone.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

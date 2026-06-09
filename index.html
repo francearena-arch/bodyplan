@@ -20,7 +20,8 @@
 /* v6 refinements */
 .collapsible-head{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
 .collapsible-head .chevron{font-size:14px}
-.collapsible-content.collapsed{display:none}
+.collapsible-head{border:1px solid #1b1b1b;border-radius:10px;padding:14px 16px;background:#0e0e0e}
+.collapsible-content.collapsed{display:none!important}
 .date-input{margin-top:8px}
 .metric-history{margin-top:12px;background:#0a0a0a;border:1px solid #181818;border-radius:10px;padding:10px}
 .metric-history summary{cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;font-size:11px}
@@ -48,7 +49,7 @@
   <div class="section-label">Workout Check</div><div id="checks"></div><button class="secondary-btn" onclick="resetWeek()">Woche zurücksetzen</button>
   <div class="section-label">Trainingshistorie</div><div id="sessionHistory" class="session-history-list"></div>
   <div class="section-label">Trainingseinheiten</div><div id="workouts"></div>
-  <div class="section-label collapsible-head" onclick="toggleSection('altSection','altChevron', true)"><span>Alternative Trainingseinheiten — Urlaub & Zuhause</span><span class="chevron" id="altChevron">▶</span></div><div id="altSection" class="collapsible-content collapsed"><div class="info-box">Ziel: Muskelreiz erhalten, nicht Gym-Training perfekt ersetzen. Arbeite langsam, kontrolliert und nahe ans Muskelversagen: letzter Satz pro Übung bei ca. 0–2 RIR.</div><div id="altWorkouts"></div></div>
+  <div class="section-label collapsible-head" onclick="toggleSection('vacationSection','vacationChevron', true)"><span>Alternative Trainingseinheiten — Urlaub & Zuhause</span><span class="chevron" id="vacationChevron">▶</span></div><div id="vacationSection" class="collapsible-content collapsed"><div class="info-box">Ziel: Muskelreiz erhalten, nicht Gym-Training perfekt ersetzen. Arbeite langsam, kontrolliert und nahe ans Muskelversagen: letzter Satz pro Übung bei ca. 0–2 RIR.</div><div id="altWorkouts"></div></div>
 </div>
 <div id="tab-ernaehrung" class="page hidden">
   <div class="section-label">Tagesziele</div><div class="stats"><div class="stat" style="border-top-color:#f97316"><div class="stat-n" style="color:#f97316">~2020</div><div class="stat-l">kcal / Tag</div></div><div class="stat" style="border-top-color:#4ade80"><div class="stat-n" style="color:#4ade80">~172g</div><div class="stat-l">Protein</div></div><div class="stat" style="border-top-color:#d4a853"><div class="stat-n" style="color:#d4a853">75 kg</div><div class="stat-l">Ziel · 10% KF</div></div></div>
@@ -109,7 +110,7 @@ function resetProgressPhotos(){if(!confirm('Progress-Fotos wirklich löschen?'))
 function todayISO(){return new Date().toISOString().slice(0,10)}
 function formatDateCH(iso){if(!iso)return ''; const [y,m,d]=iso.split('-'); return `${d}.${m}.${y}`}
 function toggleSection(id,chevId,persist=false){const el=document.getElementById(id),c=document.getElementById(chevId); if(!el)return; const is=el.classList.toggle('collapsed'); if(c)c.textContent=is?'▶':'▼'; if(persist)set('section_'+id,is?'collapsed':'open')}
-function restoreCollapsibleSections(){['altSection'].forEach(id=>{const state=get('section_'+id,'collapsed'); const el=document.getElementById(id); const c=document.getElementById(id==='altSection'?'altChevron':''); if(!el)return; const collapsed=state!=='open'; el.classList.toggle('collapsed',collapsed); if(c)c.textContent=collapsed?'▶':'▼';});}
+function restoreCollapsibleSections(){['vacationSection'].forEach(id=>{const state=get('section_'+id,'collapsed'); const el=document.getElementById(id); const c=document.getElementById('vacationChevron'); if(!el)return; const collapsed=state!=='open'; el.classList.toggle('collapsed',collapsed); if(c)c.textContent=collapsed?'▶':'▼';});}
 function loadMetrics(){['bodyWeight','bodyFat'].forEach(id=>{const inp=document.getElementById(id); if(inp)inp.value=''; const d=document.getElementById(id+'Date'); if(d)d.value=todayISO()});drawCharts()}
 function saveMetric(id){const input=document.getElementById(id);const val=normalizeNumber(input.value);if(Number.isNaN(val)){alert('Bitte einen gültigen Wert eingeben.');return}let date=(document.getElementById(id+'Date')||{}).value||todayISO();set('field_'+id,String(val));let arr=get(id+'History',[]);const sameDay=arr.findIndex(x=>x.date===date);if(sameDay>=0){arr[sameDay]={date,value:val}}else{arr.push({date,value:val})}arr=arr.sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-80);set(id+'History',arr);input.value='';const d=document.getElementById(id+'Date');if(d)d.value=todayISO();drawCharts()}
 function deleteMetricEntry(id,index){let arr=get(id+'History',[]);if(index<0||index>=arr.length)return;arr.splice(index,1);set(id+'History',arr);const last=arr[arr.length-1];set('field_'+id,last?String(last.value):'');drawCharts()}
