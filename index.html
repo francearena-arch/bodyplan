@@ -86,10 +86,12 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 
 
 .set-detail{margin-top:10px}.set-detail summary{cursor:pointer;color:#d4a853;font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;padding:8px 0}.set-compare-row{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #171717;font-size:12px}.set-compare-row span{color:#aaa}.set-compare-row strong{color:#fff}.set-compare-row em{font-style:normal;font-size:11px}.up{color:#4ade80!important}.down{color:#ff6b63!important}.neutral{color:#d4a853!important}
+.badge{background:#d4a853;color:#080808;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:7px 12px;border-radius:4px;align-self:flex-start;margin-top:4px}.menu-btn{align-self:flex-start;margin-top:2px;background:#0e0e0e;border:1px solid #2a2a2a;border-radius:10px;width:46px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;padding:0}.menu-btn span{display:block;width:20px;height:2px;background:#d4a853;border-radius:2px}.menu-overlay{position:fixed;inset:0;background:#000000cc;z-index:40;display:none}.menu-overlay.open{display:block}.menu-sheet{position:absolute;top:calc(54px + env(safe-area-inset-top));right:14px;background:#0d0d0d;border:1px solid #262626;border-radius:14px;width:280px;max-width:calc(100vw - 28px);padding:10px;box-shadow:0 20px 60px #000000aa}.menu-sheet h4{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#8a8a8a;padding:10px 10px 6px}.menu-item{width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:none;border-radius:9px;padding:14px 12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left}.menu-item:hover{background:#161616}.menu-item .mi-ico{font-size:18px;width:22px;text-align:center}.menu-item.danger{color:#ff6b63}.menu-sep{height:1px;background:#1c1c1c;margin:6px 4px}.menu-goal{padding:12px;margin:4px;background:#0f0d07;border:1px solid #d4a85333;border-radius:10px;font-size:12px;color:#d4a853;font-weight:700;letter-spacing:1px;text-align:center}
 </style>
 </head>
 <body>
-<div class="header"><div class="header-row"><div><div class="wordmark">BODY<em>PLAN</em></div><div class="split-tag">Push · Pull · Legs · Upper</div></div><div class="badge">75 kg · 10% KF</div></div><div class="tabs"><button class="tab active" onclick="switchTab('training', this)">🏋️ Training</button><button class="tab" onclick="switchTab('ernaehrung', this)">🥗 Ernährung</button></div></div>
+<div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)toggleMenu(false)"><div class="menu-sheet"><div class="menu-goal">Ziel: 75 kg · 10% KF</div><h4>Daten</h4><button class="menu-item" onclick="exportData()"><span class="mi-ico">⬇️</span>Daten exportieren (Backup)</button><button class="menu-item" onclick="triggerImport()"><span class="mi-ico">⬆️</span>Daten importieren</button><div class="menu-sep"></div><button class="menu-item" onclick="toggleMenu(false)"><span class="mi-ico">✕</span>Schließen</button><input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)"></div></div>
+<div class="header"><div class="header-row"><div><div class="wordmark">BODY<em>PLAN</em></div><div class="split-tag">Push · Pull · Legs · Upper</div></div><button class="menu-btn" id="menuBtn" onclick="toggleMenu(true)" aria-label="Menü"><span></span><span></span><span></span></button></div><div class="tabs"><button class="tab active" onclick="switchTab('training', this)">🏋️ Training</button><button class="tab" onclick="switchTab('ernaehrung', this)">🥗 Ernährung</button></div></div>
 <div id="tab-training" class="page">
   <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="doneCount">0</span>/4</div><div class="bar"><span id="weekBar" style="width:0%"></span></div></div><div class="dash-card"><div class="dash-label">Protein heute</div><div class="dash-num"><span id="proteinNow">0</span>g</div><div class="dash-sub">Ziel 172g</div></div><div class="dash-card"><div class="dash-label">Trainingsstreak</div><div class="dash-num">🔥 <span id="streakNow">0</span></div><div class="dash-sub">gespeicherte Einheiten</div></div><div class="dash-card"><div class="dash-label">Zielstatus</div><div id="goalStatus" class="dash-sub">Noch keine Messwerte.</div><div class="goal-grid"><div><div class="goal-line"><span>Gewicht</span><span id="goalWeightTxt">–</span></div><div class="bar"><span id="goalWeightBar" style="width:0%"></span></div></div><div><div class="goal-line"><span>KFA</span><span id="goalFatTxt">–</span></div><div class="bar"><span id="goalFatBar" style="width:0%"></span></div></div></div></div></div>
   <div class="section-label">Täglich — jeden Tag</div><div class="daily"><div class="daily-item"><div class="daily-num">25–30</div><div class="daily-lbl">Liegestütze</div><div class="daily-note">Morgens oder abends</div></div><div class="daily-item"><div class="daily-num">10–15</div><div class="daily-lbl">Klimmzüge</div><div class="daily-note">Kein Ersatz für Training</div></div></div>
@@ -130,60 +132,49 @@ function renderChecks(){const done=get('done',{});document.getElementById('check
 function toggleDone(id,val){const done=get('done',{});done[id]=val;set('done',done);updateDashboard()}function resetWeek(){set('done',{});renderChecks();updateDashboard()}function updateDashboard(){const done=get('done',{});const count=workouts.filter(w=>done[w.id]).length;document.getElementById('doneCount').textContent=count;document.getElementById('weekBar').style.width=(count/4*100)+'%';const n=workouts.find(w=>!done[w.id])||workouts[0];nextWorkoutId=n.id;document.getElementById('nextWorkout').textContent=n.title;document.getElementById('nextWorkoutSub').textContent=`${n.dur} · ${n.sub}`;}
 function metricMeta(id){return id==='bodyWeight'?{unit:'kg',chart:'weightChart',current:'weightCurrent',trend:'weightTrend',label:'Gewicht'}:{unit:'%',chart:'fatChart',current:'fatCurrent',trend:'fatTrend',label:'Körperfett'}}
 function normalizeNumber(v){return parseFloat(String(v).replace(',','.'))}
-function saveMetric(id){const input=document.getElementById(id);const val=normalizeNumber(input.value);if(Number.isNaN(val)){alert('Bitte einen gültigen Wert eingeben.');return}set('field_'+id,String(val));let arr=get(id+'History',[]);const today=new Date().toISOString().slice(0,10);const sameDay=arr.findIndex(x=>x.date===today);if(sameDay>=0){arr[sameDay]={date:today,value:val}}else{arr.push({date:today,value:val})}arr=arr.slice(-24);set(id+'History',arr);input.value='';drawCharts()}
+
 function deleteLastMetric(id){let arr=get(id+'History',[]);if(!arr.length)return;arr.pop();set(id+'History',arr);const last=arr[arr.length-1];set('field_'+id,last?String(last.value):'');drawCharts()}
 function resetMetric(id){if(!confirm('Verlauf wirklich zurücksetzen?'))return;set(id+'History',[]);set('field_'+id,'');document.getElementById(id).value='';drawCharts()}
-function loadMetrics(){['bodyWeight','bodyFat'].forEach(id=>{document.getElementById(id).value=''});drawCharts()}
-function drawLineChart(id,arr){const meta=metricMeta(id);const el=document.getElementById(meta.chart);const current=document.getElementById(meta.current);const trend=document.getElementById(meta.trend);if(!arr||!arr.length){el.innerHTML='<div style="font-size:11px;color:#777;padding:30px 8px;text-align:center">Noch keine gespeicherten Werte.</div>';current.textContent='Noch kein Eintrag';trend.textContent=id==='bodyFat'?'Ziel 10% Körperfett.':'Verlauf startet nach dem ersten gespeicherten Wert.';return}const vals=arr.map(x=>x.value);const last=arr[arr.length-1],first=arr[0];current.textContent=`Aktuell: ${last.value}${meta.unit}`;const delta=+(last.value-first.value).toFixed(1);const sign=delta>0?'+':'';trend.textContent=arr.length>1?`${sign}${delta}${meta.unit} seit Start · ${arr.length} Einträge gespeichert.`:`Erster Wert gespeichert · ${last.date}.`;const w=300,h=88,pad=18;let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min-=1;max+=1}else{const m=(max-min)*0.15;min-=m;max+=m}const points=vals.map((v,i)=>{const x=pad+(arr.length===1?(w-2*pad)/2:i*(w-2*pad)/(arr.length-1));const y=h-pad-((v-min)/(max-min))*(h-2*pad);return{x,y,v}});const poly=points.map(p=>`${p.x},${p.y}`).join(' ');el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><line class="grid" x1="${pad}" y1="${pad}" x2="${w-pad}" y2="${pad}"/><line class="grid" x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}"/><polyline class="line" points="${poly}"/>${points.map(p=>`<circle class="point" cx="${p.x}" cy="${p.y}" r="4"/>`).join('')}<text x="${pad}" y="12">${max.toFixed(1)}${meta.unit}</text><text x="${pad}" y="${h-4}">${min.toFixed(1)}${meta.unit}</text></svg>`}
+
 function drawCharts(){drawLineChart('bodyWeight',get('bodyWeightHistory',[]));drawLineChart('bodyFat',get('bodyFatHistory',[]));renderGoalStatus()}
 function addProtein(g){const today=new Date().toISOString().slice(0,10);let p=get('protein',{date:today,value:0});if(p.date!==today)p={date:today,value:0};p.value+=g;set('protein',p);renderProtein()}function resetProtein(){set('protein',{date:new Date().toISOString().slice(0,10),value:0});renderProtein()}function renderProtein(){const today=new Date().toISOString().slice(0,10);let p=get('protein',{date:today,value:0});if(p.date!==today)p={date:today,value:0};['proteinNow','proteinNow2'].forEach(id=>document.getElementById(id).textContent=p.value);document.getElementById('proteinBar').style.width=Math.min(100,p.value/172*100)+'%'}
-function openSession(id){const w=[...workouts,...altWorkouts].find(x=>x.id===id);activeSession=w;stopRest();document.getElementById('sessionTitle').textContent=w.title;document.getElementById('sessionSub').textContent=w.sub+' · '+w.dur;document.getElementById('sessionSummary').classList.remove('open');document.getElementById('sessionSummary').innerHTML='';document.getElementById('finishSessionBtn').disabled=false;document.getElementById('finishSessionBtn').textContent='Training speichern';document.getElementById('sessionContent').innerHTML=w.ex.map((ex,ei)=>`<div class="session-card"><div class="session-head">${ei+1}. ${ex[0]}</div>${Array.from({length:ex[2]},(_,s)=>`<div class="session-set"><label>Satz ${s+1}</label><input inputmode="decimal" class="set-input" placeholder="kg" id="sess_${ei}_${s}_kg"><input inputmode="numeric" class="set-input" placeholder="Wdh" id="sess_${ei}_${s}_reps"><input class="done" type="checkbox" onchange="completeSet(${ei},${s},this.checked)"></div>`).join('')}</div>`).join('');w.ex.forEach((ex,ei)=>{for(let s=0;s<ex[2];s++){const kg=get('field_'+fieldId(w.id,ei,s,'kg'),'');const reps=get('field_'+fieldId(w.id,ei,s,'reps'),'');document.getElementById(`sess_${ei}_${s}_kg`).value=kg;document.getElementById(`sess_${ei}_${s}_reps`).value=reps;}});document.getElementById('sessionModal').classList.add('open');startSessionElapsed()}
-function closeSession(){stopRest();stopSessionElapsed();document.getElementById('sessionModal').classList.remove('open')}function finishSession(){if(!activeSession)return;const date=new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit'});const exercises=activeSession.ex.map((ex,ei)=>({name:ex[0],sets:Array.from({length:ex[2]},(_,s)=>{const kg=document.getElementById(`sess_${ei}_${s}_kg`).value;const reps=document.getElementById(`sess_${ei}_${s}_reps`).value;const kgId=fieldId(activeSession.id,ei,s,'kg'),repId=fieldId(activeSession.id,ei,s,'reps');set('field_'+kgId,kg);set('field_'+repId,reps);return{kg,reps}})}));const hist=get('history',[]);hist.push({wid:activeSession.id,date,ts:Date.now(),exercises});set('history',hist.slice(-80));if(workouts.some(w=>w.id===activeSession.id)){const done=get('done',{});done[activeSession.id]=true;set('done',done);set('sessionStreak',(get('sessionStreak',0)||0)+1)}closeSession();stopRest();render()}
 
 function getLastMetricValue(id){const arr=get(id+'History',[]);return arr.length?arr[arr.length-1].value:null}
 function renderGoalStatus(){const w=getLastMetricValue('bodyWeight'), f=getLastMetricValue('bodyFat');const gs=document.getElementById('goalStatus');if(!gs)return;const wt=document.getElementById('goalWeightTxt'), ft=document.getElementById('goalFatTxt');const wb=document.getElementById('goalWeightBar'), fb=document.getElementById('goalFatBar');if(w==null&&f==null){gs.textContent='Noch keine Messwerte.';wt.textContent='–';ft.textContent='–';wb.style.width='0%';fb.style.width='0%';return}gs.textContent='Ziel: 75 kg bei 10% KFA';if(w!=null){wt.textContent=`${w}/75 kg`;wb.style.width=Math.max(0,Math.min(100,w/75*100))+'%'}if(f!=null){ft.textContent=`${f}/10 %`;fb.style.width=Math.max(0,Math.min(100,10/f*100))+'%'}}
 function renderStreak(){const el=document.getElementById('streakNow');if(!el)return;const hist=get('history',[]).filter(x=>workouts.some(w=>w.id===x.wid));el.textContent=get('sessionStreak',hist.length||0)}
 function renderPRTracker(){const el=document.getElementById('prTracker');if(!el)return;const prs={};get('history',[]).forEach(sess=>{(sess.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(set=>{const kg=normalizeNumber(set.kg);const reps=parseInt(set.reps);if(!Number.isNaN(kg)&&kg>0){const score=kg*(Number.isNaN(reps)?1:reps/10);const current=prs[ex.name];if(!current||kg>current.kg||(kg===current.kg&&score>current.score)){prs[ex.name]={kg,reps:Number.isNaN(reps)?'–':reps,score}}}})})});const keys=Object.keys(prs).slice(0,8);el.innerHTML=keys.length?keys.map(k=>`<div class="pr-card"><div class="pr-name">${k}</div><div class="pr-val">${prs[k].kg} kg</div><div class="dash-sub">Top-Satz: ${prs[k].reps} Wdh</div></div>`).join(''):'<div class="panel" style="grid-column:1/-1">Noch keine PRs. Speichere ein Training mit Gewicht und Wiederholungen.</div>'}
-function getRestSeconds(w,ei){const name=(w.ex[ei][0]||'').toLowerCase();const heavy=['bankdrücken','kniebeuge','deadlift','kreuzheben','klimmzüge','romanian','schulterdrücken'];if(heavy.some(x=>name.includes(x)))return 150;return 90}
+
 let restInterval=null,restEnd=0;
 function formatTime(sec){const m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
-function startRest(seconds,label='Pause läuft'){stopRest(false);restEnd=Date.now()+seconds*1000;document.getElementById('timerLabel').textContent=label;tickRest();restInterval=setInterval(tickRest,500)}
-function tickRest(){const left=Math.max(0,Math.ceil((restEnd-Date.now())/1000));document.getElementById('timerDisplay').textContent=formatTime(left);if(left<=0){stopRest(false);document.getElementById('timerLabel').textContent='Nächster Satz';if(navigator.vibrate)navigator.vibrate([120,80,120]);}}
-function stopRest(reset=true){if(restInterval){clearInterval(restInterval);restInterval=null}if(reset){document.getElementById('timerDisplay').textContent='00:00';document.getElementById('timerLabel').textContent='Pausen-Timer'}}
-function completeSet(ei,s,checked){if(!checked||!activeSession)return;const sec=getRestSeconds(activeSession,ei);startRest(sec,`Pause nach Satz ${s+1}`)}
+
 function addProgressPhoto(event){const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{let photos=get('progressPhotos',[]);photos.push({date:new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'}),src:reader.result});set('progressPhotos',photos.slice(-12));renderPhotos();event.target.value=''};reader.readAsDataURL(file)}
 function renderPhotos(){const el=document.getElementById('photoGrid');if(!el)return;const photos=get('progressPhotos',[]);el.innerHTML=photos.length?photos.slice().reverse().map(p=>`<div class="photo-card"><img src="${p.src}" alt="Progress Foto"><div class="photo-date">${p.date}</div></div>`).join(''):'<div class="dash-sub" style="grid-column:1/-1">Noch keine Fotos gespeichert.</div>'}
 function resetProgressPhotos(){if(!confirm('Progress-Fotos wirklich löschen?'))return;set('progressPhotos',[]);renderPhotos()}
-
 
 // ===== BodyPlan v6 upgrades =====
 function todayISO(){return new Date().toISOString().slice(0,10)}
 function formatDateCH(iso){if(!iso)return ''; const [y,m,d]=iso.split('-'); return `${d}.${m}.${y}`}
 function toggleSection(id,chevId,persist=false){const el=document.getElementById(id),c=document.getElementById(chevId); if(!el)return; const is=el.classList.toggle('collapsed'); if(c)c.textContent=is?'▶':'▼'; if(persist)set('section_'+id,is?'collapsed':'open')}
-function restoreCollapsibleSections(){['vacationSection'].forEach(id=>{const state=get('section_'+id,'collapsed'); const el=document.getElementById(id); const c=document.getElementById('vacationChevron'); if(!el)return; const collapsed=state!=='open'; el.classList.toggle('collapsed',collapsed); if(c)c.textContent=collapsed?'▶':'▼';});}
+
 function loadMetrics(){['bodyWeight','bodyFat'].forEach(id=>{const inp=document.getElementById(id); if(inp)inp.value=''; const d=document.getElementById(id+'Date'); if(d)d.value=todayISO()});drawCharts()}
 function saveMetric(id){const input=document.getElementById(id);const val=normalizeNumber(input.value);if(Number.isNaN(val)){alert('Bitte einen gültigen Wert eingeben.');return}let date=(document.getElementById(id+'Date')||{}).value||todayISO();set('field_'+id,String(val));let arr=get(id+'History',[]);const sameDay=arr.findIndex(x=>x.date===date);if(sameDay>=0){arr[sameDay]={date,value:val}}else{arr.push({date,value:val})}arr=arr.sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-80);set(id+'History',arr);input.value='';const d=document.getElementById(id+'Date');if(d)d.value=todayISO();drawCharts()}
 function deleteMetricEntry(id,index){let arr=get(id+'History',[]);if(index<0||index>=arr.length)return;arr.splice(index,1);set(id+'History',arr);const last=arr[arr.length-1];set('field_'+id,last?String(last.value):'');drawCharts()}
 function renderMetricHistory(id,arr){const listId=id==='bodyWeight'?'weightHistoryList':'fatHistoryList';const el=document.getElementById(listId);if(!el)return; if(!arr.length){el.innerHTML='<div class="dash-sub">Keine Einträge gespeichert.</div>';return}el.innerHTML=arr.map((x,i)=>{const prev=i>0?arr[i-1].value:null;const delta=prev==null?null:+(x.value-prev).toFixed(1);const cls=delta==null||delta===0?'delta-neutral':(id==='bodyFat'?(delta<0?'delta-neg':'delta-pos'):(delta>0?'delta-pos':'delta-neg'));const d=delta==null?'Start':`${delta>0?'+':''}${delta}${metricMeta(id).unit}`;return `<div class="metric-row"><span>${formatDateCH(x.date)} · <strong>${x.value}${metricMeta(id).unit}</strong></span><span class="delta ${cls}">${d}</span><button class="small-btn danger" onclick="deleteMetricEntry('${id}',${i})">Löschen</button></div>`}).join('')}
 function drawLineChart(id,arr){const meta=metricMeta(id);const el=document.getElementById(meta.chart);const current=document.getElementById(meta.current);const trend=document.getElementById(meta.trend);arr=(arr||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));renderMetricHistory(id,arr);if(!arr.length){el.innerHTML='<div style="font-size:11px;color:#777;padding:30px 8px;text-align:center">Noch keine gespeicherten Werte.</div>';current.textContent='Noch kein Eintrag';trend.textContent=id==='bodyFat'?'Ziel 10% Körperfett.':'Verlauf startet nach dem ersten gespeicherten Wert.';return}const vals=arr.map(x=>x.value);const last=arr[arr.length-1],first=arr[0];current.textContent=`Aktuell: ${last.value}${meta.unit}`;const delta=+(last.value-first.value).toFixed(1);const sign=delta>0?'+':'';const lastDelta=arr.length>1?+(last.value-arr[arr.length-2].value).toFixed(1):0;const lastSign=lastDelta>0?'+':'';trend.innerHTML=arr.length>1?`Seit Start: <strong>${sign}${delta}${meta.unit}</strong> · letzte Messung: <strong>${lastSign}${lastDelta}${meta.unit}</strong><br>${formatDateCH(first.date)} bis ${formatDateCH(last.date)} · ${arr.length} Einträge.`:`Erster Wert gespeichert · ${formatDateCH(last.date)}.`;const w=300,h=96,pad=20;let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min-=1;max+=1}else{const m=(max-min)*0.15;min-=m;max+=m}const points=vals.map((v,i)=>{const x=pad+(arr.length===1?(w-2*pad)/2:i*(w-2*pad)/(arr.length-1));const y=h-pad-((v-min)/(max-min))*(h-2*pad);return{x,y,v}});const poly=points.map(p=>`${p.x},${p.y}`).join(' ');const dateLabels=arr.length>1?`<text x="${pad}" y="${h-2}">${formatDateCH(first.date).slice(0,5)}</text><text x="${w-pad-30}" y="${h-2}">${formatDateCH(last.date).slice(0,5)}</text>`:'';el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><line class="grid" x1="${pad}" y1="${pad}" x2="${w-pad}" y2="${pad}"/><line class="grid" x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}"/><polyline class="line" points="${poly}"/>${points.map(p=>`<circle class="point" cx="${p.x}" cy="${p.y}" r="4"/>`).join('')}<text x="${pad}" y="12">${max.toFixed(1)}${meta.unit}</text><text x="${pad}" y="${h-9}">${min.toFixed(1)}${meta.unit}</text>${dateLabels}</svg>`}
 function getRestSeconds(w,ei){return 180}
-function completeSet(ei,s,checked){if(!checked||!activeSession)return;startRest(180,`Pause nach Satz ${s+1}`)}
-function finishSession(){if(!activeSession)return;const iso=todayISO();const date=new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});const exercises=activeSession.ex.map((ex,ei)=>({name:ex[0],sets:Array.from({length:ex[2]},(_,s)=>{const kg=document.getElementById(`sess_${ei}_${s}_kg`).value;const reps=document.getElementById(`sess_${ei}_${s}_reps`).value;const kgId=fieldId(activeSession.id,ei,s,'kg'),repId=fieldId(activeSession.id,ei,s,'reps');set('field_'+kgId,kg);set('field_'+repId,reps);return{kg,reps}})}));const hist=get('history',[]);hist.push({wid:activeSession.id,title:activeSession.title,date,iso,ts:Date.now(),exercises});set('history',hist.slice(-120));if(workouts.some(w=>w.id===activeSession.id)){const done=get('done',{});done[activeSession.id]=true;set('done',done);set('sessionStreak',(get('sessionStreak',0)||0)+1)}closeSession();stopRest();render()}
-function renderSessionHistory(){const el=document.getElementById('sessionHistory');if(!el)return;const hist=get('history',[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10);if(!hist.length){el.innerHTML='<div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div>';return}el.innerHTML=hist.map((sess,idx)=>{const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,6).map(e=>`<div class="session-ex"><b>${e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}<div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`}).join('')}
+
 function deleteSession(renderedIndex){let hist=get('history',[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));const target=hist[renderedIndex];if(!target)return;if(!confirm('Diese Trainingseinheit löschen?'))return;let original=get('history',[]);original=original.filter(x=>x.ts!==target.ts);set('history',original);render()}
 
 // ===== BodyPlan v7 upgrades =====
 function startSessionElapsed(){stopSessionElapsed(false);sessionStartTs=Date.now();tickSessionElapsed();sessionInterval=setInterval(tickSessionElapsed,1000)}
 function tickSessionElapsed(){const el=document.getElementById('sessionElapsed');if(!el||!sessionStartTs)return;el.textContent=formatTime(Math.floor((Date.now()-sessionStartTs)/1000))}
 function stopSessionElapsed(reset=true){if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}if(reset){const el=document.getElementById('sessionElapsed');if(el)el.textContent='00:00'}sessionStartTs=0}
-function completeSet(ei,s,checked){/* v7: Haken speichert nur den Satzstatus. Der Pausentimer wird bewusst manuell gestartet. */}
+
 function calcSessionVolume(exercises){return Math.round((exercises||[]).reduce((sum,ex)=>sum+(ex.sets||[]).reduce((a,set)=>{const kg=normalizeNumber(set.kg);const reps=parseInt(set.reps);return a+((!Number.isNaN(kg)&&!Number.isNaN(reps))?kg*reps:0)},0),0))}
-function finishSession(){if(!activeSession)return;const iso=todayISO();const date=new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});const durationSec=sessionStartTs?Math.floor((Date.now()-sessionStartTs)/1000):0;const exercises=activeSession.ex.map((ex,ei)=>({name:ex[0],sets:Array.from({length:ex[2]},(_,s)=>{const kg=document.getElementById(`sess_${ei}_${s}_kg`).value;const reps=document.getElementById(`sess_${ei}_${s}_reps`).value;const kgId=fieldId(activeSession.id,ei,s,'kg'),repId=fieldId(activeSession.id,ei,s,'reps');set('field_'+kgId,kg);set('field_'+repId,reps);return{kg,reps}})}));const totalVolume=calcSessionVolume(exercises);const previousSame=get('history',[]).filter(x=>x.wid===activeSession.id).slice(-1)[0];const prevVol=previousSame?Number(previousSame.totalVolume||calcSessionVolume(previousSame.exercises)):null;const delta=prevVol==null?null:totalVolume-prevVol;const hist=get('history',[]);hist.push({wid:activeSession.id,title:activeSession.title,date,iso,ts:Date.now(),durationSec,totalVolume,exercises});set('history',hist.slice(-120));if(workouts.some(w=>w.id===activeSession.id)){const done=get('done',{});done[activeSession.id]=true;set('done',done);set('sessionStreak',(get('sessionStreak',0)||0)+1)}stopRest();stopSessionElapsed(false);document.getElementById('finishSessionBtn').disabled=true;document.getElementById('finishSessionBtn').textContent='Training gespeichert';const deltaTxt=delta==null?'Erste gespeicherte Einheit dieser Art.':`${delta>0?'+':''}${Math.round(delta)} kg vs. letzte ${activeSession.title}-Einheit`;document.getElementById('sessionSummary').innerHTML=`<div class="dash-label">Zusammenfassung</div><div class="summary-num">${totalVolume.toLocaleString('de-CH')} kg</div><div>Gesamt bewegtes Volumen: Gewicht × Wiederholungen über alle eingetragenen Sätze.</div><div class="dash-sub">Dauer: ${formatTime(durationSec)} · ${deltaTxt}</div>`;document.getElementById('sessionSummary').classList.add('open');render()}
+
 function renderVolumeMiniChart(arr){arr=arr.slice(-8);if(!arr.length)return'';const vals=arr.map(x=>Number(x.totalVolume||calcSessionVolume(x.exercises)||0));const w=300,h=80,pad=18;let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min-=1;max+=1}else{const m=(max-min)*0.15;min-=m;max+=m}const pts=vals.map((v,i)=>({x:pad+(arr.length===1?(w-2*pad)/2:i*(w-2*pad)/(arr.length-1)),y:h-pad-((v-min)/(max-min))*(h-2*pad)}));const poly=pts.map(p=>`${p.x},${p.y}`).join(' ');return `<div class="volume-chart"><svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><line class="grid" x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}"/><polyline class="line" points="${poly}"/>${pts.map(p=>`<circle class="point" cx="${p.x}" cy="${p.y}" r="4"/>`).join('')}<text x="${pad}" y="12">${Math.round(max).toLocaleString('de-CH')} kg</text><text x="${pad}" y="${h-4}">${Math.round(min).toLocaleString('de-CH')} kg</text></svg></div>`}
-function renderSessionHistory(){const el=document.getElementById('sessionHistory');if(!el)return;const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));if(!all.length){el.innerHTML='<div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div>';return}const ids=[...new Set(all.map(x=>x.wid))];const charts=ids.map(id=>{const items=all.filter(x=>x.wid===id).map(x=>({...x,totalVolume:Number(x.totalVolume||calcSessionVolume(x.exercises)||0)}));const last=items[items.length-1];const prev=items[items.length-2];const d=prev?last.totalVolume-prev.totalVolume:null;const delta=d==null?'Erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${delta}</span></div>${renderVolumeMiniChart(items)}<div class="dash-sub">Letzte Einheit: ${Math.round(last.totalVolume).toLocaleString('de-CH')} kg · ${last.date||''}</div></div>`}).join('');const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,6).map(e=>`<div class="session-ex"><b>${e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');const vol=Number(sess.totalVolume||calcSessionVolume(sess.exercises)||0);return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-num" style="font-size:26px">${Math.round(vol).toLocaleString('de-CH')} kg</div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}<div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`}).join('');el.innerHTML=`<div class="volume-chart-wrap">${charts}</div>${latest}`}
+
 function restoreCollapsibleSections(){[{id:'vacationSection',chev:'vacationChevron',def:'collapsed'},{id:'weekSection',chev:'weekChevron',def:'collapsed'}].forEach(x=>{const state=get('section_'+x.id,x.def);const el=document.getElementById(x.id);const c=document.getElementById(x.chev);if(!el)return;const collapsed=state!=='open';el.classList.toggle('collapsed',collapsed);if(c)c.textContent=collapsed?'▶':'▼';});}
-
-
 
 // ===== BodyPlan v8 runtime overrides =====
 const ACTIVE_SESSION_KEY='activeSessionV8';
@@ -191,7 +182,7 @@ const REST_KEY='activeRestV8';
 function getWorkoutByIdV8(id){return [...workouts,...altWorkouts].find(x=>x.id===id)}
 function getActiveDraft(){return get(ACTIVE_SESSION_KEY,null)}
 function setActiveDraft(d){set(ACTIVE_SESSION_KEY,d)}
-function clearActiveDraft(){localStorage.removeItem(ACTIVE_SESSION_KEY);localStorage.removeItem(REST_KEY)}
+
 function collectSessionDraftFromDOM(){
   if(!activeSession)return getActiveDraft();
   const d=getActiveDraft()||{wid:activeSession.id,startedAt:sessionStartTs||Date.now(),checks:{},values:{}};
@@ -274,38 +265,7 @@ function tickRest(){
 function stopRest(){if(restInterval){clearInterval(restInterval);restInterval=null}restEnd=0;localStorage.removeItem(REST_KEY);const el=document.getElementById('timerDisplay');if(el)el.textContent='00:00'}
 function resumeRestIfAny(){const rest=get(REST_KEY,null);if(rest&&rest.end&&rest.end>Date.now()){restEnd=rest.end;const label=document.getElementById('timerLabel');if(label)label.textContent=rest.label||'Pausen-Timer';tickRest();if(restInterval)clearInterval(restInterval);restInterval=setInterval(tickRest,250)}else{localStorage.removeItem(REST_KEY)}}
 function completeSet(ei,s,checked){collectSessionDraftFromDOM(); /* Haken startet bewusst keinen Timer. */}
-function finishSession(){
-  if(!activeSession)return;
-  const draft=collectSessionDraftFromDOM();
-  const iso=todayISO();const date=new Date().toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const durationSec=draft&&draft.startedAt?Math.floor((Date.now()-draft.startedAt)/1000):(sessionStartTs?Math.floor((Date.now()-sessionStartTs)/1000):0);
-  const exercises=activeSession.ex.map((ex,ei)=>({name:ex[0],sets:Array.from({length:ex[2]},(_,s)=>{
-    const kg=(draft.values||{})[`${ei}_${s}_kg`]||'';const reps=(draft.values||{})[`${ei}_${s}_reps`]||'';
-    set('field_'+fieldId(activeSession.id,ei,s,'kg'),kg);set('field_'+fieldId(activeSession.id,ei,s,'reps'),reps);return{kg,reps}
-  })}));
-  const totalVolume=calcSessionVolume(exercises);
-  const previousSame=get('history',[]).filter(x=>x.wid===activeSession.id).slice(-1)[0];
-  const prevVol=previousSame?Number(previousSame.totalVolume||calcSessionVolume(previousSame.exercises)):null;
-  const delta=prevVol==null?null:totalVolume-prevVol;
-  const hist=get('history',[]);hist.push({wid:activeSession.id,title:activeSession.title,date,iso,ts:Date.now(),durationSec,totalVolume,exercises});set('history',hist.slice(-120));
-  if(workouts.some(w=>w.id===activeSession.id)){const done=get('done',{});done[activeSession.id]=true;set('done',done);set('sessionStreak',(get('sessionStreak',0)||0)+1)}
-  stopRest();if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}clearActiveDraft();
-  const deltaTxt=delta==null?'Erste gespeicherte Einheit dieser Art.':`${delta>0?'+':''}${Math.round(delta)} kg vs. letzte ${activeSession.title}-Einheit`;
-  document.getElementById('sessionSummary').innerHTML=`<div class="dash-label">Zusammenfassung</div><div class="summary-num">${totalVolume.toLocaleString('de-CH')} kg</div><div>Gesamt bewegtes Volumen: Gewicht × Wiederholungen über alle eingetragenen Sätze.</div><div class="dash-sub">Dauer: ${formatTime(durationSec)} · ${deltaTxt}</div>`;
-  document.getElementById('sessionSummary').classList.add('open');
-  document.getElementById('finishSessionBtn').disabled=true;document.getElementById('finishSessionBtn').textContent='Training gespeichert';
-  activeSession=null;sessionStartTs=0;updateActiveSessionBanner();render();
-}
-function endActiveSessionNoSave(){
-  if(!confirm('Aktives Training definitiv beenden? Nicht gespeicherte Satzdaten werden verworfen.')) return;
-  stopRest();
-  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
-  clearActiveDraft();
-  activeSession=null;sessionStartTs=0;
-  const modal=document.getElementById('sessionModal');if(modal)modal.classList.remove('open');
-  const summary=document.getElementById('sessionSummary');if(summary){summary.classList.remove('open');summary.innerHTML=''}
-  updateActiveSessionBanner();render();
-}
+
 function updateActiveSessionBanner(){
   const hero=document.querySelector('.dashboard .dash-card.wide');if(!hero)return;
   let banner=document.getElementById('activeSessionBanner');
@@ -327,57 +287,13 @@ function renderExerciseMiniChart(items,exName){
   const d=prev==null?null:last-prev;const delta=d==null?'erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;
   return `<div class="exercise-chart-card"><div class="exercise-chart-title"><strong>${displayExerciseName(exName)}</strong><span>${delta}</span></div>${renderVolumeMiniChart(arr)}<div class="dash-sub">Letzte Einheit: ${Math.round(last).toLocaleString('de-CH')} kg</div></div>`;
 }
-function renderSessionHistory(){
-  const el=document.getElementById('sessionHistory');if(!el)return;
-  const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  if(!all.length){el.innerHTML='<div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div>';return}
-  const ids=[...new Set(all.map(x=>x.wid))];
-  const charts=ids.map(id=>{const items=all.filter(x=>x.wid===id).map(x=>({...x,totalVolume:Number(x.totalVolume||calcSessionVolume(x.exercises)||0)}));const last=items[items.length-1];const prev=items[items.length-2];const d=prev?last.totalVolume-prev.totalVolume:null;const delta=d==null?'Erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;const names=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name)))];return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${delta}</span></div>${renderVolumeMiniChart(items)}<div class="dash-sub">Letzte Einheit: ${Math.round(last.totalVolume).toLocaleString('de-CH')} kg · ${last.date||''}</div><details open><summary>Übungsentwicklung</summary><div class="exercise-chart-grid">${names.map(n=>renderExerciseMiniChart(items,n)).join('')||'<div class="dash-sub">Noch keine Übungsdaten.</div>'}</div></details></div>`}).join('');
-  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');const vol=Number(sess.totalVolume||calcSessionVolume(sess.exercises)||0);return `<div class="session-history-card"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-num" style="font-size:26px">${Math.round(vol).toLocaleString('de-CH')} kg</div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`}).join('');
-  el.innerHTML=`<div class="volume-chart-wrap">${charts}</div>${latest}`;
-}
+
 const renderBaseV8=render;
 render=function(){renderBaseV8();restoreCollapsibleSections();renderSessionHistory();updateActiveSessionBanner();};
 
 const oldRender=render;render=function(){oldRender();restoreCollapsibleSections();renderSessionHistory();updateActiveSessionBanner();};
 
-
-
 /* BodyPlan v9: abort active session, collapsed exercise analytics, aligned progress date inputs */
-function abortSession(){
-  if(!confirm('Laufendes Training wirklich abbrechen? Nicht gespeicherte Satzdaten werden verworfen.')) return;
-  stopRest();
-  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
-  clearActiveDraft();
-  activeSession=null;
-  sessionStartTs=0;
-  const modal=document.getElementById('sessionModal');
-  if(modal) modal.classList.remove('open');
-  const summary=document.getElementById('sessionSummary');
-  if(summary){summary.classList.remove('open');summary.innerHTML=''}
-  updateActiveSessionBanner();
-  render();
-}
-
-function renderSessionHistory(){
-  const el=document.getElementById('sessionHistory');if(!el)return;
-  const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  if(!all.length){el.innerHTML='<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner"><div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div></div></details>';return}
-  const ids=[...new Set(all.map(x=>x.wid))];
-  const charts=ids.map(id=>{
-    const items=all.filter(x=>x.wid===id);
-    const last=items[items.length-1];
-    const names=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name)))];
-    const exerciseCharts=names.map(n=>renderExerciseMiniChart(items,n)).join('')||'<div class="dash-sub">Noch keine Übungsdaten.</div>';
-    return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${items.length} Einheit${items.length===1?'':'en'}</span></div><div class="exercise-chart-grid">${exerciseCharts}</div></div>`
-  }).join('');
-  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{
-    const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${e.name==='Seitheben'?'Schulter Standing Multi Flight':e.name}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');
-    return `<div class="session-history-card compact-session"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`
-  }).join('');
-  el.innerHTML=`<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner">${charts}<details><summary style="cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-top:14px;padding:12px 0">Gespeicherte Sessions anzeigen</summary>${latest}</details></div></details>`;
-}
-
 
 /* BodyPlan v10: active session controls and exercise-focused analytics */
 function maxKgForExercise(sess,name){
@@ -385,12 +301,7 @@ function maxKgForExercise(sess,name){
   if(!ex)return 0;
   return Math.max(0,...(ex.sets||[]).map(s=>parseFloat(String(s.kg).replace(',','.'))||0));
 }
-function avgKgForExercise(sess,name){
-  const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(name));
-  if(!ex)return 0;
-  const vals=(ex.sets||[]).map(s=>parseFloat(String(s.kg).replace(',','.'))||0).filter(v=>v>0);
-  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
-}
+
 function bestSetText(sess,name){
   const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(name));
   if(!ex)return '–';
@@ -404,38 +315,9 @@ function renderWeightProgressChart(items,name){
   return renderVolumeMiniChart(arr);
 }
 function displayExerciseName(n){return (n||'').split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):w).join(' ')}
-function renderExerciseProgressCard(items,exName){
-  const valid=items.filter(x=>maxKgForExercise(x,exName)>0);
-  if(!valid.length)return'';
-  const last=valid[valid.length-1], prev=valid[valid.length-2];
-  const lastMax=maxKgForExercise(last,exName), prevMax=prev?maxKgForExercise(prev,exName):null;
-  const delta=prevMax==null?'erste Messung':`${lastMax-prevMax>0?'+':''}${(lastMax-prevMax).toFixed(1).replace('.0','')} kg`;
-  const avg=avgKgForExercise(last,exName);
-  const pr=Math.max(...valid.map(x=>maxKgForExercise(x,exName)));
-  return `<div class="exercise-metric-card"><div class="exercise-metric-head"><strong>${displayExerciseName(exName)}</strong><span>${delta}</span></div>${renderWeightProgressChart(items,exName)}<div class="exercise-stats"><div class="exercise-stat"><b>${lastMax.toFixed(1).replace('.0','')} kg</b><small>Letztes Top</small></div><div class="exercise-stat"><b>${avg.toFixed(1).replace('.0','')} kg</b><small>Ø Gewicht</small></div><div class="exercise-stat"><b>${pr.toFixed(1).replace('.0','')} kg</b><small>PR</small></div></div><div class="dash-sub">Letzter Top-Satz: ${bestSetText(last,exName)}</div></div>`;
-}
-function renderSessionHistory(){
-  const el=document.getElementById('sessionHistory');if(!el)return;
-  const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  if(!all.length){el.innerHTML='<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner"><div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div></div></details>';return}
-  const ids=[...new Set(all.map(x=>x.wid))];
-  const charts=ids.map(id=>{
-    const items=all.filter(x=>x.wid===id);
-    const last=items[items.length-1];
-    const names=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>normalizeExerciseName(e.name))))];
-    const exerciseCharts=names.map(n=>renderExerciseProgressCard(items,n)).join('')||'<div class="dash-sub">Noch keine Übungsdaten.</div>';
-    return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${items.length} Einheit${items.length===1?'':'en'}</span></div>${exerciseCharts}</div>`
-  }).join('');
-  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{
-    const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${displayExerciseName(normalizeExerciseName(e.name))}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');
-    return `<div class="session-history-card compact-session"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`
-  }).join('');
-  el.innerHTML=`<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner">${charts}<details><summary style="cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-top:14px;padding:12px 0">Gespeicherte Sessions anzeigen</summary>${latest}</details></div></details>`;
-}
+
 const renderBeforeV10=render;
 render=function(){renderBeforeV10();renderSessionHistory();updateActiveSessionBanner();};
-
-
 
 /* BodyPlan v11: robust active-session termination and progression-focused exercise history */
 function removeStored(k){
@@ -567,6 +449,57 @@ function renderSessionHistory(){
     return `<div class="session-history-card compact-session"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`
   }).join('');
   el.innerHTML=`<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner">${charts}<details><summary style="cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-top:14px;padding:12px 0">Gespeicherte Sessions anzeigen</summary>${latest}</details></div></details>`;
+}
+
+
+/* ===== BodyPlan v12: Burger-Menü mit Daten-Export & -Import ===== */
+function toggleMenu(open){var o=document.getElementById('menuOverlay');if(!o)return;o.classList.toggle('open',open)}
+function collectAllData(){
+  var data={};
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if(k && k.indexOf('bp3_')===0){ data[k]=localStorage.getItem(k); }
+  }
+  return data;
+}
+function exportData(){
+  try{
+    var payload={app:'BodyPlan',version:11,exportedAt:new Date().toISOString(),data:collectAllData()};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    var stamp=new Date().toISOString().slice(0,10);
+    a.href=url;a.download='bodyplan-backup-'+stamp+'.json';
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);a.remove()},100);
+    toggleMenu(false);
+  }catch(e){alert('Export fehlgeschlagen: '+e.message)}
+}
+function triggerImport(){var inp=document.getElementById('importFile');if(inp)inp.click()}
+function importData(event){
+  var file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    try{
+      var parsed=JSON.parse(reader.result);
+      var data=parsed&&parsed.data?parsed.data:parsed;
+      if(!data||typeof data!=='object')throw new Error('Ungültiges Dateiformat.');
+      var keys=Object.keys(data).filter(function(k){return k.indexOf('bp3_')===0});
+      if(!keys.length)throw new Error('Keine BodyPlan-Daten in der Datei gefunden.');
+      if(!confirm('Import überschreibt deine aktuellen Daten mit '+keys.length+' gespeicherten Einträgen. Fortfahren?')){event.target.value='';return}
+      // Remove existing bp3_ keys first
+      var existing=[];
+      for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('bp3_')===0)existing.push(k)}
+      existing.forEach(function(k){localStorage.removeItem(k)});
+      keys.forEach(function(k){localStorage.setItem(k,data[k])});
+      event.target.value='';
+      toggleMenu(false);
+      alert('Import erfolgreich. Die App wird neu geladen.');
+      location.reload();
+    }catch(e){alert('Import fehlgeschlagen: '+e.message);event.target.value=''}
+  };
+  reader.readAsText(file);
 }
 
 if('serviceWorker'in navigator){navigator.serviceWorker.register('service-worker.js')}
