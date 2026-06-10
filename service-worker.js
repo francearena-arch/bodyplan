@@ -1,6 +1,6 @@
 BodyPlan PWA v13
 
-Konservative Wochen-Progression pro Übung (Übersicht "Diese Woche" + Hinweis
-je Übung im Plan), umsortierte Startseite, einheitliche Section-Fonts und
-Klapp-Zustände, die pro Sektion und Trainingskarte gemerkt werden. Daten-
-Export/-Import als JSON im Burger-Menü.
+Aufbauend auf v12: kompakte Wochen-Progression in 2-spaltigen Kacheln
+(+2.5 kg / +1 Wdh), schlichte einheitliche Section-Header mit dezentem
+Chevron, Wochenstruktur fix sichtbar unter der Progression, gemerkte
+Klapp-Zustände pro Sektion und Trainingskarte. JSON Export/Import im Menü.
