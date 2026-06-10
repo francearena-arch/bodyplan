@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
-  <title>BodyPlan Pro v14 · Monthly Goal</title>
+  <title>BodyPlan Pro v15 · Training Consistency</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="theme-color" content="#080808">
@@ -87,6 +87,9 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 
 .set-detail{margin-top:10px}.set-detail summary{cursor:pointer;color:#d4a853;font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;padding:8px 0}.set-compare-row{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #171717;font-size:12px}.set-compare-row span{color:#aaa}.set-compare-row strong{color:#fff}.set-compare-row em{font-style:normal;font-size:11px}.up{color:#4ade80!important}.down{color:#ff6b63!important}.neutral{color:#d4a853!important}
 .badge{background:#d4a853;color:#080808;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:7px 12px;border-radius:4px;align-self:flex-start;margin-top:4px}.menu-btn{align-self:flex-start;margin-top:2px;background:#0e0e0e;border:1px solid #2a2a2a;border-radius:10px;width:46px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;padding:0}.menu-btn span{display:block;width:20px;height:2px;background:#d4a853;border-radius:2px}.menu-overlay{position:fixed;inset:0;background:#000000cc;z-index:40;display:none}.menu-overlay.open{display:block}.menu-sheet{position:absolute;top:calc(54px + env(safe-area-inset-top));right:14px;background:#0d0d0d;border:1px solid #262626;border-radius:14px;width:280px;max-width:calc(100vw - 28px);padding:10px;box-shadow:0 20px 60px #000000aa}.menu-sheet h4{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#8a8a8a;padding:10px 10px 6px}.menu-item{width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:none;border-radius:9px;padding:14px 12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left}.menu-item:hover{background:#161616}.menu-item .mi-ico{font-size:18px;width:22px;text-align:center}.menu-item.danger{color:#ff6b63}.menu-sep{height:1px;background:#1c1c1c;margin:6px 4px}.menu-goal{padding:12px;margin:4px;background:#0f0d07;border:1px solid #d4a85333;border-radius:10px;font-size:12px;color:#d4a853;font-weight:700;letter-spacing:1px;text-align:center}
+
+.consistency-panel{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:15px;margin-top:10px}.month-summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}.month-summary-card{background:#0a0a0a;border:1px solid #1d1d1d;border-radius:10px;padding:12px}.month-summary-card .num{font-family:'Bebas Neue';font-size:28px;color:#d4a853;letter-spacing:1px;line-height:1}.month-summary-card .lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-top:4px}.heatmap-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:10px}.heatmap-title{font-weight:800;color:#fff;font-size:15px}.heatmap-sub{font-size:12px;color:#bbb}.heatmap-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:8px 0 6px}.heatmap-weekdays span{text-align:center;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:#777}.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.heat-day{height:30px;border-radius:7px;background:#121212;border:1px solid #202020;display:flex;align-items:center;justify-content:center;font-size:10px;color:#777}.heat-day.empty{background:transparent;border-color:transparent}.heat-day.l1{background:#2a220d;border-color:#5c4514;color:#d4a853}.heat-day.l2{background:#5c4514;border-color:#8b681f;color:#fff}.heat-day.l3{background:#8b4b1f;border-color:#c1762d;color:#fff}.heat-day.today{outline:1px solid #d4a853}.heat-legend{display:flex;align-items:center;gap:8px;margin-top:10px;color:#aaa;font-size:11px}.heat-dot{width:14px;height:14px;border-radius:4px;background:#121212;border:1px solid #202020}.heat-dot.l1{background:#2a220d;border-color:#5c4514}.heat-dot.l2{background:#5c4514;border-color:#8b681f}.heat-dot.l3{background:#8b4b1f;border-color:#c1762d}.month-list{display:grid;gap:8px;margin-top:12px}.month-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#0a0a0a;border:1px solid #1d1d1d;border-radius:10px;padding:11px 12px}.month-row strong{font-size:13px}.month-row span{color:#d4a853;font-weight:800}.month-row .bar{grid-column:1/-1;margin-top:2px}.best-month{margin-top:12px;background:#0f0d07;border:1px solid #d4a85333;border-left:3px solid #d4a853;border-radius:10px;padding:13px}.best-month strong{color:#d4a853}.consistency-empty{font-size:13px;color:#bbb;line-height:1.5}@media(max-width:430px){.month-summary-grid{grid-template-columns:1fr}.heat-day{height:27px;font-size:9px}}
+
 </style>
 </head>
 <body>
@@ -101,6 +104,20 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
   </div>
   <div id="page-progress" class="app-page hidden">
     <div class="section-label">Fortschritt</div><div class="dashboard"><div class="dash-card"><div class="dash-label">Gewicht</div><div class="metric-current" id="weightCurrent">Noch kein Eintrag</div><input id="bodyWeight" class="set-input" inputmode="decimal" placeholder="kg eintragen"><input id="bodyWeightDate" class="set-input date-input" type="date"><div class="metric-actions"><button class="small-btn accent" onclick="saveMetric('bodyWeight')">Speichern</button><button class="small-btn" onclick="deleteLastMetric('bodyWeight')">Letzten löschen</button><button class="small-btn danger" onclick="resetMetric('bodyWeight')">Reset</button></div><div id="weightTrend" class="trend">Verlauf startet nach dem ersten gespeicherten Wert.</div><div id="weightChart" class="line-chart"></div><details class="metric-history"><summary>Verlauf bearbeiten</summary><div id="weightHistoryList"></div></details></div><div class="dash-card"><div class="dash-label">Körperfett</div><div class="metric-current" id="fatCurrent">Noch kein Eintrag</div><input id="bodyFat" class="set-input" inputmode="decimal" placeholder="% eintragen"><input id="bodyFatDate" class="set-input date-input" type="date"><div class="metric-actions"><button class="small-btn accent" onclick="saveMetric('bodyFat')">Speichern</button><button class="small-btn" onclick="deleteLastMetric('bodyFat')">Letzten löschen</button><button class="small-btn danger" onclick="resetMetric('bodyFat')">Reset</button></div><div id="fatTrend" class="trend">Ziel 10% Körperfett.</div><div id="fatChart" class="line-chart"></div><details class="metric-history"><summary>Verlauf bearbeiten</summary><div id="fatHistoryList"></div></details></div></div>
+    <div class="section-label">Trainingskonsistenz</div>
+    <div class="consistency-panel">
+      <div class="month-summary-grid">
+        <div class="month-summary-card"><div class="num" id="consistencyCurrent">0/16</div><div class="lbl">Aktueller Monat</div></div>
+        <div class="month-summary-card"><div class="num" id="consistencyPrev">–</div><div class="lbl">Vormonat</div></div>
+        <div class="month-summary-card"><div class="num" id="consistencyBest">–</div><div class="lbl">Bester Monat</div></div>
+      </div>
+      <div class="heatmap-head"><div><div class="heatmap-title" id="heatmapTitle">Aktueller Monat</div><div class="heatmap-sub" id="heatmapSub">Trainingstage im Überblick</div></div></div>
+      <div class="heatmap-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+      <div id="trainingHeatmap" class="heatmap-grid"></div>
+      <div class="heat-legend"><span>weniger</span><span class="heat-dot"></span><span class="heat-dot l1"></span><span class="heat-dot l2"></span><span class="heat-dot l3"></span><span>mehr</span></div>
+      <div class="best-month" id="bestMonthBadge">Noch kein vollständiger Monatsverlauf vorhanden.</div>
+      <div class="month-list" id="monthComparisonList"></div>
+    </div>
   </div>
   <div id="page-history" class="app-page hidden">
     <div class="section-label">Trainingshistorie</div><div id="sessionHistory" class="session-history-list"></div>
@@ -159,16 +176,28 @@ function sessionDateObj(sess){
 }
 function monthKeyFromDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
 function monthLabel(key){if(!key)return '–';const [y,m]=key.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('de-CH',{month:'short',year:'2-digit'})}
+function monthlyTrainingStats(){
+  const target=16;
+  const counts={};
+  const days={};
+  get('history',[]).filter(x=>workouts.some(w=>w.id===x.wid)).forEach(sess=>{
+    const d=sessionDateObj(sess);if(!d)return;
+    const k=monthKeyFromDate(d);const iso=d.toISOString().slice(0,10);
+    counts[k]=(counts[k]||0)+1;
+    if(!days[k])days[k]={};
+    days[k][iso]=(days[k][iso]||0)+1;
+  });
+  return {target,counts,days};
+}
+function pctForCount(count,target=16){return Math.min(100,Math.round((count||0)/target*100))}
 function renderMonthlyGoal(){
   const doneEl=document.getElementById('monthlyDone');if(!doneEl)return;
-  const target=16;
+  const {target,counts}=monthlyTrainingStats();
   const now=new Date();const currentKey=monthKeyFromDate(now);
   const prev=new Date(now.getFullYear(),now.getMonth()-1,1);const prevKey=monthKeyFromDate(prev);
-  const counts={};
-  get('history',[]).filter(x=>workouts.some(w=>w.id===x.wid)).forEach(sess=>{const d=sessionDateObj(sess);if(!d)return;const k=monthKeyFromDate(d);counts[k]=(counts[k]||0)+1});
-  const current=counts[currentKey]||0;const currentPct=Math.min(100,Math.round(current/target*100));
-  const prevCount=counts[prevKey]||0;const prevPct=Math.min(100,Math.round(prevCount/target*100));
-  const allPcts=Object.keys(counts).map(k=>Math.min(100,Math.round((counts[k]||0)/target*100)));
+  const current=counts[currentKey]||0;const currentPct=pctForCount(current,target);
+  const prevCount=counts[prevKey]||0;const prevPct=pctForCount(prevCount,target);
+  const allPcts=Object.keys(counts).map(k=>pctForCount(counts[k]||0,target));
   const bestPct=allPcts.length?Math.max(...allPcts):0;
   doneEl.textContent=current;
   document.getElementById('monthlyTarget').textContent=target;
@@ -176,6 +205,40 @@ function renderMonthlyGoal(){
   document.getElementById('monthlyBar').style.width=currentPct+'%';
   document.getElementById('prevMonthGoal').textContent=`${monthLabel(prevKey)}: ${prevPct}% (${prevCount}/${target})`;
   document.getElementById('bestMonthGoal').textContent=bestPct?`Beste Monatsquote: ${bestPct}%`:'Beste Monatsquote: –';
+  renderTrainingConsistency();
+}
+function renderTrainingConsistency(){
+  const heat=document.getElementById('trainingHeatmap');if(!heat)return;
+  const {target,counts,days}=monthlyTrainingStats();
+  const now=new Date();const currentKey=monthKeyFromDate(now);
+  const prevKey=monthKeyFromDate(new Date(now.getFullYear(),now.getMonth()-1,1));
+  const current=counts[currentKey]||0, prev=counts[prevKey]||0;
+  const months=Object.keys(counts).sort();
+  const bestKey=months.length?months.reduce((best,k)=>pctForCount(counts[k],target)>pctForCount(counts[best],target)?k:best,months[0]):null;
+  const bestCount=bestKey?counts[bestKey]:0;
+  document.getElementById('consistencyCurrent').textContent=`${current}/${target}`;
+  document.getElementById('consistencyPrev').textContent=months.length?`${prev}/${target}`:'–';
+  document.getElementById('consistencyBest').textContent=bestKey?`${pctForCount(bestCount,target)}%`:'–';
+  document.getElementById('heatmapTitle').textContent=monthLabel(currentKey).replace('.', '');
+  document.getElementById('heatmapSub').textContent=`${current}/${target} Einheiten · ${pctForCount(current,target)}% Monatsziel`;
+  const y=now.getFullYear(),m=now.getMonth();
+  const first=new Date(y,m,1), last=new Date(y,m+1,0);
+  const firstDow=(first.getDay()+6)%7; // Monday = 0
+  let cells=[];
+  for(let i=0;i<firstDow;i++)cells.push('<div class="heat-day empty"></div>');
+  for(let d=1;d<=last.getDate();d++){
+    const date=new Date(y,m,d);const iso=date.toISOString().slice(0,10);const c=(days[currentKey]&&days[currentKey][iso])||0;
+    const lvl=c>=3?'l3':c===2?'l2':c===1?'l1':'';
+    const today=iso===todayISO()?' today':'';
+    cells.push(`<div class="heat-day ${lvl}${today}" title="${formatDateCH(iso)} · ${c} Training${c===1?'':'s'}">${d}</div>`);
+  }
+  heat.innerHTML=cells.join('');
+  const badge=document.getElementById('bestMonthBadge');
+  badge.innerHTML=bestKey?`🏆 <strong>Best Month</strong><br>${monthLabel(bestKey)} · ${bestCount}/${target} Einheiten · ${pctForCount(bestCount,target)}%`:'Noch keine gespeicherten Trainingsmonate vorhanden.';
+  const list=document.getElementById('monthComparisonList');
+  const last6=[];
+  for(let i=5;i>=0;i--){last6.push(monthKeyFromDate(new Date(now.getFullYear(),now.getMonth()-i,1)))}
+  list.innerHTML=last6.reverse().map(k=>{const c=counts[k]||0,p=pctForCount(c,target);return `<div class="month-row"><strong>${monthLabel(k)}</strong><span>${p}% · ${c}/${target}</span><div class="bar"><span style="width:${p}%"></span></div></div>`}).join('');
 }
 function renderPRTracker(){const el=document.getElementById('prTracker');if(!el)return;const prs={};get('history',[]).forEach(sess=>{(sess.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(set=>{const kg=normalizeNumber(set.kg);const reps=parseInt(set.reps);if(!Number.isNaN(kg)&&kg>0){const score=kg*(Number.isNaN(reps)?1:reps/10);const current=prs[ex.name];if(!current||kg>current.kg||(kg===current.kg&&score>current.score)){prs[ex.name]={kg,reps:Number.isNaN(reps)?'–':reps,score}}}})})});const keys=Object.keys(prs).slice(0,8);el.innerHTML=keys.length?keys.map(k=>`<div class="pr-card"><div class="pr-name">${k}</div><div class="pr-val">${prs[k].kg} kg</div><div class="dash-sub">Top-Satz: ${prs[k].reps} Wdh</div></div>`).join(''):'<div class="panel" style="grid-column:1/-1">Noch keine PRs. Speichere ein Training mit Gewicht und Wiederholungen.</div>'}
 
