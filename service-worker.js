@@ -1,6 +1,5 @@
-BodyPlan PWA v13
+BodyPlan PWA v12
 
-Aufbauend auf v12: kompakte Wochen-Progression in 2-spaltigen Kacheln
-(+2.5 kg / +1 Wdh), schlichte einheitliche Section-Header mit dezentem
-Chevron, Wochenstruktur fix sichtbar unter der Progression, gemerkte
-Klapp-Zustände pro Sektion und Trainingskarte. JSON Export/Import im Menü.
+Bereinigte Codebasis (doppelte Funktionen entfernt) plus Daten-Export/-Import
+über das Burger-Menü oben rechts. Backup als JSON sichern und bei Bedarf
+wiederherstellen.
