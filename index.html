@@ -66,6 +66,24 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 .session-history-card.compact-session{margin-top:12px;}
 @media(max-width:420px){.metric-actions{grid-template-columns:1fr;}.dash-card input.set-input,.dash-card input.date-input{font-size:15px;padding-left:8px;padding-right:8px;}}
 
+
+/* BodyPlan v10 refinements */
+.active-session-banner{grid-column:1/-1!important;margin:12px 0!important}
+.active-session-banner .row{align-items:center!important}
+.active-session-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.active-session-actions .small-btn{min-width:96px}
+.small-btn.abort{border-color:#f4433655!important;color:#ff6b63!important;background:#0e0e0e!important}
+.dashboard .dash-card input.set-input,.dashboard .dash-card input.date-input{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;display:block!important}
+.date-input{height:auto!important;padding:12px 8px!important;text-align:center!important;overflow:hidden!important}
+@media(max-width:430px){.active-session-banner .row{flex-direction:column;align-items:stretch!important}.active-session-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.active-session-actions .small-btn{width:100%;min-width:0}.date-input{font-size:14px!important;padding-left:4px!important;padding-right:4px!important}}
+.exercise-metric-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:11px;margin-top:10px}
+.exercise-metric-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+.exercise-metric-head strong{font-size:13px;color:#fff}
+.exercise-metric-head span{font-size:11px;color:#d4a853;text-align:right}
+.exercise-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.exercise-stat{background:#0e0e0e;border:1px solid #181818;border-radius:8px;padding:8px;text-align:center}
+.exercise-stat b{display:block;color:#d4a853;font-size:15px}.exercise-stat small{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#aaa}
+
 </style>
 </head>
 <body>
@@ -276,14 +294,24 @@ function finishSession(){
   document.getElementById('finishSessionBtn').disabled=true;document.getElementById('finishSessionBtn').textContent='Training gespeichert';
   activeSession=null;sessionStartTs=0;updateActiveSessionBanner();render();
 }
+function endActiveSessionNoSave(){
+  if(!confirm('Aktives Training definitiv beenden? Nicht gespeicherte Satzdaten werden verworfen.')) return;
+  stopRest();
+  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null}
+  clearActiveDraft();
+  activeSession=null;sessionStartTs=0;
+  const modal=document.getElementById('sessionModal');if(modal)modal.classList.remove('open');
+  const summary=document.getElementById('sessionSummary');if(summary){summary.classList.remove('open');summary.innerHTML=''}
+  updateActiveSessionBanner();render();
+}
 function updateActiveSessionBanner(){
-  const dash=document.querySelector('.dashboard');if(!dash)return;
+  const hero=document.querySelector('.dashboard .dash-card.wide');if(!hero)return;
   let banner=document.getElementById('activeSessionBanner');
-  if(!banner){banner=document.createElement('div');banner.id='activeSessionBanner';banner.className='active-session-banner wide';dash.insertAdjacentElement('afterend',banner)}
+  if(!banner){banner=document.createElement('div');banner.id='activeSessionBanner';banner.className='active-session-banner wide';hero.insertAdjacentElement('afterend',banner)}
   const d=getActiveDraft();
   if(!d||!d.wid){banner.classList.remove('open');banner.innerHTML='';return}
   const w=getWorkoutByIdV8(d.wid);const elapsed=Math.floor((Date.now()-(d.startedAt||Date.now()))/1000);
-  banner.innerHTML=`<div class="row"><div><span>Aktives Training</span><br><strong>${w?w.title:d.wid}</strong><div class="dash-sub">läuft seit ${formatTime(elapsed)}</div></div><button class="small-btn accent" onclick="openSession('${d.wid}')">Fortsetzen</button></div>`;
+  banner.innerHTML=`<div class="row"><div><span>Aktives Training</span><br><strong>${w?w.title:d.wid}</strong><div class="dash-sub">läuft seit ${formatTime(elapsed)}</div></div><div class="active-session-actions"><button class="small-btn accent" onclick="openSession('${d.wid}')">Fortsetzen</button><button class="small-btn abort" onclick="endActiveSessionNoSave()">Beenden</button></div></div>`;
   banner.classList.add('open');
 }
 setInterval(updateActiveSessionBanner,1000);
@@ -295,7 +323,7 @@ function renderExerciseMiniChart(items,exName){
   const arr=items.map((x,i)=>({...x,totalVolume:vals[i]}));
   const last=vals[vals.length-1]||0, prev=vals.length>1?vals[vals.length-2]:null;
   const d=prev==null?null:last-prev;const delta=d==null?'erste Messung':`${d>0?'+':''}${Math.round(d).toLocaleString('de-CH')} kg`;
-  return `<div class="exercise-chart-card"><div class="exercise-chart-title"><strong>${exName}</strong><span>${delta}</span></div>${renderVolumeMiniChart(arr)}<div class="dash-sub">Letzte Einheit: ${Math.round(last).toLocaleString('de-CH')} kg</div></div>`;
+  return `<div class="exercise-chart-card"><div class="exercise-chart-title"><strong>${displayExerciseName(exName)}</strong><span>${delta}</span></div>${renderVolumeMiniChart(arr)}<div class="dash-sub">Letzte Einheit: ${Math.round(last).toLocaleString('de-CH')} kg</div></div>`;
 }
 function renderSessionHistory(){
   const el=document.getElementById('sessionHistory');if(!el)return;
@@ -347,6 +375,63 @@ function renderSessionHistory(){
   }).join('');
   el.innerHTML=`<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner">${charts}<details><summary style="cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-top:14px;padding:12px 0">Gespeicherte Sessions anzeigen</summary>${latest}</details></div></details>`;
 }
+
+
+/* BodyPlan v10: active session controls and exercise-focused analytics */
+function maxKgForExercise(sess,name){
+  const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(name));
+  if(!ex)return 0;
+  return Math.max(0,...(ex.sets||[]).map(s=>parseFloat(String(s.kg).replace(',','.'))||0));
+}
+function avgKgForExercise(sess,name){
+  const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(name));
+  if(!ex)return 0;
+  const vals=(ex.sets||[]).map(s=>parseFloat(String(s.kg).replace(',','.'))||0).filter(v=>v>0);
+  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+}
+function bestSetText(sess,name){
+  const ex=(sess.exercises||[]).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(name));
+  if(!ex)return '–';
+  let best=null;
+  (ex.sets||[]).forEach(s=>{const kg=parseFloat(String(s.kg).replace(',','.'))||0;const reps=parseInt(s.reps)||0;if(kg>0&&(!best||kg>best.kg||(kg===best.kg&&reps>best.reps)))best={kg,reps}});
+  return best?`${best.kg} kg × ${best.reps||'–'}`:'–';
+}
+function renderWeightProgressChart(items,name){
+  const arr=items.map(x=>({...x,totalVolume:maxKgForExercise(x,name)})).filter(x=>x.totalVolume>0);
+  if(!arr.length)return '<div class="dash-sub">Noch keine Gewichtsdaten für diese Übung.</div>';
+  return renderVolumeMiniChart(arr);
+}
+function displayExerciseName(n){return (n||'').split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):w).join(' ')}
+function renderExerciseProgressCard(items,exName){
+  const valid=items.filter(x=>maxKgForExercise(x,exName)>0);
+  if(!valid.length)return'';
+  const last=valid[valid.length-1], prev=valid[valid.length-2];
+  const lastMax=maxKgForExercise(last,exName), prevMax=prev?maxKgForExercise(prev,exName):null;
+  const delta=prevMax==null?'erste Messung':`${lastMax-prevMax>0?'+':''}${(lastMax-prevMax).toFixed(1).replace('.0','')} kg`;
+  const avg=avgKgForExercise(last,exName);
+  const pr=Math.max(...valid.map(x=>maxKgForExercise(x,exName)));
+  return `<div class="exercise-metric-card"><div class="exercise-metric-head"><strong>${displayExerciseName(exName)}</strong><span>${delta}</span></div>${renderWeightProgressChart(items,exName)}<div class="exercise-stats"><div class="exercise-stat"><b>${lastMax.toFixed(1).replace('.0','')} kg</b><small>Letztes Top</small></div><div class="exercise-stat"><b>${avg.toFixed(1).replace('.0','')} kg</b><small>Ø Gewicht</small></div><div class="exercise-stat"><b>${pr.toFixed(1).replace('.0','')} kg</b><small>PR</small></div></div><div class="dash-sub">Letzter Top-Satz: ${bestSetText(last,exName)}</div></div>`;
+}
+function renderSessionHistory(){
+  const el=document.getElementById('sessionHistory');if(!el)return;
+  const all=get('history',[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
+  if(!all.length){el.innerHTML='<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner"><div class="panel">Noch keine Trainings gespeichert. Starte eine Einheit und speichere sie nach dem Training.</div></div></details>';return}
+  const ids=[...new Set(all.map(x=>x.wid))];
+  const charts=ids.map(id=>{
+    const items=all.filter(x=>x.wid===id);
+    const last=items[items.length-1];
+    const names=[...new Set(items.flatMap(s=>(s.exercises||[]).map(e=>normalizeExerciseName(e.name))))];
+    const exerciseCharts=names.map(n=>renderExerciseProgressCard(items,n)).join('')||'<div class="dash-sub">Noch keine Übungsdaten.</div>';
+    return `<div class="volume-card"><div class="volume-title"><strong>${last.title||id}</strong><span class="volume-delta">${items.length} Einheit${items.length===1?'':'en'}</span></div>${exerciseCharts}</div>`
+  }).join('');
+  const latest=all.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,10).map((sess,idx)=>{
+    const ex=(sess.exercises||[]).filter(e=>(e.sets||[]).some(s=>s.kg||s.reps)).slice(0,8).map(e=>`<div class="session-ex"><b>${displayExerciseName(normalizeExerciseName(e.name))}</b><br>${(e.sets||[]).map((s,i)=>`S${i+1}: ${s.kg||'-'} kg × ${s.reps||'-'} Wdh`).join(' · ')}</div>`).join('');
+    return `<div class="session-history-card compact-session"><div class="session-history-title"><strong>${sess.title||sess.wid}</strong><span class="session-history-date">${sess.date||''}</span></div><div class="dash-sub">Dauer: ${sess.durationSec?formatTime(sess.durationSec):'–'}</div><details><summary>Satzdetails anzeigen</summary>${ex||'<div class="dash-sub">Keine Satzdaten gespeichert.</div>'}</details><div class="session-actions"><button class="small-btn danger" onclick="deleteSession(${idx})">Session löschen</button></div></div>`
+  }).join('');
+  el.innerHTML=`<details class="history-collapsible"><summary>Trainingshistorie anzeigen</summary><div class="history-collapsible-inner">${charts}<details><summary style="cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-top:14px;padding:12px 0">Gespeicherte Sessions anzeigen</summary>${latest}</details></div></details>`;
+}
+const renderBeforeV10=render;
+render=function(){renderBeforeV10();renderSessionHistory();updateActiveSessionBanner();};
 
 if('serviceWorker'in navigator){navigator.serviceWorker.register('service-worker.js')}
 render();
