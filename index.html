@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
-  <title>BodyPlan Pro v13 · Navigation</title>
+  <title>BodyPlan Pro v14 · Monthly Goal</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="theme-color" content="#080808">
@@ -75,7 +75,7 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 .small-btn.abort{border-color:#f4433655!important;color:#ff6b63!important;background:#0e0e0e!important}
 .dashboard .dash-card input.set-input,.dashboard .dash-card input.date-input{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;display:block!important}
 .date-input{height:auto!important;padding:12px 8px!important;text-align:center!important;overflow:hidden!important}
-@media(max-width:430px){.active-session-banner .row{flex-direction:column;align-items:stretch!important}.active-session-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.active-session-actions .small-btn{width:100%;min-width:0}.date-input{font-size:14px!important;padding-left:4px!important;padding-right:4px!important}}
+.monthly-meta{font-size:11px;line-height:1.45;margin-top:9px;color:#ddd}@media(max-width:430px){.active-session-banner .row{flex-direction:column;align-items:stretch!important}.active-session-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.active-session-actions .small-btn{width:100%;min-width:0}.date-input{font-size:14px!important;padding-left:4px!important;padding-right:4px!important}}
 .exercise-metric-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:11px;margin-top:10px}
 .exercise-metric-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
 .exercise-metric-head strong{font-size:13px;color:#fff}
@@ -95,7 +95,7 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 <div id="tab-training" class="page">
   <div id="page-dashboard" class="app-page">
     <div class="section-label">Täglich — jeden Tag</div><div class="daily"><div class="daily-item"><div class="daily-num">25</div><div class="daily-lbl">Liegestütze</div><div class="daily-note">Morgens oder abends</div></div><div class="daily-item"><div class="daily-num">10</div><div class="daily-lbl">Klimmzüge</div><div class="daily-note">Kein Ersatz für Training</div></div></div>
-    <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="doneCount">0</span>/4</div><div class="bar"><span id="weekBar" style="width:0%"></span></div></div><div class="dash-card"><div class="dash-label">Protein heute</div><div class="dash-num"><span id="proteinNow">0</span>g</div><div class="dash-sub">Ziel 172g</div></div><div class="dash-card"><div class="dash-label">Trainingsstreak</div><div class="dash-num">🔥 <span id="streakNow">0</span></div><div class="dash-sub">gespeicherte Einheiten</div></div><div class="dash-card"><div class="dash-label">Zielstatus</div><div id="goalStatus" class="dash-sub">Noch keine Messwerte.</div><div class="goal-grid"><div><div class="goal-line"><span>Gewicht</span><span id="goalWeightTxt">–</span></div><div class="bar"><span id="goalWeightBar" style="width:0%"></span></div></div><div><div class="goal-line"><span>KFA</span><span id="goalFatTxt">–</span></div><div class="bar"><span id="goalFatBar" style="width:0%"></span></div></div></div></div></div>
+    <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="doneCount">0</span>/4</div><div class="bar"><span id="weekBar" style="width:0%"></span></div></div><div class="dash-card"><div class="dash-label">Protein heute</div><div class="dash-num"><span id="proteinNow">0</span>g</div><div class="dash-sub">Ziel 172g</div></div><div class="dash-card"><div class="dash-label">Monatsziel</div><div class="dash-num"><span id="monthlyDone">0</span>/<span id="monthlyTarget">16</span></div><div class="dash-sub"><span id="monthlyPercent">0</span>% erreicht</div><div class="bar"><span id="monthlyBar" style="width:0%"></span></div><div class="dash-sub monthly-meta"><span id="prevMonthGoal">Vormonat: –</span><br><span id="bestMonthGoal">Beste Monatsquote: –</span></div></div><div class="dash-card"><div class="dash-label">Zielstatus</div><div id="goalStatus" class="dash-sub">Noch keine Messwerte.</div><div class="goal-grid"><div><div class="goal-line"><span>Gewicht</span><span id="goalWeightTxt">–</span></div><div class="bar"><span id="goalWeightBar" style="width:0%"></span></div></div><div><div class="goal-line"><span>KFA</span><span id="goalFatTxt">–</span></div><div class="bar"><span id="goalFatBar" style="width:0%"></span></div></div></div></div></div>
     <div class="section-label">Persönliche Rekorde</div><div id="prTracker" class="pr-grid"></div>
     <div class="section-label">Workout Check</div><div id="checks"></div><button class="secondary-btn" onclick="resetWeek()">Woche zurücksetzen</button>
   </div>
@@ -137,7 +137,7 @@ function saveExerciseField(id){set('field_'+id,document.getElementById(id).value
 function restoreFields(){document.querySelectorAll('input[id]').forEach(inp=>{const v=get('field_'+inp.id,null);if(v!==null)inp.value=v})}
 function historyBlock(wid,ei){const h=get('history',[]).filter(x=>x.wid===wid).slice(-3).reverse();if(!h.length)return '<div class="history">Noch keine Historie für diese Übung.</div>';let rows=h.map(sess=>{const ex=sess.exercises[ei];if(!ex)return'';return `${sess.date}: ${ex.sets.map(a=>`${a.kg||'-'}kg × ${a.reps||'-'}`).join(' · ')}`}).join('<br>');return `<div class="history"><strong>Historie</strong><br>${rows}</div>`}
 function recommendation(w,ei){const hist=get('history',[]).filter(x=>x.wid===w.id).slice(-1)[0];if(!hist)return'';const ex=hist.exercises[ei];if(!ex)return'';const max=parseInt(String(w.ex[ei][3]).split('–').pop())||12;const allTop=ex.sets.every(s=>parseInt(s.reps)>=max);const anyKg=ex.sets.some(s=>parseFloat(s.kg)>0);if(allTop&&anyKg)return '<div class="recommend">↑ Nächstes Mal Gewicht leicht erhöhen (+2.5 kg / kleinste Stufe).</div>';if(allTop)return '<div class="recommend">↑ Nächstes Mal schwierigere Variante oder langsamere Exzentrik.</div>';return '<div class="recommend">Ziel: gleiche Last, mehr saubere Wiederholungen.</div>'}
-function render(){document.getElementById('workouts').innerHTML=workouts.map(makeCard).join('');document.getElementById('altWorkouts').innerHTML=altWorkouts.map(makeCard).join('');restoreCollapsibleSections();document.getElementById('meals').innerHTML=meals.map(m=>`<div class="meal"><div class="meal-top"><div class="meal-l"><div class="meal-emoji">${m[0]}</div><div><div class="meal-name">${m[1]}</div><div class="meal-time">${m[2]}</div></div></div><div><div class="meal-p">${m[3]}</div><div class="meal-k">${m[4]}</div></div></div>${m[5].map(i=>`<div class="meal-item">${i}</div>`).join('')}</div>`).join('');renderChecks();restoreFields();loadMetrics();renderProtein();updateDashboard();renderStreak();renderPRTracker();renderPhotos();renderGoalStatus();}
+function render(){document.getElementById('workouts').innerHTML=workouts.map(makeCard).join('');document.getElementById('altWorkouts').innerHTML=altWorkouts.map(makeCard).join('');restoreCollapsibleSections();document.getElementById('meals').innerHTML=meals.map(m=>`<div class="meal"><div class="meal-top"><div class="meal-l"><div class="meal-emoji">${m[0]}</div><div><div class="meal-name">${m[1]}</div><div class="meal-time">${m[2]}</div></div></div><div><div class="meal-p">${m[3]}</div><div class="meal-k">${m[4]}</div></div></div>${m[5].map(i=>`<div class="meal-item">${i}</div>`).join('')}</div>`).join('');renderChecks();restoreFields();loadMetrics();renderProtein();updateDashboard();renderMonthlyGoal();renderPRTracker();renderPhotos();renderGoalStatus();}
 function renderChecks(){const done=get('done',{});document.getElementById('checks').innerHTML=workouts.map(w=>`<label class="check-row"><span>${w.title} erledigt</span><input type="checkbox" ${done[w.id]?'checked':''} onchange="toggleDone('${w.id}',this.checked)"></label>`).join('')}
 function toggleDone(id,val){const done=get('done',{});done[id]=val;set('done',done);updateDashboard()}function resetWeek(){set('done',{});renderChecks();updateDashboard()}function updateDashboard(){const done=get('done',{});const count=workouts.filter(w=>done[w.id]).length;document.getElementById('doneCount').textContent=count;document.getElementById('weekBar').style.width=(count/4*100)+'%';const n=workouts.find(w=>!done[w.id])||workouts[0];nextWorkoutId=n.id;document.getElementById('nextWorkout').textContent=n.title;document.getElementById('nextWorkoutSub').textContent=`${n.dur} · ${n.sub}`;}
 function metricMeta(id){return id==='bodyWeight'?{unit:'kg',chart:'weightChart',current:'weightCurrent',trend:'weightTrend',label:'Gewicht'}:{unit:'%',chart:'fatChart',current:'fatCurrent',trend:'fatTrend',label:'Körperfett'}}
@@ -151,7 +151,32 @@ function addProtein(g){const today=new Date().toISOString().slice(0,10);let p=ge
 
 function getLastMetricValue(id){const arr=get(id+'History',[]);return arr.length?arr[arr.length-1].value:null}
 function renderGoalStatus(){const w=getLastMetricValue('bodyWeight'), f=getLastMetricValue('bodyFat');const gs=document.getElementById('goalStatus');if(!gs)return;const wt=document.getElementById('goalWeightTxt'), ft=document.getElementById('goalFatTxt');const wb=document.getElementById('goalWeightBar'), fb=document.getElementById('goalFatBar');if(w==null&&f==null){gs.textContent='Noch keine Messwerte.';wt.textContent='–';ft.textContent='–';wb.style.width='0%';fb.style.width='0%';return}gs.textContent='Ziel: 75 kg bei 10% KFA';if(w!=null){wt.textContent=`${w}/75 kg`;wb.style.width=Math.max(0,Math.min(100,w/75*100))+'%'}if(f!=null){ft.textContent=`${f}/10 %`;fb.style.width=Math.max(0,Math.min(100,10/f*100))+'%'}}
-function renderStreak(){const el=document.getElementById('streakNow');if(!el)return;const hist=get('history',[]).filter(x=>workouts.some(w=>w.id===x.wid));el.textContent=get('sessionStreak',hist.length||0)}
+function sessionDateObj(sess){
+  if(sess.iso){const d=new Date(sess.iso+'T12:00:00');if(!isNaN(d))return d}
+  if(sess.ts){const d=new Date(sess.ts);if(!isNaN(d))return d}
+  if(sess.date){const m=String(sess.date).match(/(\d{2})\.(\d{2})\.(\d{4})/);if(m){const d=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`);if(!isNaN(d))return d}}
+  return null
+}
+function monthKeyFromDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function monthLabel(key){if(!key)return '–';const [y,m]=key.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('de-CH',{month:'short',year:'2-digit'})}
+function renderMonthlyGoal(){
+  const doneEl=document.getElementById('monthlyDone');if(!doneEl)return;
+  const target=16;
+  const now=new Date();const currentKey=monthKeyFromDate(now);
+  const prev=new Date(now.getFullYear(),now.getMonth()-1,1);const prevKey=monthKeyFromDate(prev);
+  const counts={};
+  get('history',[]).filter(x=>workouts.some(w=>w.id===x.wid)).forEach(sess=>{const d=sessionDateObj(sess);if(!d)return;const k=monthKeyFromDate(d);counts[k]=(counts[k]||0)+1});
+  const current=counts[currentKey]||0;const currentPct=Math.min(100,Math.round(current/target*100));
+  const prevCount=counts[prevKey]||0;const prevPct=Math.min(100,Math.round(prevCount/target*100));
+  const allPcts=Object.keys(counts).map(k=>Math.min(100,Math.round((counts[k]||0)/target*100)));
+  const bestPct=allPcts.length?Math.max(...allPcts):0;
+  doneEl.textContent=current;
+  document.getElementById('monthlyTarget').textContent=target;
+  document.getElementById('monthlyPercent').textContent=currentPct;
+  document.getElementById('monthlyBar').style.width=currentPct+'%';
+  document.getElementById('prevMonthGoal').textContent=`${monthLabel(prevKey)}: ${prevPct}% (${prevCount}/${target})`;
+  document.getElementById('bestMonthGoal').textContent=bestPct?`Beste Monatsquote: ${bestPct}%`:'Beste Monatsquote: –';
+}
 function renderPRTracker(){const el=document.getElementById('prTracker');if(!el)return;const prs={};get('history',[]).forEach(sess=>{(sess.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(set=>{const kg=normalizeNumber(set.kg);const reps=parseInt(set.reps);if(!Number.isNaN(kg)&&kg>0){const score=kg*(Number.isNaN(reps)?1:reps/10);const current=prs[ex.name];if(!current||kg>current.kg||(kg===current.kg&&score>current.score)){prs[ex.name]={kg,reps:Number.isNaN(reps)?'–':reps,score}}}})})});const keys=Object.keys(prs).slice(0,8);el.innerHTML=keys.length?keys.map(k=>`<div class="pr-card"><div class="pr-name">${k}</div><div class="pr-val">${prs[k].kg} kg</div><div class="dash-sub">Top-Satz: ${prs[k].reps} Wdh</div></div>`).join(''):'<div class="panel" style="grid-column:1/-1">Noch keine PRs. Speichere ein Training mit Gewicht und Wiederholungen.</div>'}
 
 let restInterval=null,restEnd=0;
