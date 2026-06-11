@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
-  <title>BodyPlan Pro v15 · Training Consistency</title>
+  <title>BodyPlan Pro v18 · Daily Consistency</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="theme-color" content="#080808">
@@ -96,15 +96,15 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 /* BodyPlan v17: dashboard refinement and static history page */
 .history-workout-group{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;margin-bottom:12px;overflow:hidden}.history-workout-group>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;color:#d4a853;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:11px}.history-workout-group>summary::-webkit-details-marker{display:none}.history-workout-group>summary small{color:#d4a853;font-size:12px;text-transform:none;letter-spacing:0;font-weight:600}.history-workout-group>summary:after{content:'▼';color:#fff;font-size:14px;margin-left:12px}.history-workout-group[open]>summary:after{content:'▲'}.history-workout-group .history-collapsible-inner{padding:0 16px 16px}.saved-sessions{margin-top:16px}.dash-card .bar{max-width:100%}
 
-</style>
+.habit-btn{width:100%;border:1px solid #d4a85355;border-radius:8px;background:#0e0e0e;color:#d4a853;font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;padding:10px 8px;margin-top:12px;cursor:pointer}.habit-btn.done{background:#d4a853;color:#080808;border-color:#d4a853}.habit-btn:active{transform:scale(.98)}</style>
 </head>
 <body>
 <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)toggleMenu(false)"><div class="menu-sheet"><div class="menu-goal">NAVIGATION</div><button class="menu-item" onclick="showAppPage('dashboard')"><span class="mi-ico">⌂</span>Dashboard</button><button class="menu-item" onclick="showAppPage('progress')"><span class="mi-ico">📈</span>Fortschritt</button><button class="menu-item" onclick="showAppPage('history')"><span class="mi-ico">📊</span>Trainingshistorie</button><button class="menu-item" onclick="showAppPage('plan')"><span class="mi-ico">🏋️</span>Trainingsplan</button><button class="menu-item" onclick="showAppPage('alternative')"><span class="mi-ico">🏝️</span>Alternative Trainingseinheiten</button><div class="menu-sep"></div><button class="menu-item" onclick="exportData()"><span class="mi-ico">⬇️</span>Daten exportieren</button><button class="menu-item" onclick="triggerImport()"><span class="mi-ico">⬆️</span>Daten importieren</button><div class="menu-sep"></div><button class="menu-item" onclick="toggleMenu(false)"><span class="mi-ico">✕</span>Schließen</button><input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)"></div></div>
 <div class="header"><div class="header-row"><div class="brand-home" onclick="showAppPage('dashboard')" role="button" aria-label="Zur Startseite"><div class="wordmark">BODY<em>PLAN</em></div><div class="split-tag">Push · Pull · Legs · Upper</div></div><button class="menu-btn" id="menuBtn" onclick="toggleMenu(true)" aria-label="Menü"><span></span><span></span><span></span></button></div><div class="tabs"><button class="tab active" onclick="switchTab('training', this)">🏋️ Training</button><button class="tab" onclick="switchTab('ernaehrung', this)">🥗 Ernährung</button></div></div>
 <div id="tab-training" class="page">
   <div id="page-dashboard" class="app-page">
-    <div class="section-label">Täglich — jeden Tag</div><div class="daily"><div class="daily-item"><div class="daily-num">25</div><div class="daily-lbl">Liegestütze</div><div class="daily-note">Morgens oder abends</div></div><div class="daily-item"><div class="daily-num">10</div><div class="daily-lbl">Klimmzüge</div><div class="daily-note">Kein Ersatz für Training</div></div></div>
-    <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="doneCount">0</span>/4</div><div class="bar"><span id="weekBar" style="width:0%"></span></div></div><div class="dash-card"><div class="dash-label">Nächster Meilenstein</div><div class="dash-num" id="milestoneNum">–</div><div class="dash-sub" id="milestoneSub">Noch keine Messwerte.</div><div class="bar"><span id="milestoneBar" style="width:0%"></span></div></div><div class="dash-card"><div class="dash-label">Monatsziel</div><div class="dash-num"><span id="monthlyDone">0</span>/<span id="monthlyTarget">16</span></div><div class="dash-sub"><span id="monthlyPercent">0</span>% erreicht</div><div class="bar"><span id="monthlyBar" style="width:0%"></span></div><div class="dash-sub monthly-meta"><span id="prevMonthGoal">Vormonat: –</span><br><span id="bestMonthGoal">Beste Monatsquote: –</span></div></div><div class="dash-card"><div class="dash-label">Zielstatus</div><div id="goalStatus" class="dash-sub">Noch keine Messwerte.</div><div class="goal-grid"><div><div class="goal-line"><span>Gewicht</span><span id="goalWeightTxt">–</span></div><div class="bar"><span id="goalWeightBar" style="width:0%"></span></div></div><div><div class="goal-line"><span>KFA</span><span id="goalFatTxt">–</span></div><div class="bar"><span id="goalFatBar" style="width:0%"></span></div></div></div></div></div>
+    <div class="section-label">Täglich — jeden Tag</div><div class="daily"><div class="daily-item"><div class="daily-num">25</div><div class="daily-lbl">Liegestütze</div><div class="daily-note">Täglich erfassen</div><button class="habit-btn" id="pushupDoneBtn" onclick="toggleDailyHabit('pushups')">Erledigt</button></div><div class="daily-item"><div class="daily-num">10</div><div class="daily-lbl">Klimmzüge</div><div class="daily-note">Täglich erfassen</div><button class="habit-btn" id="pullupDoneBtn" onclick="toggleDailyHabit('pullups')">Erledigt</button></div></div>
+    <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="doneCount">0</span>/4</div><div class="bar"><span id="weekBar" style="width:0%"></span></div></div><div class="dash-card"><div class="dash-label">Daily Consistency</div><div class="dash-num">🔥 <span id="dailyStreak">0</span></div><div class="dash-sub"><strong id="dailyPushupsYtd">0</strong> Liegestütze YTD<br><strong id="dailyPullupsYtd">0</strong> Klimmzüge YTD</div><div class="bar"><span id="dailyQuoteBar" style="width:0%"></span></div><div class="dash-sub">Jahresquote: <span id="dailyQuote">0</span>%</div></div><div class="dash-card"><div class="dash-label">Monatsziel</div><div class="dash-num"><span id="monthlyDone">0</span>/<span id="monthlyTarget">16</span></div><div class="dash-sub"><span id="monthlyPercent">0</span>% erreicht</div><div class="bar"><span id="monthlyBar" style="width:0%"></span></div><div class="dash-sub monthly-meta"><span id="prevMonthGoal">Vormonat: –</span><br><span id="bestMonthGoal">Beste Monatsquote: –</span></div></div><div class="dash-card"><div class="dash-label">Zielstatus</div><div id="goalStatus" class="dash-sub">Noch keine Messwerte.</div><div class="goal-grid"><div><div class="goal-line"><span>Gewicht</span><span id="goalWeightTxt">–</span></div><div class="bar"><span id="goalWeightBar" style="width:0%"></span></div></div><div><div class="goal-line"><span>KFA</span><span id="goalFatTxt">–</span></div><div class="bar"><span id="goalFatBar" style="width:0%"></span></div></div></div></div></div>
     <div class="section-label">Workout Check</div><div id="checks"></div><button class="secondary-btn" onclick="resetWeek()">Woche zurücksetzen</button>
     <div class="section-label">Persönliche Rekorde</div><div id="prTracker" class="pr-grid"></div>
   </div>
@@ -160,7 +160,7 @@ function saveExerciseField(id){set('field_'+id,document.getElementById(id).value
 function restoreFields(){document.querySelectorAll('input[id]').forEach(inp=>{const v=get('field_'+inp.id,null);if(v!==null)inp.value=v})}
 function historyBlock(wid,ei){const h=get('history',[]).filter(x=>x.wid===wid).slice(-3).reverse();if(!h.length)return '<div class="history">Noch keine Historie für diese Übung.</div>';let rows=h.map(sess=>{const ex=sess.exercises[ei];if(!ex)return'';return `${sess.date}: ${ex.sets.map(a=>`${a.kg||'-'}kg × ${a.reps||'-'}`).join(' · ')}`}).join('<br>');return `<div class="history"><strong>Historie</strong><br>${rows}</div>`}
 function recommendation(w,ei){const hist=get('history',[]).filter(x=>x.wid===w.id).slice(-1)[0];if(!hist)return'';const ex=hist.exercises[ei];if(!ex)return'';const max=parseInt(String(w.ex[ei][3]).split('–').pop())||12;const allTop=ex.sets.every(s=>parseInt(s.reps)>=max);const anyKg=ex.sets.some(s=>parseFloat(s.kg)>0);if(allTop&&anyKg)return '<div class="recommend">↑ Nächstes Mal Gewicht leicht erhöhen (+2.5 kg / kleinste Stufe).</div>';if(allTop)return '<div class="recommend">↑ Nächstes Mal schwierigere Variante oder langsamere Exzentrik.</div>';return '<div class="recommend">Ziel: gleiche Last, mehr saubere Wiederholungen.</div>'}
-function render(){document.getElementById('workouts').innerHTML=workouts.map(makeCard).join('');document.getElementById('altWorkouts').innerHTML=altWorkouts.map(makeCard).join('');restoreCollapsibleSections();document.getElementById('meals').innerHTML=meals.map(m=>`<div class="meal"><div class="meal-top"><div class="meal-l"><div class="meal-emoji">${m[0]}</div><div><div class="meal-name">${m[1]}</div><div class="meal-time">${m[2]}</div></div></div><div><div class="meal-p">${m[3]}</div><div class="meal-k">${m[4]}</div></div></div>${m[5].map(i=>`<div class="meal-item">${i}</div>`).join('')}</div>`).join('');renderChecks();restoreFields();loadMetrics();renderProtein();updateDashboard();renderMonthlyGoal();renderPRTracker();renderPhotos();renderGoalStatus();renderNextMilestone();}
+function render(){document.getElementById('workouts').innerHTML=workouts.map(makeCard).join('');document.getElementById('altWorkouts').innerHTML=altWorkouts.map(makeCard).join('');restoreCollapsibleSections();document.getElementById('meals').innerHTML=meals.map(m=>`<div class="meal"><div class="meal-top"><div class="meal-l"><div class="meal-emoji">${m[0]}</div><div><div class="meal-name">${m[1]}</div><div class="meal-time">${m[2]}</div></div></div><div><div class="meal-p">${m[3]}</div><div class="meal-k">${m[4]}</div></div></div>${m[5].map(i=>`<div class="meal-item">${i}</div>`).join('')}</div>`).join('');renderChecks();restoreFields();loadMetrics();renderProtein();updateDashboard();renderMonthlyGoal();renderPRTracker();renderPhotos();renderGoalStatus();renderNextMilestone();renderDailyHabits();}
 function renderChecks(){const done=get('done',{});document.getElementById('checks').innerHTML=workouts.map(w=>`<label class="check-row"><span>${w.title} erledigt</span><input type="checkbox" ${done[w.id]?'checked':''} onchange="toggleDone('${w.id}',this.checked)"></label>`).join('')}
 function toggleDone(id,val){const done=get('done',{});done[id]=val;set('done',done);updateDashboard()}function resetWeek(){set('done',{});renderChecks();updateDashboard()}function updateDashboard(){const done=get('done',{});const count=workouts.filter(w=>done[w.id]).length;document.getElementById('doneCount').textContent=count;document.getElementById('weekBar').style.width=(count/4*100)+'%';const n=workouts.find(w=>!done[w.id])||workouts[0];nextWorkoutId=n.id;document.getElementById('nextWorkout').textContent=n.title;document.getElementById('nextWorkoutSub').textContent=`${n.dur} · ${n.sub}`;}
 function metricMeta(id){return id==='bodyWeight'?{unit:'kg',chart:'weightChart',current:'weightCurrent',trend:'weightTrend',label:'Gewicht'}:{unit:'%',chart:'fatChart',current:'fatCurrent',trend:'fatTrend',label:'Körperfett'}}
@@ -171,6 +171,61 @@ function resetMetric(id){if(!confirm('Verlauf wirklich zurücksetzen?'))return;s
 
 function drawCharts(){drawLineChart('bodyWeight',get('bodyWeightHistory',[]));drawLineChart('bodyFat',get('bodyFatHistory',[]));renderGoalStatus();renderNextMilestone()}
 function addProtein(g){const today=new Date().toISOString().slice(0,10);let p=get('protein',{date:today,value:0});if(p.date!==today)p={date:today,value:0};p.value+=g;set('protein',p);renderProtein()}function resetProtein(){set('protein',{date:new Date().toISOString().slice(0,10),value:0});renderProtein()}function renderProtein(){const today=new Date().toISOString().slice(0,10);let p=get('protein',{date:today,value:0});if(p.date!==today)p={date:today,value:0};['proteinNow','proteinNow2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=p.value});const bar=document.getElementById('proteinBar');if(bar)bar.style.width=Math.min(100,p.value/172*100)+'%'}
+
+function todayIso(){return new Date().toISOString().slice(0,10)}
+function dailyTarget(type){return type==='pushups'?25:10}
+function getDailyHabits(){return get('dailyHabits',{})||{}}
+function setDailyHabits(data){set('dailyHabits',data)}
+function toggleDailyHabit(type){
+  const today=todayIso();
+  const data=getDailyHabits();
+  if(!data[today])data[today]={pushups:0,pullups:0};
+  data[today][type]=data[today][type]>=dailyTarget(type)?0:dailyTarget(type);
+  if((data[today].pushups||0)===0&&(data[today].pullups||0)===0)delete data[today];
+  setDailyHabits(data);
+  renderDailyHabits();
+}
+function isDailyComplete(entry){return entry&&(entry.pushups||0)>=25&&(entry.pullups||0)>=10}
+function dailyStreakCount(data){
+  let streak=0;
+  const d=new Date();
+  while(true){
+    const iso=d.toISOString().slice(0,10);
+    if(isDailyComplete(data[iso])){streak++;d.setDate(d.getDate()-1)}else break;
+  }
+  return streak;
+}
+function dailyYearStats(data){
+  const now=new Date();
+  const year=now.getFullYear();
+  const start=new Date(year,0,1);
+  const daysPassed=Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate())-start)/86400000)+1;
+  let pushups=0,pullups=0,completeDays=0;
+  Object.entries(data).forEach(([iso,val])=>{
+    if(!iso.startsWith(String(year)+'-'))return;
+    pushups+=Number(val.pushups||0);
+    pullups+=Number(val.pullups||0);
+    if(isDailyComplete(val))completeDays++;
+  });
+  return {pushups,pullups,completeDays,daysPassed,quote:daysPassed?Math.round(completeDays/daysPassed*100):0};
+}
+function renderDailyHabits(){
+  const data=getDailyHabits();
+  const today=todayIso();
+  const entry=data[today]||{};
+  const pBtn=document.getElementById('pushupDoneBtn');
+  const cBtn=document.getElementById('pullupDoneBtn');
+  if(pBtn){const done=(entry.pushups||0)>=25;pBtn.classList.toggle('done',done);pBtn.textContent=done?'✓ Erledigt':'Erledigt'}
+  if(cBtn){const done=(entry.pullups||0)>=10;cBtn.classList.toggle('done',done);cBtn.textContent=done?'✓ Erledigt':'Erledigt'}
+  const stats=dailyYearStats(data);
+  const streak=dailyStreakCount(data);
+  const streakEl=document.getElementById('dailyStreak');if(streakEl)streakEl.textContent=streak;
+  const py=document.getElementById('dailyPushupsYtd');if(py)py.textContent=stats.pushups.toLocaleString('de-CH');
+  const cy=document.getElementById('dailyPullupsYtd');if(cy)cy.textContent=stats.pullups.toLocaleString('de-CH');
+  const q=document.getElementById('dailyQuote');if(q)q.textContent=stats.quote;
+  const qb=document.getElementById('dailyQuoteBar');if(qb)qb.style.width=Math.min(100,stats.quote)+'%';
+}
+
 
 function getLastMetricValue(id){const arr=get(id+'History',[]);return arr.length?arr[arr.length-1].value:null}
 function renderGoalStatus(){const w=getLastMetricValue('bodyWeight'), f=getLastMetricValue('bodyFat');const gs=document.getElementById('goalStatus');if(!gs)return;const wt=document.getElementById('goalWeightTxt'), ft=document.getElementById('goalFatTxt');const wb=document.getElementById('goalWeightBar'), fb=document.getElementById('goalFatBar');if(w==null&&f==null){gs.textContent='Noch keine Messwerte.';wt.textContent='–';ft.textContent='–';wb.style.width='0%';fb.style.width='0%';return}gs.textContent='Ziel: 75 kg bei 10% KFA';if(w!=null){wt.textContent=`${w}/75 kg`;wb.style.width=Math.max(0,Math.min(100,w/75*100))+'%'}if(f!=null){ft.textContent=`${f}/10 %`;fb.style.width=Math.max(0,Math.min(100,10/f*100))+'%'}}
