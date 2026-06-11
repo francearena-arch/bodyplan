@@ -1,3 +1,1 @@
-BodyPlan PWA v21
-
-Refined body composition card layout.
+BodyPlan PWA v22
