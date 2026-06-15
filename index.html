@@ -105,6 +105,51 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 .compact-workout-sub{font-size:11px;color:#d7d7d7;line-height:1.35;margin-top:4px;letter-spacing:.2px;max-width:220px}
 .compact-title-block{min-width:0;flex:1}
 @media(max-width:420px){.compact-workout-sub{font-size:10px;max-width:150px}.compact-title-block{max-width:150px}}
+
+/* BodyPlan v33: realistic anatomy heatmap overlays */
+.body-map-card{padding:10px;background:#060606}
+.body-map svg{display:none}
+.anatomy-map{position:relative;width:100%;max-width:560px;margin:0 auto;border-radius:12px;overflow:hidden;background:#050505;box-shadow:inset 0 0 0 1px #161616}
+.anatomy-map img{width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none}
+.muscle-overlay{position:absolute;display:block;pointer-events:none;opacity:0;border-radius:999px;mix-blend-mode:screen;filter:blur(1.5px);transition:opacity .2s,background .2s,box-shadow .2s}
+.muscle-overlay.level0{opacity:0}
+.muscle-overlay.level1{opacity:.28;background:#d4a853;box-shadow:0 0 16px rgba(212,168,83,.22)}
+.muscle-overlay.level2{opacity:.42;background:#d4a853;box-shadow:0 0 20px rgba(212,168,83,.32)}
+.muscle-overlay.level3{opacity:.52;background:#d9782f;box-shadow:0 0 22px rgba(217,120,47,.36)}
+.muscle-overlay.level4{opacity:.62;background:#e34836;box-shadow:0 0 24px rgba(227,72,54,.44)}
+/* Front overlays */
+.ov-front-chest-l{left:42%;top:22%;width:12%;height:8%;transform:rotate(12deg)}
+.ov-front-chest-r{left:54%;top:22%;width:12%;height:8%;transform:rotate(-12deg)}
+.ov-front-shoulder-l{left:37%;top:20%;width:9%;height:7%;transform:rotate(-18deg)}
+.ov-front-shoulder-r{left:63%;top:20%;width:9%;height:7%;transform:rotate(18deg)}
+.ov-front-side-shoulder-l{left:35%;top:25%;width:7%;height:7%;transform:rotate(-10deg)}
+.ov-front-side-shoulder-r{left:67%;top:25%;width:7%;height:7%;transform:rotate(10deg)}
+.ov-front-biceps-l{left:35%;top:31%;width:6%;height:11%;transform:rotate(8deg)}
+.ov-front-biceps-r{left:68%;top:31%;width:6%;height:11%;transform:rotate(-8deg)}
+.ov-front-triceps-l{left:40%;top:33%;width:5%;height:12%;transform:rotate(-6deg)}
+.ov-front-triceps-r{left:64%;top:33%;width:5%;height:12%;transform:rotate(6deg)}
+.ov-front-core{left:46%;top:29%;width:16%;height:20%;border-radius:35%}
+.ov-front-quads-l{left:43%;top:55%;width:10%;height:19%;transform:rotate(-5deg)}
+.ov-front-quads-r{left:55%;top:55%;width:10%;height:19%;transform:rotate(5deg)}
+.ov-front-calves-l{left:44%;top:78%;width:8%;height:15%;transform:rotate(-4deg)}
+.ov-front-calves-r{left:56%;top:78%;width:8%;height:15%;transform:rotate(4deg)}
+/* Back overlays */
+.ov-back-traps{left:43%;top:12%;width:22%;height:14%;border-radius:40% 40% 55% 55%}
+.ov-back-rear-shoulder-l{left:35%;top:21%;width:10%;height:8%;transform:rotate(-15deg)}
+.ov-back-rear-shoulder-r{left:64%;top:21%;width:10%;height:8%;transform:rotate(15deg)}
+.ov-back-lats-l{left:39%;top:25%;width:13%;height:19%;transform:rotate(7deg);border-radius:45%}
+.ov-back-lats-r{left:56%;top:25%;width:13%;height:19%;transform:rotate(-7deg);border-radius:45%}
+.ov-back-lower{left:48%;top:39%;width:12%;height:16%;border-radius:34%}
+.ov-back-triceps-l{left:34%;top:32%;width:7%;height:13%;transform:rotate(6deg)}
+.ov-back-triceps-r{left:68%;top:32%;width:7%;height:13%;transform:rotate(-6deg)}
+.ov-back-glutes-l{left:44%;top:54%;width:11%;height:11%;transform:rotate(6deg)}
+.ov-back-glutes-r{left:55%;top:54%;width:11%;height:11%;transform:rotate(-6deg)}
+.ov-back-hamstrings-l{left:44%;top:65%;width:9%;height:17%;transform:rotate(-4deg)}
+.ov-back-hamstrings-r{left:56%;top:65%;width:9%;height:17%;transform:rotate(4deg)}
+.ov-back-calves-l{left:45%;top:82%;width:8%;height:13%;transform:rotate(-2deg)}
+.ov-back-calves-r{left:57%;top:82%;width:8%;height:13%;transform:rotate(2deg)}
+@media(max-width:420px){.anatomy-map{max-width:100%}.body-map-card{padding:8px}.muscle-overlay{filter:blur(1px)}}
+
 </style>
 <style>
 /* BodyPlan v28: sticky modal close, synced workout notes and progression targets */
@@ -748,64 +793,32 @@ function setMuscleRange(days){muscleRangeDays=days;[30,90,365].forEach(d=>{const
 function getMuscleScores(days){const cutoff=Date.now()-days*86400000;const hist=get('history',[]).filter(s=>((s.ts||0)>=cutoff));const scores={};muscleNames.forEach(m=>scores[m]=0);hist.forEach(sess=>{(sess.exercises||[]).forEach(ex=>{const name=normalizeMuscleExerciseName(ex.name);const map=muscleMap[name];if(!map)return;const setCount=(ex.sets||[]).filter(s=>(s.kg||s.reps)).length || (ex.sets||[]).length || 1;Object.entries(map).forEach(([m,w])=>{scores[m]+=setCount*w})})});return scores}
 function muscleLevel(v,max){if(!max||v<=0)return 0;const r=v/max;if(r>=.75)return 4;if(r>=.5)return 3;if(r>=.25)return 2;return 1}
 function clsForMuscle(scores,m,max){return 'muscle-shape level'+muscleLevel(scores[m]||0,max)}
-function frontSvg(scores,max){const c=m=>clsForMuscle(scores,m,max);return `<svg viewBox="0 0 520 560" role="img" aria-label="Muskel Heatmap Front mit Beschriftungen">
-<text class="body-title" x="260" y="28" text-anchor="middle">FRONT</text>
-<ellipse class="body-head" cx="260" cy="70" rx="24" ry="30"/>
-<path class="body-outline" d="M224 105 Q260 91 296 105 L315 151 L329 235 L314 320 L299 516 Q260 540 221 516 L206 320 L191 235 L205 151 Z"/>
-<path class="body-detail" d="M228 127 Q260 144 292 127"/><path class="body-detail" d="M235 191 Q260 202 285 191"/><path class="body-detail" d="M237 222 Q260 235 283 222"/>
-<path class="${c('chest')}" d="M218 126 Q244 101 257 139 Q242 168 214 157 Q206 138 218 126Z"/>
-<path class="${c('chest')}" d="M302 126 Q276 101 263 139 Q278 168 306 157 Q314 138 302 126Z"/>
-<path class="${c('frontShoulder')}" d="M198 126 Q216 99 241 113 Q226 144 204 162 Q188 152 198 126Z"/>
-<path class="${c('frontShoulder')}" d="M322 126 Q304 99 279 113 Q294 144 316 162 Q332 152 322 126Z"/>
-<path class="${c('sideShoulder')}" d="M187 155 Q167 189 168 232 Q188 233 199 201 Q204 174 187 155Z"/>
-<path class="${c('sideShoulder')}" d="M333 155 Q353 189 352 232 Q332 233 321 201 Q316 174 333 155Z"/>
-<path class="${c('biceps')}" d="M169 233 Q163 278 179 319 Q197 307 199 255 Q191 234 169 233Z"/>
-<path class="${c('biceps')}" d="M351 233 Q357 278 341 319 Q323 307 321 255 Q329 234 351 233Z"/>
-<path class="${c('triceps')}" d="M199 204 Q215 252 198 314 Q219 295 223 236 Q216 213 199 204Z"/>
-<path class="${c('triceps')}" d="M321 204 Q305 252 322 314 Q301 295 297 236 Q304 213 321 204Z"/>
-<path class="${c('core')}" d="M231 166 Q260 184 289 166 L286 292 Q260 318 234 292Z"/>
-<path class="body-detail" d="M260 170 L260 300 M240 205 L280 205 M238 238 L282 238 M240 270 L280 270"/>
-<path class="${c('quads')}" d="M220 313 Q246 318 257 361 L250 472 Q222 461 211 394Z"/>
-<path class="${c('quads')}" d="M300 313 Q274 318 263 361 L270 472 Q298 461 309 394Z"/>
-<path class="${c('calves')}" d="M214 455 Q245 470 247 523 Q222 533 206 498Z"/>
-<path class="${c('calves')}" d="M306 455 Q275 470 273 523 Q298 533 314 498Z"/>
-<path class="body-joint" d="M211 318 Q196 338 203 360 Q218 354 224 326Z"/><path class="body-joint" d="M309 318 Q324 338 317 360 Q302 354 296 326Z"/>
-<path class="callout-line" d="M151 126 C184 113 192 116 209 128"/><circle class="callout-dot" cx="209" cy="128" r="3"/><text class="callout-text" x="62" y="129">Schulter</text>
-<path class="callout-line" d="M150 168 C184 166 202 164 222 149"/><circle class="callout-dot" cx="222" cy="149" r="3"/><text class="callout-text" x="78" y="171">Brust</text>
-<path class="callout-line" d="M153 233 C171 229 178 232 188 250"/><circle class="callout-dot" cx="188" cy="250" r="3"/><text class="callout-text" x="76" y="238">Bizeps</text>
-<path class="callout-line" d="M150 368 C183 371 201 383 220 411"/><circle class="callout-dot" cx="220" cy="411" r="3"/><text class="callout-text" x="52" y="371">Quadrizeps</text>
-<path class="callout-line" d="M370 209 C345 207 325 207 287 212"/><circle class="callout-dot" cx="287" cy="212" r="3"/><text class="callout-text" x="384" y="214">Bauch</text>
-<path class="callout-line" d="M367 284 C346 283 332 281 318 267"/><circle class="callout-dot" cx="318" cy="267" r="3"/><text class="callout-text" x="383" y="289">Trizeps</text>
-<path class="callout-line" d="M377 475 C344 469 322 486 307 503"/><circle class="callout-dot" cx="307" cy="503" r="3"/><text class="callout-text" x="392" y="479">Wade</text>
-</svg>`}
-function backSvg(scores,max){const c=m=>clsForMuscle(scores,m,max);return `<svg viewBox="0 0 520 560" role="img" aria-label="Muskel Heatmap Back mit Beschriftungen">
-<text class="body-title" x="260" y="28" text-anchor="middle">BACK</text>
-<ellipse class="body-head" cx="260" cy="70" rx="24" ry="30"/>
-<path class="body-outline" d="M224 105 Q260 91 296 105 L315 151 L329 235 L314 320 L299 516 Q260 540 221 516 L206 320 L191 235 L205 151 Z"/>
-<path class="${c('traps')}" d="M236 104 Q260 128 284 104 Q281 148 260 158 Q239 148 236 104Z"/>
-<path class="${c('rearShoulder')}" d="M198 128 Q217 99 244 113 Q227 150 205 168 Q188 155 198 128Z"/>
-<path class="${c('rearShoulder')}" d="M322 128 Q303 99 276 113 Q293 150 315 168 Q332 155 322 128Z"/>
-<path class="${c('lats')}" d="M209 153 Q245 165 254 199 L244 307 Q211 284 195 218Z"/>
-<path class="${c('lats')}" d="M311 153 Q275 165 266 199 L276 307 Q309 284 325 218Z"/>
-<path class="${c('lowerBack')}" d="M238 292 Q260 307 282 292 L287 356 Q260 376 233 356Z"/>
-<path class="${c('triceps')}" d="M169 190 Q195 213 199 273 Q190 306 173 318 Q158 253 169 190Z"/>
-<path class="${c('triceps')}" d="M351 190 Q325 213 321 273 Q330 306 347 318 Q362 253 351 190Z"/>
-<path class="${c('glutes')}" d="M220 352 Q249 344 258 383 Q248 425 214 418 Q199 383 220 352Z"/>
-<path class="${c('glutes')}" d="M300 352 Q271 344 262 383 Q272 425 306 418 Q321 383 300 352Z"/>
-<path class="${c('hamstrings')}" d="M218 418 Q247 429 254 471 L248 522 Q221 509 209 459Z"/>
-<path class="${c('hamstrings')}" d="M302 418 Q273 429 266 471 L272 522 Q299 509 311 459Z"/>
-<path class="${c('calves')}" d="M212 468 Q243 482 247 525 Q222 535 206 499Z"/>
-<path class="${c('calves')}" d="M308 468 Q277 482 273 525 Q298 535 314 499Z"/>
-<path class="body-detail" d="M260 164 L260 356 M226 145 C244 158 254 171 260 192 M294 145 C276 158 266 171 260 192 M232 224 Q260 245 288 224"/>
-<path class="callout-line" d="M159 122 C193 123 215 126 242 133"/><circle class="callout-dot" cx="242" cy="133" r="3"/><text class="callout-text" x="66" y="125">Trapez</text>
-<path class="callout-line" d="M152 169 C181 164 195 160 209 149"/><circle class="callout-dot" cx="209" cy="149" r="3"/><text class="callout-text" x="42" y="173">Hintere Schulter</text>
-<path class="callout-line" d="M153 240 C190 235 204 225 220 202"/><circle class="callout-dot" cx="220" cy="202" r="3"/><text class="callout-text" x="66" y="244">Latissimus</text>
-<path class="callout-line" d="M151 374 C184 371 202 378 220 391"/><circle class="callout-dot" cx="220" cy="391" r="3"/><text class="callout-text" x="68" y="377">Gesäss</text>
-<path class="callout-line" d="M367 206 C340 205 322 203 303 190"/><circle class="callout-dot" cx="303" cy="190" r="3"/><text class="callout-text" x="381" y="210">Rückenmitte</text>
-<path class="callout-line" d="M370 276 C346 277 333 272 324 257"/><circle class="callout-dot" cx="324" cy="257" r="3"/><text class="callout-text" x="386" y="280">Trizeps</text>
-<path class="callout-line" d="M376 438 C344 432 321 430 302 450"/><circle class="callout-dot" cx="302" cy="450" r="3"/><text class="callout-text" x="386" y="443">Beinbeuger</text>
-<path class="callout-line" d="M376 500 C345 496 323 506 309 515"/><circle class="callout-dot" cx="309" cy="515" r="3"/><text class="callout-text" x="391" y="504">Wade</text>
-</svg>`}
+function muscleOverlay(scores,m,max,classes){
+  const level=muscleLevel(scores[m]||0,max);
+  return `<span class="muscle-overlay level${level} ${classes}" data-muscle="${m}"></span>`;
+}
+function frontSvg(scores,max){return `<div class="anatomy-map anatomy-front" role="img" aria-label="Muskel Heatmap Frontansicht">
+  <img src="assets/body-heatmap-front-v33.png" alt="Anatomische Frontansicht mit beschrifteten Muskelgruppen">
+  ${muscleOverlay(scores,'chest',max,'ov-front-chest-l')}${muscleOverlay(scores,'chest',max,'ov-front-chest-r')}
+  ${muscleOverlay(scores,'frontShoulder',max,'ov-front-shoulder-l')}${muscleOverlay(scores,'frontShoulder',max,'ov-front-shoulder-r')}
+  ${muscleOverlay(scores,'sideShoulder',max,'ov-front-side-shoulder-l')}${muscleOverlay(scores,'sideShoulder',max,'ov-front-side-shoulder-r')}
+  ${muscleOverlay(scores,'biceps',max,'ov-front-biceps-l')}${muscleOverlay(scores,'biceps',max,'ov-front-biceps-r')}
+  ${muscleOverlay(scores,'triceps',max,'ov-front-triceps-l')}${muscleOverlay(scores,'triceps',max,'ov-front-triceps-r')}
+  ${muscleOverlay(scores,'core',max,'ov-front-core')}
+  ${muscleOverlay(scores,'quads',max,'ov-front-quads-l')}${muscleOverlay(scores,'quads',max,'ov-front-quads-r')}
+  ${muscleOverlay(scores,'calves',max,'ov-front-calves-l')}${muscleOverlay(scores,'calves',max,'ov-front-calves-r')}
+</div>`}
+function backSvg(scores,max){return `<div class="anatomy-map anatomy-back" role="img" aria-label="Muskel Heatmap Rückansicht">
+  <img src="assets/body-heatmap-back-v33.png" alt="Anatomische Rückansicht mit beschrifteten Muskelgruppen">
+  ${muscleOverlay(scores,'traps',max,'ov-back-traps')}
+  ${muscleOverlay(scores,'rearShoulder',max,'ov-back-rear-shoulder-l')}${muscleOverlay(scores,'rearShoulder',max,'ov-back-rear-shoulder-r')}
+  ${muscleOverlay(scores,'lats',max,'ov-back-lats-l')}${muscleOverlay(scores,'lats',max,'ov-back-lats-r')}
+  ${muscleOverlay(scores,'lowerBack',max,'ov-back-lower')}
+  ${muscleOverlay(scores,'triceps',max,'ov-back-triceps-l')}${muscleOverlay(scores,'triceps',max,'ov-back-triceps-r')}
+  ${muscleOverlay(scores,'glutes',max,'ov-back-glutes-l')}${muscleOverlay(scores,'glutes',max,'ov-back-glutes-r')}
+  ${muscleOverlay(scores,'hamstrings',max,'ov-back-hamstrings-l')}${muscleOverlay(scores,'hamstrings',max,'ov-back-hamstrings-r')}
+  ${muscleOverlay(scores,'calves',max,'ov-back-calves-l')}${muscleOverlay(scores,'calves',max,'ov-back-calves-r')}
+</div>`}
 function renderMuscleHeatmap(){const front=document.getElementById('frontBodyMap'),back=document.getElementById('backBodyMap');if(!front||!back)return;const scores=getMuscleScores(muscleRangeDays);const max=Math.max(...Object.values(scores),1);front.innerHTML=frontSvg(scores,max);back.innerHTML=backSvg(scores,max);const entries=Object.entries(scores).sort((a,b)=>b[1]-a[1]);const active=entries.filter(x=>x[1]>0);const top=document.getElementById('muscleTopList'),low=document.getElementById('muscleLowList');if(top)top.innerHTML=active.length?active.slice(0,3).map(([m,v],i)=>`${i+1}. ${muscleLabels[m]} · ${Math.round(v)}`).join('<br>'):'Noch keine Trainingsdaten im Zeitraum.';if(low)low.innerHTML=entries.filter(x=>x[1]===0).slice(0,3).map(([m],i)=>`${i+1}. ${muscleLabels[m]}`).join('<br>') || entries.slice(-3).reverse().map(([m,v],i)=>`${i+1}. ${muscleLabels[m]} · ${Math.round(v)}`).join('<br>')}
 
 /* ===== BodyPlan v13: Dashboard-Subpages & Navigation ===== */
@@ -833,7 +846,7 @@ function collectAllData(){
 }
 function exportData(){
   try{
-    var payload={app:'BodyPlan',version:28,exportedAt:new Date().toISOString(),data:collectAllData()};
+    var payload={app:'BodyPlan',version:33,exportedAt:new Date().toISOString(),data:collectAllData()};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
