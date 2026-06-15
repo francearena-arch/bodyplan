@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
   <title>BodyPlan v36</title>
-  <link rel="manifest" href="manifest.json?v=36">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v36.png?v=36">
-  <link rel="apple-touch-icon" href="apple-touch-icon-v36.png?v=36">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-v36-192.png?v=36">
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-v36-512.png?v=36">
+  <link rel="manifest" href="manifest.json?v=38">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v38.png?v=38">
+  <link rel="apple-touch-icon" href="apple-touch-icon-v38.png?v=38">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-v38-192.png?v=38">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-v38-512.png?v=38">
   
   
   <meta name="theme-color" content="#080808">
@@ -941,3 +941,99 @@ render();
 .muscle-overlay.level4{opacity:.34;background:#e34836}
 
 </style>
+
+
+<style id="bodyplan-v38-svg-heatmap">
+/* BodyPlan v38: pure SVG anatomical heatmap. No external image assets. */
+.body-map svg.anatomy-svg-v38{display:block!important;width:100%;height:auto;max-height:720px;margin:0 auto;overflow:visible}
+.body-map-card{background:#070707!important;border:1px solid #1b1b1b;border-radius:14px;padding:10px!important;overflow:hidden}
+.anatomy-svg-v38 .base{fill:#111;stroke:#3f3f3f;stroke-width:1.15;opacity:.86}
+.anatomy-svg-v38 .bone-line,.anatomy-svg-v38 .detail{fill:none;stroke:#8a8a8a;stroke-width:.65;opacity:.55}
+.anatomy-svg-v38 .muscle-shape{fill:#242424;stroke:#555;stroke-width:1.05;transition:fill .2s ease,opacity .2s ease;opacity:.96}
+.anatomy-svg-v38 .muscle-shape.level0{fill:#242424}
+.anatomy-svg-v38 .muscle-shape.level1{fill:#5d4b24}
+.anatomy-svg-v38 .muscle-shape.level2{fill:#d4a853}
+.anatomy-svg-v38 .muscle-shape.level3{fill:#d9782f}
+.anatomy-svg-v38 .muscle-shape.level4{fill:#e34836}
+.anatomy-svg-v38 .callout-line{fill:none;stroke:#8d8d8d;stroke-width:.9;stroke-linecap:round;opacity:.86}
+.anatomy-svg-v38 .callout-dot{fill:#8d8d8d}
+.anatomy-svg-v38 .callout-text{font-family:'DM Sans',Arial,sans-serif;font-size:12px;fill:#f4f4f4;font-weight:800;letter-spacing:.2px}
+.anatomy-svg-v38 .callout-sub{font-family:'DM Sans',Arial,sans-serif;font-size:9px;fill:#a8a8a8;font-weight:400}
+.anatomy-svg-v38 .body-title{font-family:'DM Sans',Arial,sans-serif;font-size:11px;fill:#d4a853;font-weight:900;letter-spacing:5px}
+@media(max-width:420px){.body-map svg.anatomy-svg-v38{max-height:690px}.anatomy-svg-v38 .callout-text{font-size:11px}.anatomy-svg-v38 .callout-sub{font-size:8px}.anatomy-svg-v38 .body-title{font-size:10px}}
+</style>
+
+
+<script id="bodyplan-v38-svg-heatmap-js">
+/* BodyPlan v38: final pure SVG front/back heatmap functions */
+function bpV38MuscleClass(scores,m,max){return clsForMuscle(scores,m,max)}
+function frontSvg(scores,max){return `
+<svg class="anatomy-svg-v38" viewBox="0 0 430 720" role="img" aria-label="Muskel Heatmap Frontansicht">
+  <text x="215" y="26" text-anchor="middle" class="body-title">FRONT</text>
+  <!-- silhouette/base -->
+  <ellipse class="base" cx="215" cy="74" rx="30" ry="39"/>
+  <path class="base" d="M176 120 C192 110 238 110 254 120 L268 165 C254 188 176 188 162 165 Z"/>
+  <path class="base" d="M176 182 C166 230 166 308 181 354 C194 374 236 374 249 354 C264 307 264 230 254 182 Z"/>
+  <path class="base" d="M169 354 C190 374 240 374 261 354 L254 413 C238 433 192 433 176 413 Z"/>
+  <!-- muscles front -->
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'chest',max)}" d="M174 150 C193 135 209 137 214 161 C203 177 181 184 165 172 C163 164 166 156 174 150 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'chest',max)}" d="M256 150 C237 135 221 137 216 161 C227 177 249 184 265 172 C267 164 264 156 256 150 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'frontShoulder',max)}" d="M148 145 C161 126 180 126 186 146 C175 158 160 169 146 167 C137 159 140 151 148 145 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'frontShoulder',max)}" d="M282 145 C269 126 250 126 244 146 C255 158 270 169 284 167 C293 159 290 151 282 145 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'sideShoulder',max)}" d="M134 158 C151 151 166 162 164 183 C157 202 139 213 125 204 C123 184 126 168 134 158 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'sideShoulder',max)}" d="M296 158 C279 151 264 162 266 183 C273 202 291 213 305 204 C307 184 304 168 296 158 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'biceps',max)}" d="M124 205 C141 199 154 213 153 244 C151 275 136 296 121 290 C112 256 113 225 124 205 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'biceps',max)}" d="M306 205 C289 199 276 213 277 244 C279 275 294 296 309 290 C318 256 317 225 306 205 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'triceps',max)}" d="M155 215 C167 231 170 277 158 312 C148 303 146 260 150 232 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'triceps',max)}" d="M275 215 C263 231 260 277 272 312 C282 303 284 260 280 232 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'core',max)}" d="M187 188 C203 197 227 197 243 188 L247 338 C235 354 195 354 183 338 Z"/>
+  <path class="detail" d="M215 193 L215 348 M191 225 H239 M191 260 H239 M193 296 H237"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'quads',max)}" d="M181 424 C199 402 216 419 211 477 C207 528 191 571 171 559 C163 510 164 456 181 424 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'quads',max)}" d="M249 424 C231 402 214 419 219 477 C223 528 239 571 259 559 C267 510 266 456 249 424 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'calves',max)}" d="M171 575 C190 567 204 584 198 639 C189 674 163 676 153 642 C153 613 158 589 171 575 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'calves',max)}" d="M259 575 C240 567 226 584 232 639 C241 674 267 676 277 642 C277 613 272 589 259 575 Z"/>
+  <!-- labels -->
+  <text x="35" y="148" class="callout-text">Brust</text><text x="35" y="162" class="callout-sub">Pectoralis</text><path class="callout-line" d="M88 148 L139 148 L178 158"/><circle class="callout-dot" cx="178" cy="158" r="3"/>
+  <text x="35" y="213" class="callout-text">Bizeps</text><path class="callout-line" d="M86 209 L114 209 L138 230"/><circle class="callout-dot" cx="138" cy="230" r="3"/>
+  <text x="35" y="106" class="callout-text">Vordere Schulter</text><path class="callout-line" d="M148 106 L172 132 L160 149"/><circle class="callout-dot" cx="160" cy="149" r="3"/>
+  <text x="35" y="458" class="callout-text">Quadrizeps</text><path class="callout-line" d="M116 454 C139 452 154 461 179 482"/><circle class="callout-dot" cx="179" cy="482" r="3"/>
+  <text x="35" y="629" class="callout-text">Wade</text><path class="callout-line" d="M74 624 C111 617 135 620 170 616"/><circle class="callout-dot" cx="170" cy="616" r="3"/>
+  <text x="328" y="242" class="callout-text">Trizeps</text><path class="callout-line" d="M316 238 L285 245 L274 252"/><circle class="callout-dot" cx="274" cy="252" r="3"/>
+  <text x="328" y="289" class="callout-text">Bauch</text><path class="callout-line" d="M316 285 L265 285 L234 284"/><circle class="callout-dot" cx="234" cy="284" r="3"/>
+</svg>`}
+function backSvg(scores,max){return `
+<svg class="anatomy-svg-v38" viewBox="0 0 430 720" role="img" aria-label="Muskel Heatmap Rückansicht">
+  <text x="215" y="26" text-anchor="middle" class="body-title">BACK</text>
+  <ellipse class="base" cx="215" cy="74" rx="30" ry="39"/>
+  <path class="base" d="M176 120 C192 110 238 110 254 120 L267 178 C250 199 180 199 163 178 Z"/>
+  <path class="base" d="M171 185 C165 250 169 320 184 367 C198 388 232 388 246 367 C261 320 265 250 259 185 Z"/>
+  <path class="base" d="M176 370 C194 390 236 390 254 370 L259 425 C241 445 189 445 171 425 Z"/>
+  <!-- muscles back -->
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'traps',max)}" d="M181 125 C197 135 233 135 249 125 C246 153 238 178 215 192 C192 178 184 153 181 125 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'rearShoulder',max)}" d="M142 154 C157 136 181 137 188 159 C177 175 157 184 140 176 C133 168 134 160 142 154 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'rearShoulder',max)}" d="M288 154 C273 136 249 137 242 159 C253 175 273 184 290 176 C297 168 296 160 288 154 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'lats',max)}" d="M174 185 C190 199 206 218 208 264 C208 304 193 347 174 363 C154 320 150 225 174 185 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'lats',max)}" d="M256 185 C240 199 224 218 222 264 C222 304 237 347 256 363 C276 320 280 225 256 185 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'lowerBack',max)}" d="M205 312 C214 320 216 320 225 312 L240 381 C228 400 202 400 190 381 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'triceps',max)}" d="M123 202 C141 198 154 218 153 257 C151 290 137 319 120 314 C111 276 112 228 123 202 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'triceps',max)}" d="M307 202 C289 198 276 218 277 257 C279 290 293 319 310 314 C319 276 318 228 307 202 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'glutes',max)}" d="M180 425 C198 410 215 420 213 456 C207 486 182 497 164 472 C162 451 168 435 180 425 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'glutes',max)}" d="M250 425 C232 410 215 420 217 456 C223 486 248 497 266 472 C268 451 262 435 250 425 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'hamstrings',max)}" d="M177 500 C195 484 213 503 207 552 C202 598 185 632 166 618 C158 572 161 525 177 500 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'hamstrings',max)}" d="M253 500 C235 484 217 503 223 552 C228 598 245 632 264 618 C272 572 269 525 253 500 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'calves',max)}" d="M166 620 C186 613 199 632 194 670 C184 698 159 699 149 672 C150 651 154 632 166 620 Z"/>
+  <path class="muscle-shape ${bpV38MuscleClass(scores,'calves',max)}" d="M264 620 C244 613 231 632 236 670 C246 698 271 699 281 672 C280 651 276 632 264 620 Z"/>
+  <path class="detail" d="M215 135 L215 392 M185 198 C205 220 225 220 245 198 M185 278 C205 293 225 293 245 278"/>
+  <!-- labels -->
+  <text x="35" y="150" class="callout-text">Nacken / Trapez</text><path class="callout-line" d="M135 146 C154 139 174 139 198 153"/><circle class="callout-dot" cx="198" cy="153" r="3"/>
+  <text x="35" y="210" class="callout-text">Hintere Schulter</text><path class="callout-line" d="M145 206 L158 182 L155 166"/><circle class="callout-dot" cx="155" cy="166" r="3"/>
+  <text x="35" y="292" class="callout-text">Latissimus</text><path class="callout-line" d="M113 288 L150 280 L180 266"/><circle class="callout-dot" cx="180" cy="266" r="3"/>
+  <text x="35" y="456" class="callout-text">Gesäß</text><path class="callout-line" d="M81 452 C119 448 145 452 181 459"/><circle class="callout-dot" cx="181" cy="459" r="3"/>
+  <text x="328" y="243" class="callout-text">Rückenmitte</text><path class="callout-line" d="M316 239 L270 248 L240 252"/><circle class="callout-dot" cx="240" cy="252" r="3"/>
+  <text x="328" y="306" class="callout-text">Trizeps</text><path class="callout-line" d="M316 302 L290 295 L279 278"/><circle class="callout-dot" cx="279" cy="278" r="3"/>
+  <text x="328" y="555" class="callout-text">Beinbeuger</text><path class="callout-line" d="M318 551 C293 545 276 548 248 560"/><circle class="callout-dot" cx="248" cy="560" r="3"/>
+  <text x="328" y="653" class="callout-text">Wade</text><path class="callout-line" d="M318 649 C292 646 274 649 260 656"/><circle class="callout-dot" cx="260" cy="656" r="3"/>
+</svg>`}
+if(typeof renderMuscleHeatmap==='function'){setTimeout(renderMuscleHeatmap,50)}
+</script>
+
