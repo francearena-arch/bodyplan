@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
   <title>BodyPlan Pro v28 · Workout UX</title>
   <link rel="manifest" href="manifest.json?v=32">
-  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-v32-192.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-v32-512.png">
+  
+  
   <meta name="theme-color" content="#080808">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -106,7 +106,7 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 .compact-title-block{min-width:0;flex:1}
 @media(max-width:420px){.compact-workout-sub{font-size:10px;max-width:150px}.compact-title-block{max-width:150px}}
 
-/* BodyPlan v33: realistic anatomy heatmap overlays */
+/* BodyPlan v35: cache-busted realistic anatomy heatmap overlays */
 .body-map-card{padding:10px;background:#060606}
 .body-map svg{display:none}
 .anatomy-map{position:relative;width:100%;max-width:560px;margin:0 auto;border-radius:12px;overflow:hidden;background:#050505;box-shadow:inset 0 0 0 1px #161616}
@@ -798,7 +798,7 @@ function muscleOverlay(scores,m,max,classes){
   return `<span class="muscle-overlay level${level} ${classes}" data-muscle="${m}"></span>`;
 }
 function frontSvg(scores,max){return `<div class="anatomy-map anatomy-front" role="img" aria-label="Muskel Heatmap Frontansicht">
-  <img src="assets/body-heatmap-front-v33.png" alt="Anatomische Frontansicht mit beschrifteten Muskelgruppen">
+  <img src="assets/body-heatmap-front-v35.png?v=35" alt="Anatomische Frontansicht mit beschrifteten Muskelgruppen">
   ${muscleOverlay(scores,'chest',max,'ov-front-chest-l')}${muscleOverlay(scores,'chest',max,'ov-front-chest-r')}
   ${muscleOverlay(scores,'frontShoulder',max,'ov-front-shoulder-l')}${muscleOverlay(scores,'frontShoulder',max,'ov-front-shoulder-r')}
   ${muscleOverlay(scores,'sideShoulder',max,'ov-front-side-shoulder-l')}${muscleOverlay(scores,'sideShoulder',max,'ov-front-side-shoulder-r')}
@@ -809,7 +809,7 @@ function frontSvg(scores,max){return `<div class="anatomy-map anatomy-front" rol
   ${muscleOverlay(scores,'calves',max,'ov-front-calves-l')}${muscleOverlay(scores,'calves',max,'ov-front-calves-r')}
 </div>`}
 function backSvg(scores,max){return `<div class="anatomy-map anatomy-back" role="img" aria-label="Muskel Heatmap Rückansicht">
-  <img src="assets/body-heatmap-back-v33.png" alt="Anatomische Rückansicht mit beschrifteten Muskelgruppen">
+  <img src="assets/body-heatmap-back-v35.png?v=35" alt="Anatomische Rückansicht mit beschrifteten Muskelgruppen">
   ${muscleOverlay(scores,'traps',max,'ov-back-traps')}
   ${muscleOverlay(scores,'rearShoulder',max,'ov-back-rear-shoulder-l')}${muscleOverlay(scores,'rearShoulder',max,'ov-back-rear-shoulder-r')}
   ${muscleOverlay(scores,'lats',max,'ov-back-lats-l')}${muscleOverlay(scores,'lats',max,'ov-back-lats-r')}
