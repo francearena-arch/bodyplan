@@ -1,17 +1,31 @@
-const CACHE_NAME='bodyplan-v38';
-const ASSETS=[
-'./',
-'./index.html?v=38',
-'./manifest.json?v=38',
-'./service-worker.js?v=38',
-'./icons/icon-v38-192.png?v=38',
-'./icons/icon-v38-512.png?v=38',
-'./icons/icon-192.png?v=38',
-'./icons/icon-512.png?v=38',
-'./apple-touch-icon-v38.png?v=38',
-'./apple-touch-icon.png?v=38',
-'./favicon.png?v=38'
-];
-self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(ASSETS)));self.skipWaiting();});
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
-self.addEventListener('fetch',event=>{event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));return response;}).catch(()=>caches.match(event.request)));});
+{
+  "name": "BodyPlan",
+  "short_name": "BodyPlan",
+  "description": "Training, Ernährung und Fortschrittstracking für iPhone.",
+  "start_url": "./index.html?v=39",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-v39-192.png?v=39",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-v39-512.png?v=39",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon-v39.png?v=39",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
