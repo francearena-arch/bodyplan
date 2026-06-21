@@ -1,14 +1,14 @@
-const CACHE_NAME='bodyplan-v41';
+const CACHE_NAME='bodyplan-v42';
 const ASSETS=[
 './',
 './index.html?v=41?v=39',
 './manifest.json?v=39',
 './service-worker.js?v=39',
-'./icons/icon-v40-192.png?v=39',
-'./icons/icon-v40-512.png?v=39',
+'./icons/icon-v42-192.png?v=39',
+'./icons/icon-v42-512.png?v=39',
 './icons/icon-192.png?v=39',
 './icons/icon-512.png?v=39',
-'./apple-touch-icon-v40.png?v=39',
+'./apple-touch-icon-v42.png?v=39',
 './apple-touch-icon.png?v=39',
 './favicon.png?v=39'
 ];
