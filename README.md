@@ -1,10 +1,6 @@
-# BodyPlan PWA
+BodyPlan PWA v41
 
-## v40
-
-- Daily Consistency card simplified: removed YTD quote and progress bar.
-- Current and best daily streak displayed more proportionally.
-- YTD push-up and pull-up totals retained.
-- Body progress card simplified: removed focus line.
-- Added compact progress bars for weight and body-fat targets.
+- Adds Daily Consistency Analytics page.
+- Monthly push-up and pull-up targets.
+- Month-over-month comparison and records.
 - Existing local data remains unchanged.

@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
   <title>BodyPlan v36</title>
-  <link rel="manifest" href="manifest.json?v=40">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v40.png?v=40">
-  <link rel="apple-touch-icon" href="apple-touch-icon-v40.png?v=40">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-v40-192.png?v=40">
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-v40-512.png?v=40">
+  <link rel="manifest" href="manifest.json?v=41">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v40.png?v=39">
+  <link rel="apple-touch-icon" href="apple-touch-icon-v40.png?v=39">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-v40-192.png?v=39">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-v40-512.png?v=39">
   
   
   <meta name="theme-color" content="#080808">
@@ -166,6 +166,30 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 .muscle-overlay.level3{opacity:.28;background:#d9782f}
 .muscle-overlay.level4{opacity:.34;background:#e34836}
 
+
+/* BodyPlan v41: Daily Consistency Analytics */
+.dc-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.dc-summary-card{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:11px;padding:14px 10px;text-align:left}
+.dc-summary-card .num{font-family:'Bebas Neue';font-size:30px;letter-spacing:1px;color:#d4a853;line-height:1}
+.dc-summary-card .lbl{font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:#aaa;margin-top:5px;line-height:1.25}
+.dc-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dc-metric{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:15px;margin-bottom:10px}
+.dc-metric-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.dc-metric-title{font-size:13px;color:#fff;font-weight:700}
+.dc-metric-value{font-family:'Bebas Neue';font-size:27px;letter-spacing:1px;color:#d4a853;white-space:nowrap}
+.dc-metric-sub{font-size:12px;color:#ddd;line-height:1.45;margin-top:8px}
+.dc-month-list{display:grid;gap:9px;margin-top:10px}
+.dc-month-row{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:12px}
+.dc-month-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.dc-month-name{font-size:12px;font-weight:800;color:#fff}
+.dc-month-percent{font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;color:#d4a853}
+.dc-month-meta{font-size:11px;color:#ddd;line-height:1.45;margin-top:7px}
+.dc-record-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.dc-record{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:13px 10px}
+.dc-record strong{display:block;font-family:'Bebas Neue';font-size:27px;color:#d4a853;letter-spacing:1px;font-weight:400;line-height:1}
+.dc-record span{display:block;font-size:8px;letter-spacing:1.6px;text-transform:uppercase;color:#aaa;margin-top:6px;line-height:1.25}
+@media(max-width:420px){.dc-summary-grid,.dc-record-grid{grid-template-columns:1fr}.dc-split{grid-template-columns:1fr}}
+
 </style>
 <style>
 /* BodyPlan v28: sticky modal close, synced workout notes and progression targets */
@@ -199,11 +223,35 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 .muscle-overlay.level3{opacity:.28;background:#d9782f}
 .muscle-overlay.level4{opacity:.34;background:#e34836}
 
+
+/* BodyPlan v41: Daily Consistency Analytics */
+.dc-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.dc-summary-card{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:11px;padding:14px 10px;text-align:left}
+.dc-summary-card .num{font-family:'Bebas Neue';font-size:30px;letter-spacing:1px;color:#d4a853;line-height:1}
+.dc-summary-card .lbl{font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:#aaa;margin-top:5px;line-height:1.25}
+.dc-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dc-metric{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:15px;margin-bottom:10px}
+.dc-metric-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.dc-metric-title{font-size:13px;color:#fff;font-weight:700}
+.dc-metric-value{font-family:'Bebas Neue';font-size:27px;letter-spacing:1px;color:#d4a853;white-space:nowrap}
+.dc-metric-sub{font-size:12px;color:#ddd;line-height:1.45;margin-top:8px}
+.dc-month-list{display:grid;gap:9px;margin-top:10px}
+.dc-month-row{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:12px}
+.dc-month-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.dc-month-name{font-size:12px;font-weight:800;color:#fff}
+.dc-month-percent{font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;color:#d4a853}
+.dc-month-meta{font-size:11px;color:#ddd;line-height:1.45;margin-top:7px}
+.dc-record-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.dc-record{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:13px 10px}
+.dc-record strong{display:block;font-family:'Bebas Neue';font-size:27px;color:#d4a853;letter-spacing:1px;font-weight:400;line-height:1}
+.dc-record span{display:block;font-size:8px;letter-spacing:1.6px;text-transform:uppercase;color:#aaa;margin-top:6px;line-height:1.25}
+@media(max-width:420px){.dc-summary-grid,.dc-record-grid{grid-template-columns:1fr}.dc-split{grid-template-columns:1fr}}
+
 </style>
 
 </head>
 <body>
-<div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)toggleMenu(false)"><div class="menu-sheet"><div class="menu-goal">NAVIGATION</div><button class="menu-item" onclick="showAppPage('dashboard')"><span class="mi-ico">⌂</span>Dashboard</button><button class="menu-item" onclick="showAppPage('progress')"><span class="mi-ico">📈</span>Fortschritt</button><button class="menu-item" onclick="showAppPage('muscles')"><span class="mi-ico">🔥</span>Muskel-Heatmap</button><button class="menu-item" onclick="showAppPage('history')"><span class="mi-ico">📊</span>Trainingshistorie</button><button class="menu-item" onclick="showAppPage('plan')"><span class="mi-ico">🏋️</span>Trainingsplan</button><button class="menu-item" onclick="showAppPage('alternative')"><span class="mi-ico">🏝️</span>Alternative Trainingseinheiten</button><div class="menu-sep"></div><button class="menu-item" onclick="exportData()"><span class="mi-ico">⬇️</span>Daten exportieren</button><button class="menu-item" onclick="triggerImport()"><span class="mi-ico">⬆️</span>Daten importieren</button><div class="menu-sep"></div><button class="menu-item" onclick="toggleMenu(false)"><span class="mi-ico">✕</span>Schließen</button><input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)"></div></div>
+<div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)toggleMenu(false)"><div class="menu-sheet"><div class="menu-goal">NAVIGATION</div><button class="menu-item" onclick="showAppPage('dashboard')"><span class="mi-ico">⌂</span>Dashboard</button><button class="menu-item" onclick="showAppPage('progress')"><span class="mi-ico">📈</span>Fortschritt</button><button class="menu-item" onclick="showAppPage('daily-consistency')"><span class="mi-ico">🔥</span>Daily Consistency</button><button class="menu-item" onclick="showAppPage('muscles')"><span class="mi-ico">💪</span>Muskel-Heatmap</button><button class="menu-item" onclick="showAppPage('history')"><span class="mi-ico">📊</span>Trainingshistorie</button><button class="menu-item" onclick="showAppPage('plan')"><span class="mi-ico">🏋️</span>Trainingsplan</button><button class="menu-item" onclick="showAppPage('alternative')"><span class="mi-ico">🏝️</span>Alternative Trainingseinheiten</button><div class="menu-sep"></div><button class="menu-item" onclick="exportData()"><span class="mi-ico">⬇️</span>Daten exportieren</button><button class="menu-item" onclick="triggerImport()"><span class="mi-ico">⬆️</span>Daten importieren</button><div class="menu-sep"></div><button class="menu-item" onclick="toggleMenu(false)"><span class="mi-ico">✕</span>Schließen</button><input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)"></div></div>
 <div class="header"><div class="header-row"><div class="brand-home" onclick="showAppPage('dashboard')" role="button" aria-label="Zur Startseite"><div class="wordmark">BODY<em>PLAN</em></div></div><button class="menu-btn" id="menuBtn" onclick="toggleMenu(true)" aria-label="Menü"><span></span><span></span><span></span></button></div><div class="tabs"><button class="tab active" onclick="switchTab('training', this)">🏋️ Training</button><button class="tab" onclick="switchTab('ernaehrung', this)">🥗 Ernährung</button></div></div>
 <div id="tab-training" class="page">
   <div id="page-dashboard" class="app-page">
@@ -227,6 +275,45 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
       <div class="heat-legend"><span>weniger</span><span class="heat-dot"></span><span class="heat-dot l1"></span><span class="heat-dot l2"></span><span class="heat-dot l3"></span><span>mehr</span></div>
       <div class="best-month" id="bestMonthBadge">Noch kein vollständiger Monatsverlauf vorhanden.</div>
       <div class="month-list" id="monthComparisonList"></div>
+    </div>
+  </div>
+
+  <div id="page-daily-consistency" class="app-page hidden">
+    <div class="section-label">Daily Consistency</div>
+    <div class="panel">
+      <div class="heatmap-title">Daily Consistency Analytics</div>
+      <div class="heatmap-sub">Monatliche Auswertung deiner täglichen Liegestütze und Klimmzüge. Ziel: 25 Liegestütze und 10 Klimmzüge pro Tag.</div>
+      <div class="dc-summary-grid">
+        <div class="dc-summary-card"><div class="num" id="dcCurrentMonthDays">0/0</div><div class="lbl">erfüllte Tage</div></div>
+        <div class="dc-summary-card"><div class="num" id="dcCurrentMonthQuote">0%</div><div class="lbl">Monatsquote</div></div>
+        <div class="dc-summary-card"><div class="num" id="dcBestMonthQuote">–</div><div class="lbl">bester Monat</div></div>
+      </div>
+      <div class="dc-split">
+        <div class="dc-metric">
+          <div class="dc-metric-head"><div class="dc-metric-title">Liegestütze</div><div class="dc-metric-value" id="dcPushupsNow">0/0</div></div>
+          <div class="bar"><span id="dcPushupsBar" style="width:0%"></span></div>
+          <div class="dc-metric-sub" id="dcPushupsSub">0% des Monatsziels</div>
+        </div>
+        <div class="dc-metric">
+          <div class="dc-metric-head"><div class="dc-metric-title">Klimmzüge</div><div class="dc-metric-value" id="dcPullupsNow">0/0</div></div>
+          <div class="bar"><span id="dcPullupsBar" style="width:0%"></span></div>
+          <div class="dc-metric-sub" id="dcPullupsSub">0% des Monatsziels</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-label">Monatsvergleich</div>
+    <div class="panel">
+      <div class="heatmap-sub">Vergleich der letzten 12 Monate nach erfüllten Tagen. Ein Tag zählt nur, wenn Liegestütze und Klimmzüge erledigt sind.</div>
+      <div id="dcMonthComparison" class="dc-month-list"></div>
+    </div>
+    <div class="section-label">Rekorde & Gesamtleistung</div>
+    <div class="panel">
+      <div class="dc-record-grid">
+        <div class="dc-record"><strong id="dcRecordStreak">0</strong><span>längste Serie</span></div>
+        <div class="dc-record"><strong id="dcRecordPushups">0</strong><span>Liegestütze gesamt</span></div>
+        <div class="dc-record"><strong id="dcRecordPullups">0</strong><span>Klimmzüge gesamt</span></div>
+      </div>
+      <div class="dc-metric-sub" id="dcBestMonthText" style="margin-top:12px">Noch kein Monatsrekord vorhanden.</div>
     </div>
   </div>
 
@@ -354,6 +441,33 @@ function dailyYearStats(data){
   });
   return {pushups,pullups,completeDays,daysPassed,quote:daysPassed?Math.round(completeDays/daysPassed*100):0};
 }
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate()}
+function monthKeyDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function monthLabelFromKey(key){const [y,m]=key.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('de-CH',{month:'short',year:'2-digit'})}
+function dailyMonthStats(data,key){
+  const [y,m]=key.split('-').map(Number);const days=daysInMonth(y,m-1);let pushups=0,pullups=0,completeDays=0;
+  Object.entries(data).forEach(([iso,val])=>{if(!iso.startsWith(key+'-'))return;pushups+=Number(val.pushups||0);pullups+=Number(val.pullups||0);if(isDailyComplete(val))completeDays++});
+  const pushTarget=days*25,pullTarget=days*10;
+  const pushPct=pushTarget?Math.round(pushups/pushTarget*100):0;
+  const pullPct=pullTarget?Math.round(pullups/pullTarget*100):0;
+  const quote=days?Math.round(completeDays/days*100):0;
+  return {key,days,pushups,pullups,completeDays,pushTarget,pullTarget,pushPct,pullPct,quote};
+}
+function getLast12MonthKeys(){const arr=[];const now=new Date();for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);arr.push(monthKeyDate(d))}return arr}
+function renderDailyConsistencyAnalytics(){
+  const data=getDailyHabits();const keys=getLast12MonthKeys();const months=keys.map(k=>dailyMonthStats(data,k));const current=months[months.length-1];
+  const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+  setText('dcCurrentMonthDays',`${current.completeDays}/${current.days}`);setText('dcCurrentMonthQuote',`${current.quote}%`);
+  setText('dcPushupsNow',`${current.pushups.toLocaleString('de-CH')}/${current.pushTarget.toLocaleString('de-CH')}`);
+  setText('dcPullupsNow',`${current.pullups.toLocaleString('de-CH')}/${current.pullTarget.toLocaleString('de-CH')}`);
+  setText('dcPushupsSub',`${current.pushPct}% des Monatsziels · ${monthLabelFromKey(current.key)}`);setText('dcPullupsSub',`${current.pullPct}% des Monatsziels · ${monthLabelFromKey(current.key)}`);
+  const pb=document.getElementById('dcPushupsBar');if(pb)pb.style.width=Math.min(100,current.pushPct)+'%';const cb=document.getElementById('dcPullupsBar');if(cb)cb.style.width=Math.min(100,current.pullPct)+'%';
+  const best=months.reduce((a,b)=>b.quote>a.quote?b:a,months[0]);setText('dcBestMonthQuote',best?`${best.quote}%`:'–');
+  const list=document.getElementById('dcMonthComparison');if(list){list.innerHTML=months.map(m=>`<div class="dc-month-row"><div class="dc-month-top"><div class="dc-month-name">${monthLabelFromKey(m.key)}</div><div class="dc-month-percent">${m.quote}%</div></div><div class="bar"><span style="width:${Math.min(100,m.quote)}%"></span></div><div class="dc-month-meta">${m.completeDays}/${m.days} Tage erfüllt · ${m.pushups.toLocaleString('de-CH')}/${m.pushTarget.toLocaleString('de-CH')} Liegestütze · ${m.pullups.toLocaleString('de-CH')}/${m.pullTarget.toLocaleString('de-CH')} Klimmzüge</div></div>`).join('')}
+  const allPush=Object.values(data).reduce((sum,v)=>sum+Number(v.pushups||0),0);const allPull=Object.values(data).reduce((sum,v)=>sum+Number(v.pullups||0),0);
+  setText('dcRecordStreak',dailyBestStreakCount(data));setText('dcRecordPushups',allPush.toLocaleString('de-CH'));setText('dcRecordPullups',allPull.toLocaleString('de-CH'));
+  const bt=document.getElementById('dcBestMonthText');if(bt)bt.textContent=best?`Bester Monat: ${monthLabelFromKey(best.key)} · ${best.completeDays}/${best.days} erfüllte Tage · ${best.quote}% Monatsquote.`:'Noch kein Monatsrekord vorhanden.';
+}
 function renderDailyHabits(){
   const data=getDailyHabits();
   const today=todayIso();
@@ -371,7 +485,9 @@ function renderDailyHabits(){
   const cy=document.getElementById('dailyPullupsYtd');if(cy)cy.textContent=stats.pullups.toLocaleString('de-CH');
   const q=document.getElementById('dailyQuote');if(q)q.textContent=stats.quote;
   const qb=document.getElementById('dailyQuoteBar');if(qb)qb.style.width=Math.min(100,stats.quote)+'%';
+  renderDailyConsistencyAnalytics();
 }
+
 
 
 function getLastMetricValue(id){const arr=get(id+'History',[]);return arr.length?arr[arr.length-1].value:null}
@@ -879,6 +995,7 @@ function showAppPage(name){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
   var firstTab=document.querySelector('.tab'); if(firstTab)firstTab.classList.add('active');
   toggleMenu(false);
+  if(name==='daily-consistency')renderDailyConsistencyAnalytics();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -894,7 +1011,7 @@ function collectAllData(){
 }
 function exportData(){
   try{
-    var payload={app:'BodyPlan',version:33,exportedAt:new Date().toISOString(),data:collectAllData()};
+    var payload={app:'BodyPlan',version:41,exportedAt:new Date().toISOString(),data:collectAllData()};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
@@ -960,6 +1077,30 @@ render();
 .muscle-overlay.level3{opacity:.28;background:#d9782f}
 .muscle-overlay.level4{opacity:.34;background:#e34836}
 
+
+/* BodyPlan v41: Daily Consistency Analytics */
+.dc-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.dc-summary-card{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:11px;padding:14px 10px;text-align:left}
+.dc-summary-card .num{font-family:'Bebas Neue';font-size:30px;letter-spacing:1px;color:#d4a853;line-height:1}
+.dc-summary-card .lbl{font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:#aaa;margin-top:5px;line-height:1.25}
+.dc-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dc-metric{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:15px;margin-bottom:10px}
+.dc-metric-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.dc-metric-title{font-size:13px;color:#fff;font-weight:700}
+.dc-metric-value{font-family:'Bebas Neue';font-size:27px;letter-spacing:1px;color:#d4a853;white-space:nowrap}
+.dc-metric-sub{font-size:12px;color:#ddd;line-height:1.45;margin-top:8px}
+.dc-month-list{display:grid;gap:9px;margin-top:10px}
+.dc-month-row{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:12px}
+.dc-month-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.dc-month-name{font-size:12px;font-weight:800;color:#fff}
+.dc-month-percent{font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;color:#d4a853}
+.dc-month-meta{font-size:11px;color:#ddd;line-height:1.45;margin-top:7px}
+.dc-record-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.dc-record{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:13px 10px}
+.dc-record strong{display:block;font-family:'Bebas Neue';font-size:27px;color:#d4a853;letter-spacing:1px;font-weight:400;line-height:1}
+.dc-record span{display:block;font-size:8px;letter-spacing:1.6px;text-transform:uppercase;color:#aaa;margin-top:6px;line-height:1.25}
+@media(max-width:420px){.dc-summary-grid,.dc-record-grid{grid-template-columns:1fr}.dc-split{grid-template-columns:1fr}}
+
 </style>
 
 
@@ -981,6 +1122,30 @@ render();
 .anatomy-svg-v38 .callout-sub{font-family:'DM Sans',Arial,sans-serif;font-size:9px;fill:#a8a8a8;font-weight:400}
 .anatomy-svg-v38 .body-title{font-family:'DM Sans',Arial,sans-serif;font-size:11px;fill:#d4a853;font-weight:900;letter-spacing:5px}
 @media(max-width:420px){.body-map svg.anatomy-svg-v38{max-height:690px}.anatomy-svg-v38 .callout-text{font-size:11px}.anatomy-svg-v38 .callout-sub{font-size:8px}.anatomy-svg-v38 .body-title{font-size:10px}}
+
+/* BodyPlan v41: Daily Consistency Analytics */
+.dc-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.dc-summary-card{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:11px;padding:14px 10px;text-align:left}
+.dc-summary-card .num{font-family:'Bebas Neue';font-size:30px;letter-spacing:1px;color:#d4a853;line-height:1}
+.dc-summary-card .lbl{font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:#aaa;margin-top:5px;line-height:1.25}
+.dc-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dc-metric{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:12px;padding:15px;margin-bottom:10px}
+.dc-metric-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.dc-metric-title{font-size:13px;color:#fff;font-weight:700}
+.dc-metric-value{font-family:'Bebas Neue';font-size:27px;letter-spacing:1px;color:#d4a853;white-space:nowrap}
+.dc-metric-sub{font-size:12px;color:#ddd;line-height:1.45;margin-top:8px}
+.dc-month-list{display:grid;gap:9px;margin-top:10px}
+.dc-month-row{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:12px}
+.dc-month-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.dc-month-name{font-size:12px;font-weight:800;color:#fff}
+.dc-month-percent{font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;color:#d4a853}
+.dc-month-meta{font-size:11px;color:#ddd;line-height:1.45;margin-top:7px}
+.dc-record-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.dc-record{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:13px 10px}
+.dc-record strong{display:block;font-family:'Bebas Neue';font-size:27px;color:#d4a853;letter-spacing:1px;font-weight:400;line-height:1}
+.dc-record span{display:block;font-size:8px;letter-spacing:1.6px;text-transform:uppercase;color:#aaa;margin-top:6px;line-height:1.25}
+@media(max-width:420px){.dc-summary-grid,.dc-record-grid{grid-template-columns:1fr}.dc-split{grid-template-columns:1fr}}
+
 </style>
 
 
