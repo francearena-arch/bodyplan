@@ -1,4 +1,4 @@
-const CACHE_NAME='bodyplan-2-beta5';
+const CACHE_NAME='bodyplan-2-beta6';
 const ASSETS=[
 './','./index.html','./app.css','./app.js',
 './exercise-seed.json','./starter-plan.json',

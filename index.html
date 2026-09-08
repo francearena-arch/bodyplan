@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="BodyPlan">
 <meta name="theme-color" content="#080808">
 <title>BodyPlan</title>
-<link rel="manifest" href="manifest.json?v=200b5">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=200b5">
-<link rel="stylesheet" href="app.css?v=200b5">
+<link rel="manifest" href="manifest.json?v=200b6">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=200b6">
+<link rel="stylesheet" href="app.css?v=200b6">
 </head>
 <body>
 <header class="topbar">
@@ -68,8 +68,19 @@
   </section>
 </div>
 
+<div class="dialog-backdrop" id="newPlanDialog" hidden><section class="body-dialog" role="dialog" aria-modal="true" aria-labelledby="newPlanTitle"><div class="row"><div><div class="eyebrow">Trainingsplanung</div><h2 id="newPlanTitle">Neuer Trainingsplan</h2></div><button class="icon-close" id="closeNewPlanDialog" aria-label="Schließen">×</button></div><form id="newPlanForm"><div class="form-field"><label for="newPlanName">Planname</label><input id="newPlanName" required maxlength="100" placeholder="z. B. Athletic V-Taper"></div><p class="muted">Du kannst den Plan jederzeit umbenennen, Einheiten hinzufügen und Übungen aus deiner Bibliothek auswählen.</p><div class="actions"><button class="secondary" type="button" id="cancelNewPlan">Abbrechen</button><button class="primary" type="submit">Plan erstellen</button></div></form></section></div>
+<div class="picker-backdrop" id="exercisePickerDialog" hidden>
+<section class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+ <div class="picker-handle"></div>
+ <div class="picker-heading"><div><div class="eyebrow">Übungsbibliothek</div><h2 id="pickerTitle">Übungen auswählen</h2><p id="pickerSubtitle">Wähle Übungen für deine Einheit.</p></div><button class="icon-close" id="closeExercisePicker" aria-label="Schließen">×</button></div>
+ <div class="picker-controls"><label class="picker-search-wrap"><span class="sr-only">Übung suchen</span><input id="pickerSearch" type="search" placeholder="Übung oder Muskelgruppe suchen" autocomplete="off"></label>
+ <div class="picker-filters"><select id="pickerMuscle" aria-label="Muskelgruppe"><option value="">Alle Muskelgruppen</option></select><select id="pickerEquipment" aria-label="Equipment"><option value="">Alle Geräte</option></select></div></div>
+ <div class="picker-results" id="pickerResults"></div>
+ <div class="picker-footer"><button class="picker-create-link" id="pickerCreate" type="button">+ Neue Übung anlegen</button><div class="picker-footer-actions"><button class="secondary" id="pickerCancel" type="button">Abbrechen</button><span id="pickerCount"></span><button class="primary" id="pickerAdd" type="button" disabled>Übung auswählen</button></div></div>
+ <form id="pickerCreateForm" class="picker-create-form" hidden><div class="row"><h3>Neue Übung</h3><button type="button" class="mini secondary" id="pickerCreateCancel">Abbrechen</button></div><div class="form-field"><label for="pickerCreateName">Name</label><input id="pickerCreateName" required maxlength="120" placeholder="z. B. Rudern am Kabelzug"></div><div class="form-field"><label for="pickerCreateEquipment">Equipment</label><input id="pickerCreateEquipment" placeholder="Optional"></div><div class="form-field"><label for="pickerCreateMuscle">Primäre Muskelgruppe</label><select id="pickerCreateMuscle"><option value="">Nicht zugeordnet</option></select></div><button class="primary full" type="submit">Übung erstellen und auswählen</button></form>
+</section></div>
 <div class="dialog-backdrop" id="bodyDialog" hidden><section class="body-dialog" role="dialog" aria-modal="true" aria-labelledby="bodyDialogTitle"><div class="row"><div><div class="eyebrow">Körperdaten</div><h2 id="bodyDialogTitle">Messung erfassen</h2></div><button class="icon-close" id="closeBodyDialog" aria-label="Schließen">×</button></div><form id="bodyForm"><div class="form-field"><label for="bodyDate">Datum</label><input id="bodyDate" type="date" required></div><div class="grid2"><div class="form-field"><label for="bodyWeight">Gewicht (kg)</label><input id="bodyWeight" type="number" inputmode="decimal" min="20" max="500" step="0.1" placeholder="z. B. 72,5"></div><div class="form-field"><label for="bodyFat">Körperfett (%)</label><input id="bodyFat" type="number" inputmode="decimal" min="1" max="70" step="0.1" placeholder="z. B. 12,0"></div></div><p class="muted">Mindestens einen Wert eingeben. Leere Felder verändern bestehende Messwerte nicht.</p><button class="primary full" type="submit">Messung speichern</button></form></section></div>
 <input id="importFile" type="file" accept=".json" hidden>
-<script src="app.js?v=200b5"></script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js?v=200b5").catch(()=>{})}</script></body>
+<script src="app.js?v=200b6"></script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js?v=200b6").catch(()=>{})}</script></body>
 </html>

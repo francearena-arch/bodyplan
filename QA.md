@@ -1,17 +1,7 @@
-# Beta 5 – Qualitätsprüfung
+# Beta 6 – Qualitätsprüfung
 
-## Durchgeführt
-- JavaScript-Syntaxprüfung.
-- Logiktests für Plan-Duplikation, Löschung, Schutz des aktiven Plans und Erhalt der Trainingshistorie.
-- Tests für primäre, sekundäre und weitere Muskelgewichtung sowie historische Muskel-Snapshots.
-- Tests für Körpermessungen, Verlauf, Bearbeiten/Löschen und Datenbank-Normalisierung.
-- Chromium-Integrationstest: Dashboard, Planverwaltung, Übungsbibliothek, Körperdaten, Heatmap, Einstellungen und Trainingsspeicherung.
-- Responsive Overflow-Prüfung der Hauptansichten bei 320, 375, 390, 430 und 768 Pixeln.
-- Visuelle Prüfung der Vorder- und Rückseitenbilder sowie der Brustmaske. Die übrigen Masken wurden nicht verändert.
-- Überprüfung der referenzierten Dateien und ZIP-Integrität.
+Durchgeführt: JavaScript-Syntaxprüfung, Logikregression für Planerhaltung und Löschung, Muskelgewichtungen, historische Trainingsdaten und Körpermessungen. Chromium-Integrationstest für die vollständige Planerstellung, Bibliothekssuche, Muskelgruppenfilter, Übungsauswahl, eigene Übungen, Ersetzen einer Übung und Einstellungen. Responsive Overflow-Prüfung bei 320, 375, 390, 430 und 768 Pixeln. Visuelle Prüfung des neuen Selektors bei 390 Pixeln. Die Anatomie-Masken wurden bytegenau mit Beta 5 verglichen und nicht verändert.
 
-## Grenzen
-Die Browserprüfung verwendet eine isolierte lokale Testumgebung. Ein vollständiger Test des Service-Worker-Update-Lebenszyklus auf GitHub Pages, der iOS-Home-Screen-PWA, der nativen Swipe-Gesten und der echten Bestandsdaten auf dem iPhone war hier nicht möglich. Die App ist deshalb als Beta und nicht als vollständig produktionszertifizierte Anwendung gekennzeichnet.
+Die Tests liefen in einer isolierten Chromium-Umgebung. Native iOS-Picker, VoiceOver, der produktive Service-Worker-Update-Lebenszyklus und die tatsächlichen Bestandsdaten auf dem iPhone wurden nicht vollständig getestet. Das Release ist deshalb weiterhin als Beta gekennzeichnet.
 
-## Vor dem produktiven Einsatz
-Backup erstellen, Release deployen, vorhandene Daten kontrollieren und die zentralen Abläufe auf dem iPhone testen. Bei Abweichungen das Backup behalten und keine Website-Daten löschen.
+Vor dem produktiven Einsatz: Backup erstellen, deployen, Daten kontrollieren und die zentralen Abläufe auf dem iPhone prüfen. Bei Problemen keine Website-Daten löschen.
