@@ -10,7 +10,7 @@ const localISO=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padS
 const mondayOf=d=>{let x=new Date(d);x.setHours(0,0,0,0);let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x};
 const fmtDate=iso=>{if(!iso)return"—";let d=new Date(iso);return isNaN(d)?"—":d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const fmtTime=s=>{s=Math.max(0,Math.floor(s||0));return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
-let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,sessionTick=null,restTick=null;
+let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,sessionTick=null,restTick=null,dashboardTick=null;
 
 function getJSON(k,f=null){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
 function setJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -46,12 +46,45 @@ function migrateFresh(){
   let p=normalizePlan(starter);p.status="active";
   return {schemaVersion:2,createdAt:now(),updatedAt:now(),exercises,plans:[p],activePlanId:p.id,sessions,settings:{dashboard:["next","week","last","body"],habitsEnabled:false},migration:{source:"v44",at:now(),historyCount:oldHist.length}};
 }
+
+function normalizeName(s){return String(s||"").trim().toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")}
+function repairMuscleMappings(){
+  if(!seed?.exercises||!db?.exercises)return false;
+  const seedMap=new Map();
+  seed.exercises.forEach(s=>{
+    seedMap.set(normalizeName(s.name),s);
+    (s.aliases||[]).forEach(a=>seedMap.set(normalizeName(a),s));
+  });
+  let changed=false;
+  db.exercises.forEach(e=>{
+    const s=seedMap.get(normalizeName(e.name)) || (e.aliases||[]).map(a=>seedMap.get(normalizeName(a))).find(Boolean);
+    if(!s)return;
+    const empty=!e.muscles||Object.keys(e.muscles).length===0;
+    if(empty&&s.muscles&&Object.keys(s.muscles).length){
+      e.muscles=clone(s.muscles); e.primaryMuscle=e.primaryMuscle||s.primaryMuscle||""; changed=true;
+    } else if(!e.primaryMuscle&&s.primaryMuscle){e.primaryMuscle=s.primaryMuscle;changed=true}
+  });
+  (db.sessions||[]).forEach(sess=>(sess.exercises||[]).forEach(se=>{
+    let linked=db.exercises.find(e=>e.id===se.exerciseId);
+    if(linked&&linked.muscles&&Object.keys(linked.muscles).length)return;
+    const s=seedMap.get(normalizeName(se.nameSnapshot));
+    if(!s)return;
+    if(linked){
+      linked.muscles=clone(s.muscles||{});linked.primaryMuscle=linked.primaryMuscle||s.primaryMuscle||"";changed=true;
+    }else{
+      const existing=db.exercises.find(e=>normalizeName(e.name)===normalizeName(s.name));
+      if(existing){se.exerciseId=existing.id;changed=true}
+    }
+  }));
+  return changed;
+}
 function init(){
   db=getJSON(DB_KEY,null);
-  if(!db){db=migrateFresh();save()}
+  if(!db){db=migrateFresh()}
   db.schemaVersion=2;
   db.settings=db.settings||{dashboard:["next","week","last","body"],habitsEnabled:false};
   db.sessions=db.sessions||[];db.plans=db.plans||[];db.exercises=db.exercises||[];
+  repairMuscleMappings();
   save();bindShell();render();restoreActiveBanner();
 }
 function activePlan(){return db.plans.find(p=>p.id===db.activePlanId)||db.plans.find(p=>p.status==="active")||db.plans[0]}
@@ -78,6 +111,7 @@ function bodyVal(x){if(x==null)return null;if(typeof x==="number")return x;retur
 function openDrawer(){ $("#drawer").classList.add("open");$("#drawerBackdrop").classList.add("open");$("#drawer").setAttribute("aria-hidden","false") }
 function closeDrawer(){ $("#drawer").classList.remove("open");$("#drawerBackdrop").classList.remove("open");$("#drawer").setAttribute("aria-hidden","true") }
 function bindShell(){
+  $("#brandHome").onclick=()=>{page="dashboard";selectedPlan=null;selectedDay=null;closeDrawer();render()};
   $("#menuBtn").onclick=openDrawer;$("#closeDrawer").onclick=closeDrawer;$("#drawerBackdrop").onclick=closeDrawer;
   $$(".drawer-nav button[data-page]").forEach(b=>b.onclick=()=>{page=b.dataset.page;selectedPlan=null;selectedDay=null;closeDrawer();render()});
   $("#backupBtn").onclick=backup;$("#importBtn").onclick=()=>$("#importFile").click();
@@ -87,10 +121,12 @@ function bindShell(){
   $$(".rest-actions button").forEach(b=>b.onclick=()=>startRest(Number(b.dataset.rest)));
 }
 function render(){
+  clearInterval(dashboardTick);dashboardTick=null;
   $$(".drawer-nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
   const views={dashboard:renderDashboard,plans:renderPlans,library:renderLibrary,history:renderHistory,progress:renderProgress,heatmap:renderHeatmap,settings:renderSettings};
   $("#app").innerHTML=(views[page]||renderDashboard)();
   bindPageActions();
+  if(page==="dashboard")startDashboardTicker();
 }
 function bindPageActions(){
   $$("[data-action]").forEach(el=>{
@@ -103,19 +139,51 @@ function bindPageActions(){
 function btn(label,action,cls="secondary"){return `<button class="${cls}" data-action="${action}">${esc(label)}</button>`}
 function field(label,value,action,type="text"){return `<div class="form-field"><label>${esc(label)}</label><input type="${type}" value="${esc(value)}" data-action="${action}"></div>`}
 
+function sessionSetStats(a){
+  const work=(a?.exercises||[]).flatMap(e=>(e.sets||[]).filter(s=>s.kind!=="warmup"));
+  return {done:work.filter(s=>s.completed).length,total:work.length};
+}
+function dashboardActiveCard(active){
+  const stats=sessionSetStats(active), elapsed=Math.max(0,(Date.now()-new Date(active.startedAt).getTime())/1000);
+  return `<div class="card active-workout-card">
+    <div class="eyebrow"><span class="active-pulse"></span>Training läuft</div>
+    <div class="hero-title">${esc(active.title||"Training")}</div>
+    <div class="muted">${esc(active.planName||"")}</div>
+    <div class="active-session-meta">
+      <div><span>Zeit</span><strong id="activeElapsedDashboard">${fmtTime(elapsed)}</strong></div>
+      <div><span>Sätze</span><strong>${stats.done} / ${stats.total}</strong></div>
+    </div>
+    <div class="actions">${btn("Training fortsetzen","start:"+active.dayId,"primary")}</div>
+  </div>`;
+}
+function startDashboardTicker(){
+  const el=$("#activeElapsedDashboard"),a=getJSON(ACTIVE_KEY,null);if(!el||!a)return;
+  const tick=()=>{const node=$("#activeElapsedDashboard");if(!node)return;node.textContent=fmtTime((Date.now()-new Date(a.startedAt).getTime())/1000)};
+  tick();dashboardTick=setInterval(tick,1000);
+}
 function renderDashboard(){
-  const p=activePlan(), n=nextDay(), week=currentWeekSessions(), last=lastSession(), body=latestBody(), cards=db.settings.dashboard||[];
-  let html=`<div class="dashboard-intro"><div class="eyebrow">Heute</div><h1 class="page-title">Dein Training</h1></div>`;
-  if(cards.includes("next"))html+=`<div class="card hero"><div class="eyebrow">Nächste Einheit</div><div class="hero-title">${esc(n?`${n.label||""} · ${n.name}`:"Plan auswählen")}</div><div class="muted">${esc(p?.name||"Kein aktiver Plan")}</div>${n?`<div class="actions">${btn("Training starten","start:"+n.id,"primary")}${btn("Plan ansehen","openplan:"+p.id)}</div>`:""}</div>`;
+  const p=activePlan(), n=nextDay(), week=currentWeekSessions(), last=lastSession(), body=latestBody(), cards=db.settings.dashboard||[], active=getJSON(ACTIVE_KEY,null);
+  let html=`<div class="dashboard-intro"><div class="eyebrow">BodyPlan</div><h1 class="page-title">${active?"Training in progress":"Dein Training"}</h1></div>`;
+  if(active)html+=dashboardActiveCard(active);
+  else if(cards.includes("next"))html+=`<div class="workout-hero">
+    <div class="eyebrow">Nächste Einheit</div>
+    <div class="hero-title">${esc(n?`${n.label||""} · ${n.name}`:"Plan auswählen")}</div>
+    <div class="muted">${esc(p?.name||"Kein aktiver Plan")}</div>
+    ${n?`<div class="hero-meta">
+      <span class="hero-chip"><strong>${n.exercises?.length||0}</strong> Übungen</span>
+      ${p?.targetMinutes?`<span class="hero-chip">ca. <strong>${p.targetMinutes}</strong> Min</span>`:""}
+      <span class="hero-chip"><strong>${week.length}</strong> / ${p?.days?.length||0} diese Woche</span>
+    </div>
+    <div class="actions">${btn("Training starten","start:"+n.id,"primary")}${btn("Plan ansehen","openplan:"+p.id)}</div>`:""}
+  </div>`;
   if(cards.includes("week"))html+=`<div class="card"><div class="eyebrow">Wochenfortschritt</div><div class="kpi">${week.length} / ${p?.days?.length||0}</div><div class="bar"><span style="width:${Math.min(100,(week.length/(p?.days?.length||1))*100)}%"></span></div><div class="muted" style="margin-top:10px">${week.length===0?"Die Woche beginnt mit deiner ersten Einheit.":week.length>=(p?.days?.length||0)?"Trainingswoche abgeschlossen.":"Noch "+((p?.days?.length||0)-week.length)+" Einheit"+(((p?.days?.length||0)-week.length)===1?"":"en")+" offen."}</div></div>`;
   if(cards.includes("last"))html+=`<div class="card"><div class="eyebrow">Letztes Training</div>${last?`<div class="hero-title" style="font-size:24px">${esc(last.title)}</div><div class="muted">${fmtDate(last.startedAt||last.localDate)}${last.durationSec?` · ${Math.round(last.durationSec/60)} Min`:``}</div><div class="actions">${btn("Historie öffnen","page:history")}</div>`:`<div class="empty">Noch kein Training gespeichert.</div>`}</div>`;
-  if(cards.includes("body"))html+=`<div class="card"><div class="eyebrow">Körper</div><div class="grid2" style="margin-top:10px"><div><div class="small">Gewicht</div><div class="kpi" style="font-size:27px">${bodyVal(body.weight)??"—"}${bodyVal(body.weight)!=null?" kg":""}</div></div><div><div class="small">KFA</div><div class="kpi" style="font-size:27px">${bodyVal(body.fat)??"—"}${bodyVal(body.fat)!=null?" %":""}</div></div></div></div>`;
-  if(cards.includes("prs"))html+=`<div class="card"><div class="eyebrow">Persönliche Rekorde</div><div class="muted" style="margin-top:8px">PR-Auswertung wird aus deinen gespeicherten Sätzen berechnet.</div></div>`;
-  if(cards.includes("heatmap"))html+=`<div class="card"><div class="eyebrow">Muskelbelastung</div><div class="muted" style="margin-top:8px">Welche Muskelgruppen du zuletzt am stärksten trainiert hast.</div><div class="actions">${btn("Heatmap öffnen","page:heatmap")}</div></div>`;
+  if(cards.includes("body"))html+=`<div class="card"><div class="eyebrow">Körper</div><div class="grid2" style="margin-top:10px"><div><div class="small">Gewicht</div><div class="kpi" style="font-size:27px">${bodyVal(body.weight)??"—"}${bodyVal(body.weight)!=null?" kg":""}</div></div><div><div class="small">KFA</div><div class="kpi" style="font-size:27px">${bodyVal(body.fat)??"—"}${bodyVal(body.fat)!=null?" %":""}</div></div></div><div class="actions">${btn("Fortschritt öffnen","page:progress")}</div></div>`;
+  if(cards.includes("prs"))html+=`<div class="card"><div class="eyebrow">Persönliche Rekorde</div><div class="muted" style="margin-top:8px">Rekorde werden aus deinen gespeicherten Arbeitssätzen abgeleitet.</div><div class="actions">${btn("Historie öffnen","page:history")}</div></div>`;
+  if(cards.includes("heatmap"))html+=`<div class="card"><div class="eyebrow">Muskelbelastung</div><div class="muted" style="margin-top:8px">Sieh, welche Muskelgruppen dein Training zuletzt am stärksten belastet hat.</div><div class="actions">${btn("Heatmap öffnen","page:heatmap")}</div></div>`;
   if(cards.includes("habits")&&db.settings.habitsEnabled)html+=`<div class="card"><div class="eyebrow">Gewohnheiten</div><div class="muted" style="margin-top:8px">Deine Daily-Consistency-Daten bleiben optional verfügbar.</div></div>`;
   return html;
 }
-
 function renderPlans(){
   if(selectedPlan){
     const p=plan();if(!p){selectedPlan=null;return renderPlans()}
@@ -198,15 +266,20 @@ function anatomyZones(view,scores,max){
   if(view==="front")return `
     <span class="heat-zone z-chest l${lv("chest")}"></span>
     <span class="heat-zone z-front-delts-l l${lv("front_delts")}"></span><span class="heat-zone z-front-delts-r l${lv("front_delts")}"></span>
+    <span class="heat-zone z-side-delts-l l${lv("side_delts")}"></span><span class="heat-zone z-side-delts-r l${lv("side_delts")}"></span>
     <span class="heat-zone z-biceps-l l${lv("biceps")}"></span><span class="heat-zone z-biceps-r l${lv("biceps")}"></span>
+    <span class="heat-zone z-forearms-l l${lv("forearms")}"></span><span class="heat-zone z-forearms-r l${lv("forearms")}"></span>
     <span class="heat-zone z-abs l${lv("abs")}"></span>
+    <span class="heat-zone z-obliques-l l${lv("obliques")}"></span><span class="heat-zone z-obliques-r l${lv("obliques")}"></span>
     <span class="heat-zone z-quads-l l${lv("quads")}"></span><span class="heat-zone z-quads-r l${lv("quads")}"></span>
     <span class="heat-zone z-calves-l l${lv("calves")}"></span><span class="heat-zone z-calves-r l${lv("calves")}"></span>`;
   return `
     <span class="heat-zone z-traps l${lv("traps")}"></span>
     <span class="heat-zone z-rear-delts-l l${lv("rear_delts")}"></span><span class="heat-zone z-rear-delts-r l${lv("rear_delts")}"></span>
+    <span class="heat-zone z-side-delts-l l${lv("side_delts")}"></span><span class="heat-zone z-side-delts-r l${lv("side_delts")}"></span>
     <span class="heat-zone z-upper-back l${lv("upper_back")}"></span>
     <span class="heat-zone z-lats l${lv("lats")}"></span>
+    <span class="heat-zone z-erectors l${lv("erectors")}"></span>
     <span class="heat-zone z-triceps-l l${lv("triceps")}"></span><span class="heat-zone z-triceps-r l${lv("triceps")}"></span>
     <span class="heat-zone z-glutes l${lv("glutes")}"></span>
     <span class="heat-zone z-hamstrings-l l${lv("hamstrings")}"></span><span class="heat-zone z-hamstrings-r l${lv("hamstrings")}"></span>
@@ -217,12 +290,26 @@ function anatomyView(view,scores,max){
   const label=view==="front"?"Vorderseite":"Rückseite";
   return `<div class="anatomy-card"><div class="eyebrow">${label}</div><div class="anatomy-wrap ${view}" style="margin-top:10px"><img src="${src}" alt="Anatomische Muskelansicht ${label}">${anatomyZones(view,scores,max)}</div></div>`;
 }
+function completedSetsInRange(days){
+  const cutoff=Date.now()-days*864e5;
+  return (db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate).getTime()>=cutoff)
+    .reduce((sum,s)=>sum+(s.exercises||[]).reduce((n,e)=>n+(e.sets||[]).filter(z=>z.kind!=="warmup"&&z.completed!==false).length,0),0);
+}
 function renderHeatmap(){
-  const scores=muscleScores(heatRange), max=Math.max(0,...Object.values(scores)), ranked=Object.entries(scores).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const scores=muscleScores(heatRange), max=Math.max(0,...Object.values(scores)), totalSets=completedSetsInRange(heatRange);
+  const ranked=Object.entries(scores).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,10);
   return `<div class="eyebrow">Analyse</div><h1 class="page-title">Muskel-Heatmap</h1>
   <div class="range-tabs"><button data-range="30" class="${heatRange===30?"active":""}">30 Tage</button><button data-range="90" class="${heatRange===90?"active":""}">90 Tage</button><button data-range="365" class="${heatRange===365?"active":""}">12 Monate</button></div>
+  <div class="card compact" style="margin-bottom:14px">
+    <div class="row"><div><div class="eyebrow">Auswertung</div><div class="muted" style="margin-top:5px">${totalSets} absolvierte Arbeitssätze im Zeitraum</div></div><span class="tag">${ranked.length} Muskelgruppen</span></div>
+  </div>
   <div class="heat-layout">${anatomyView("front",scores,max)}${anatomyView("back",scores,max)}</div>
-  <div class="card" style="margin-top:14px"><div class="eyebrow">Trainingsreiz</div>${ranked.length?`<div class="muscle-rank" style="margin-top:14px">${ranked.map(([m,v])=>`<div class="muscle-rank-row"><span>${esc(seed.muscleGroups[m]||m)}</span><div class="bar"><span style="width:${max?Math.round(v/max*100):0}%"></span></div><strong>${v.toFixed(1)}</strong></div>`).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}<div class="heat-caption">Die Heatmap zeigt den geschätzten Trainingsreiz aus deinen absolvierten Arbeitssätzen und den in der Übungsbibliothek hinterlegten Muskelgewichtungen.</div></div>`;
+  <div class="card" style="margin-top:14px">
+    <div class="eyebrow">Trainingsreiz</div>
+    ${ranked.length?`<div class="muscle-rank" style="margin-top:14px">${ranked.map(([m,v])=>`<div class="muscle-rank-row"><span>${esc(seed.muscleGroups[m]||m)}</span><div class="bar"><span style="width:${max?Math.round(v/max*100):0}%"></span></div><strong>${v.toFixed(1)} P</strong></div>`).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}
+    <div class="heat-legend-scale"><div><i></i>Niedrig</div><div><i></i>Moderat</div><div><i></i>Hoch</div><div><i></i>Sehr hoch</div></div>
+    <div class="score-help"><strong>Was bedeutet ein Reizpunkt?</strong><br>BodyPlan gewichtet jeden absolvierten Arbeitssatz mit der Muskelbeteiligung der Übung. Beispiel: 3 Sätze Bankdrücken × Brust-Gewichtung 1,0 = 3,0 P für die Brust. Eine sekundäre Gewichtung von 0,5 ergibt 1,5 P. Die Körperfarben zeigen die Belastung <strong>relativ zur am stärksten trainierten Muskelgruppe</strong> im gewählten Zeitraum.</div>
+  </div>`;
 }
 function renderSettings(){
   const opts=[["next","Nächste Einheit"],["week","Wochenfortschritt"],["last","Letztes Training"],["body","Körperfortschritt"],["prs","Persönliche Rekorde"],["heatmap","Muskelbelastung"],["habits","Gewohnheiten"]];
@@ -277,23 +364,73 @@ function handleAction(a,el){
   if(op==="setmin"||op==="setmax"){let s=entry().sets.find(s=>s.id===arg);s[op==="setmin"?"repsMin":"repsMax"]=Math.max(0,Number(val)||0);save();return}
 }
 
+function lastExercisePerformance(exerciseId){
+  const sessions=[...(db.sessions||[])].sort((a,b)=>new Date(b.startedAt||b.localDate)-new Date(a.startedAt||a.localDate));
+  for(const s of sessions){
+    const e=(s.exercises||[]).find(x=>x.exerciseId===exerciseId);
+    if(!e)continue;
+    const sets=(e.sets||[]).filter(x=>x.kind!=="warmup"&&x.completed!==false&&(x.kg!==""||x.reps!==""));
+    if(!sets.length)continue;
+    return {date:s.startedAt||s.localDate,sets};
+  }
+  return null;
+}
+function formatLastPerformance(perf){
+  if(!perf)return "";
+  const parts=perf.sets.slice(0,5).map(s=>{
+    const kg=String(s.kg??"").trim(), reps=String(s.reps??"").trim();
+    if(kg&&reps)return `${esc(kg)} kg × ${esc(reps)}`;
+    if(reps)return `${esc(reps)} Wdh`;
+    if(kg)return `${esc(kg)} kg`;
+    return "";
+  }).filter(Boolean);
+  if(!parts.length)return "";
+  return `<div class="last-performance"><strong>Letztes Mal · ${fmtDate(perf.date)}</strong><br>${parts.join(" · ")}</div>`;
+}
+function updateSessionProgress(active){
+  const stats=sessionSetStats(active), bar=$("#sessionProgressBar");
+  if(bar)bar.style.width=(stats.total?Math.round(stats.done/stats.total*100):0)+"%";
+}
 function openSession(dayId){
   const p=activePlan(), d=p?.days.find(x=>x.id===dayId);if(!d)return;
   let active=getJSON(ACTIVE_KEY,null);
-  if(active&&active.dayId!==dayId){if(!confirm("Es gibt ein anderes laufendes Training. Verwerfen und diese Einheit starten?"))return;localStorage.removeItem(ACTIVE_KEY)}
+  if(active&&active.dayId!==dayId){
+    if(!confirm("Es läuft bereits ein anderes Training. Dieses verwerfen und die neue Einheit starten?"))return;
+    localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);active=null;
+  }
   if(!active||active.dayId!==dayId){
-    active={id:uid(),planId:p.id,dayId:d.id,title:`${d.label||""} · ${d.name}`.replace(/^ · /,""),planName:p.name,startedAt:now(),localDate:localISO(),exercises:d.exercises.map(pe=>{const x=ex(pe.exerciseId);return{id:uid(),exerciseId:pe.exerciseId,nameSnapshot:x?.name||"Übung",permanentNote:x?.notes||"",sessionNote:"",sets:pe.sets.map(s=>({id:uid(),kind:s.kind||"working",repsMin:s.repsMin,repsMax:s.repsMax,kg:"",reps:"",completed:false}))}})};
+    active={id:uid(),planId:p.id,dayId:d.id,title:`${d.label||""} · ${d.name}`.replace(/^ · /,""),planName:p.name,startedAt:now(),localDate:localISO(),exercises:d.exercises.map(pe=>{
+      const x=ex(pe.exerciseId);
+      return{id:uid(),exerciseId:pe.exerciseId,nameSnapshot:x?.name||"Übung",permanentNote:x?.notes||"",sessionNote:"",sets:pe.sets.map(s=>({id:uid(),kind:s.kind||"working",repsMin:s.repsMin,repsMax:s.repsMax,kg:"",reps:"",completed:false}))}
+    })};
     setJSON(ACTIVE_KEY,active)
   }
-  renderSession(active);$("#sessionOverlay").classList.add("open");startElapsedTicker()
+  renderSession(active);
+  $("#sessionOverlay").classList.add("open");
+  updateSessionProgress(active);
+  startElapsedTicker();
+  resumeRestTicker();
 }
-function restoreActiveBanner(){const a=getJSON(ACTIVE_KEY,null);if(a){/* intentionally silent; Dashboard start reopens matching unit */}}
+function restoreActiveBanner(){/* Running workouts are rendered directly on the dashboard. */}
 function renderSession(active){
-  $("#sessionPlanLabel").textContent=active.planName||"Training";$("#sessionTitle").textContent=active.title||"Einheit";
-  $("#sessionContent").innerHTML=active.exercises.map((e,ei)=>`<div class="session-ex"><div class="session-ex-head"><div><div class="session-ex-title">${esc(e.nameSnapshot)}</div><div class="exercise-meta">${e.sets.filter(s=>s.kind!=="warmup").length} Arbeitssätze</div></div></div>
-  ${e.permanentNote?`<div class="muted" style="margin:7px 0 10px">${esc(e.permanentNote)}</div>`:""}
-  ${e.sets.map((s,si)=>`<div class="session-set"><span class="small">${si+1}</span><input inputmode="decimal" placeholder="kg" value="${esc(s.kg)}" data-session="kg:${ei}:${si}"><input inputmode="numeric" placeholder="${s.repsMin??""}–${s.repsMax??""}" value="${esc(s.reps)}" data-session="reps:${ei}:${si}"><button class="done-btn ${s.completed?"done":""}" data-session="done:${ei}:${si}">✓</button></div>`).join("")}
-  <div class="form-field"><label>Notiz nur für heute</label><textarea data-session="note:${ei}">${esc(e.sessionNote||"")}</textarea></div></div>`).join("");
+  $("#sessionPlanLabel").textContent=active.planName||"Training";
+  $("#sessionTitle").textContent=active.title||"Einheit";
+  $("#sessionContent").innerHTML=active.exercises.map((e,ei)=>{
+    const perf=lastExercisePerformance(e.exerciseId);
+    return `<div class="session-ex">
+      <div class="session-ex-head"><div><div class="session-ex-title">${esc(e.nameSnapshot)}</div><div class="exercise-meta">${e.sets.filter(s=>s.kind!=="warmup").length} Arbeitssätze</div></div></div>
+      ${e.permanentNote?`<div class="muted" style="margin:7px 0 8px">${esc(e.permanentNote)}</div>`:""}
+      ${formatLastPerformance(perf)}
+      <div class="set-head"><span>Satz</span><span>kg</span><span>Wdh</span><span>OK</span></div>
+      ${e.sets.map((s,si)=>`<div class="session-set">
+        <span class="small">${s.kind==="warmup"?"W":si+1}</span>
+        <input inputmode="decimal" aria-label="Gewicht Satz ${si+1}" placeholder="kg" value="${esc(s.kg)}" data-session="kg:${ei}:${si}">
+        <input inputmode="numeric" aria-label="Wiederholungen Satz ${si+1}" placeholder="${s.repsMin??""}–${s.repsMax??""}" value="${esc(s.reps)}" data-session="reps:${ei}:${si}">
+        <button class="done-btn ${s.completed?"done":""}" data-session="done:${ei}:${si}" aria-label="Satz ${si+1} erledigt">✓</button>
+      </div>`).join("")}
+      <div class="form-field"><label>Notiz für dieses Training</label><textarea data-session="note:${ei}" placeholder="Optional">${esc(e.sessionNote||"")}</textarea></div>
+    </div>`;
+  }).join("");
   $$("[data-session]").forEach(el=>{
     const [op,ei,si]=el.dataset.session.split(":");
     const evt=op==="done"?"click":"input";
@@ -304,21 +441,62 @@ function updateSessionField(op,ei,si,el){
   let a=getJSON(ACTIVE_KEY,null);if(!a)return;
   if(op==="kg")a.exercises[ei].sets[si].kg=el.value;
   if(op==="reps")a.exercises[ei].sets[si].reps=el.value;
-  if(op==="done"){a.exercises[ei].sets[si].completed=!a.exercises[ei].sets[si].completed;el.classList.toggle("done",a.exercises[ei].sets[si].completed)}
+  if(op==="done"){
+    a.exercises[ei].sets[si].completed=!a.exercises[ei].sets[si].completed;
+    el.classList.toggle("done",a.exercises[ei].sets[si].completed);
+  }
   if(op==="note")a.exercises[ei].sessionNote=el.value;
-  setJSON(ACTIVE_KEY,a)
+  setJSON(ACTIVE_KEY,a);
+  if(op==="done")updateSessionProgress(a);
 }
-function startElapsedTicker(){clearInterval(sessionTick);const tick=()=>{let a=getJSON(ACTIVE_KEY,null);if(a)$("#elapsed").textContent=fmtTime((Date.now()-new Date(a.startedAt).getTime())/1000)};tick();sessionTick=setInterval(tick,1000)}
-function closeSession(){$("#sessionOverlay").classList.remove("open");clearInterval(sessionTick)}
-function startRest(sec){let r={endsAt:Date.now()+sec*1000};setJSON(REST_KEY,r);clearInterval(restTick);const tick=()=>{let left=Math.ceil((r.endsAt-Date.now())/1000);$("#restTimer").textContent=fmtTime(Math.max(0,left));if(left<=0){clearInterval(restTick);localStorage.removeItem(REST_KEY)}};tick();restTick=setInterval(tick,250)}
+function startElapsedTicker(){
+  clearInterval(sessionTick);
+  const tick=()=>{
+    let a=getJSON(ACTIVE_KEY,null), el=$("#elapsed");
+    if(a&&el)el.textContent=fmtTime((Date.now()-new Date(a.startedAt).getTime())/1000)
+  };
+  tick();sessionTick=setInterval(tick,1000)
+}
+function closeSession(){
+  $("#sessionOverlay").classList.remove("open");
+  clearInterval(sessionTick);sessionTick=null;
+  page="dashboard";selectedPlan=null;selectedDay=null;render()
+}
+function runRestTicker(r){
+  clearInterval(restTick);
+  const tick=()=>{
+    let left=Math.ceil((r.endsAt-Date.now())/1000),el=$("#restTimer");
+    if(el)el.textContent=fmtTime(Math.max(0,left));
+    if(left<=0){clearInterval(restTick);restTick=null;localStorage.removeItem(REST_KEY)}
+  };
+  tick();if(r.endsAt>Date.now())restTick=setInterval(tick,250)
+}
+function resumeRestTicker(){
+  const r=getJSON(REST_KEY,null);
+  if(r?.endsAt>Date.now())runRestTicker(r);
+  else{localStorage.removeItem(REST_KEY);const el=$("#restTimer");if(el)el.textContent="00:00"}
+}
+function startRest(sec){
+  const r={endsAt:Date.now()+sec*1000};setJSON(REST_KEY,r);runRestTicker(r)
+}
 function finishSession(){
   let a=getJSON(ACTIVE_KEY,null);if(!a)return;
   const workSets=a.exercises.flatMap(e=>e.sets).filter(s=>s.kind!=="warmup");
   if(!workSets.some(s=>s.completed)){if(!confirm("Noch kein Satz ist als erledigt markiert. Training trotzdem speichern?"))return}
   a.durationSec=Math.round((Date.now()-new Date(a.startedAt).getTime())/1000);a.savedAt=now();a.source="bodyplan2";
-  db.sessions.push(a);save();localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);closeSession();page="dashboard";render()
+  db.sessions.push(a);save();
+  localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);
+  clearInterval(restTick);restTick=null;
+  $("#sessionOverlay").classList.remove("open");clearInterval(sessionTick);sessionTick=null;
+  page="dashboard";selectedPlan=null;selectedDay=null;render()
 }
-function abortSession(){if(confirm("Laufendes Training wirklich verwerfen?")){localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);closeSession();render()}}
+function abortSession(){
+  if(!confirm("Laufendes Training wirklich verwerfen?"))return;
+  localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);
+  clearInterval(restTick);restTick=null;
+  $("#sessionOverlay").classList.remove("open");clearInterval(sessionTick);sessionTick=null;
+  page="dashboard";selectedPlan=null;selectedDay=null;render()
+}
 async function importBackup(e){
   const f=e.target.files[0];if(!f)return;
   try{const data=JSON.parse(await f.text()), incoming=data.app||data.alpha;if(!incoming||![1,2].includes(incoming.schemaVersion))throw Error("Unbekanntes Backup-Format");if(!confirm("Aktuelle BodyPlan-Daten durch dieses Backup ersetzen?"))return;backup();db=stripTransient(clone(incoming));db.schemaVersion=2;save();page="dashboard";selectedPlan=null;selectedDay=null;render()}catch(err){alert("Import fehlgeschlagen: "+err.message)}finally{e.target.value=""}
