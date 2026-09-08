@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "width": 768,
+  "height": 1024,
+  "groups": [
+    "chest",
+    "lats",
+    "upper_back",
+    "traps",
+    "front_delts",
+    "side_delts",
+    "rear_delts",
+    "biceps",
+    "triceps",
+    "forearms",
+    "abs",
+    "obliques",
+    "erectors",
+    "quads",
+    "hamstrings",
+    "glutes",
+    "calves"
+  ],
+  "method": "registered pixel masks"
+}

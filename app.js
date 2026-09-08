@@ -126,7 +126,9 @@ function render(){
   const views={dashboard:renderDashboard,plans:renderPlans,library:renderLibrary,history:renderHistory,progress:renderProgress,heatmap:renderHeatmap,settings:renderSettings};
   $("#app").innerHTML=(views[page]||renderDashboard)();
   bindPageActions();
+  if(page==="plans"&&!selectedPlan)bindPlanSwipes();
   if(page==="dashboard")startDashboardTicker();
+  if(page==="heatmap"){const scores=muscleScores(heatRange);paintHeatmaps(scores,Math.max(0,...Object.values(scores)))}
 }
 function bindPageActions(){
   $$("[data-action]").forEach(el=>{
@@ -184,21 +186,36 @@ function renderDashboard(){
   if(cards.includes("habits")&&db.settings.habitsEnabled)html+=`<div class="card"><div class="eyebrow">Gewohnheiten</div><div class="muted" style="margin-top:8px">Deine Daily-Consistency-Daten bleiben optional verfügbar.</div></div>`;
   return html;
 }
-function renderPlans(){
-  if(selectedPlan){
-    const p=plan();if(!p){selectedPlan=null;return renderPlans()}
-    return `<div class="row"><button class="link-btn" data-action="allplans">‹ Alle Pläne</button><span class="tag">${esc(p.status||"draft")}</span></div>
-    <div class="eyebrow" style="margin-top:18px">Trainingsplan</div><h1 class="page-title">${esc(p.name)}</h1>
-    ${field("Planname",p.name,"planname:"+p.id)}
-    <div class="actions">${btn("Als aktiven Plan setzen","activate:"+p.id,"primary")}${btn("Duplizieren","duplicate:"+p.id)}${btn(p.status==="archived"?"Reaktivieren":"Archivieren","archive:"+p.id)}</div>
-    <div class="section-head"><h2>Einheiten</h2>${btn("+ Einheit","addday","mini")}</div>
-    ${p.days.map(d=>renderDayCard(d)).join("")}
-    <div class="form-field"><label>Planregeln</label><textarea data-action="planrules:${p.id}">${esc(p.rules||"")}</textarea></div>`;
-  }
-  return `<div class="row top"><div><div class="eyebrow">Training</div><h1 class="page-title">Trainingspläne</h1></div>${btn("+ Neu","newplan","primary")}</div>
-  ${db.plans.filter(p=>p.status!=="archived").map(p=>`<div class="card"><div class="row"><div><div class="eyebrow">${p.id===db.activePlanId?"Aktiver Plan":"Plan"}</div><div class="plan-card-title">${esc(p.name)}</div><div class="muted">${p.days.length} Einheiten</div></div>${btn("Öffnen","openplan:"+p.id)}</div></div>`).join("")}
-  ${db.plans.some(p=>p.status==="archived")?`<div class="section-head"><h2>Archiv</h2></div>${db.plans.filter(p=>p.status==="archived").map(p=>`<div class="card compact"><div class="row"><div><strong>${esc(p.name)}</strong><div class="muted">${p.days.length} Einheiten</div></div>${btn("Öffnen","openplan:"+p.id,"mini")}</div></div>`).join("")}`:""}`;
+function planListCard(p){
+ const active=p.id===db.activePlanId;
+ return `<div class="swipe-row" data-plan-swipe="${esc(p.id)}"><div class="swipe-actions"><button class="swipe-delete" data-action="deleteplan:${esc(p.id)}">Löschen</button></div><div class="card swipe-face"><div class="row"><div><div class="eyebrow">${active?"Aktiver Plan":"Plan"}</div><div class="plan-card-title">${esc(p.name)}</div><div class="muted">${p.days.length} Einheiten</div></div>${btn("Öffnen","openplan:"+p.id)}</div></div></div>`;
 }
+function renderPlans(){
+ if(selectedPlan){
+  const p=plan();if(!p){selectedPlan=null;return renderPlans()}
+  return `<div class="row"><button class="link-btn" data-action="allplans">‹ Alle Pläne</button><span class="tag">${esc(p.status||"draft")}</span></div>
+  <div class="eyebrow" style="margin-top:18px">Trainingsplan</div><h1 class="page-title">${esc(p.name)}</h1>
+  ${field("Planname",p.name,"planname:"+p.id)}
+  <div class="actions">${btn("Als aktiven Plan setzen","activate:"+p.id,"primary")}${btn("Duplizieren","duplicate:"+p.id)}${btn(p.status==="archived"?"Reaktivieren":"Archivieren","archive:"+p.id)}${btn("Plan löschen","deleteplan:"+p.id,"mini danger")}</div>
+  <div class="section-head"><h2>Einheiten</h2>${btn("+ Einheit","addday","mini")}</div>
+  ${p.days.map(d=>renderDayCard(d)).join("")}
+  <div class="form-field"><label>Planregeln</label><textarea data-action="planrules:${p.id}">${esc(p.rules||"")}</textarea></div>`;
+ }
+ const archived=db.plans.filter(p=>p.status==="archived");
+ return `<div class="row top"><div><div class="eyebrow">Training</div><h1 class="page-title">Trainingspläne</h1></div>${btn("+ Neu","newplan","primary")}</div>
+ ${db.plans.filter(p=>p.status!=="archived").map(planListCard).join("")}
+ ${archived.length?`<details class="archive-fold"><summary>Archiv <span>${archived.length}</span></summary><div class="archive-content">${archived.map(planListCard).join("")}</div></details>`:""}`;
+}
+function bindPlanSwipes(){
+ document.querySelectorAll(".swipe-row").forEach(row=>{
+  const face=row.querySelector(".swipe-face");let startX=0,startY=0,origin=0,dragging=false,tracking=false;
+  const set=x=>{face.style.transform=`translateX(${x}px)`;row.classList.toggle("revealed",x<0)};
+  row.addEventListener("touchstart",e=>{if(e.target.closest("button"))return;startX=e.touches[0].clientX;startY=e.touches[0].clientY;origin=row.classList.contains("revealed")?-92:0;tracking=true;dragging=false},{passive:true});
+  row.addEventListener("touchmove",e=>{if(!tracking)return;const dx=e.touches[0].clientX-startX,dy=e.touches[0].clientY-startY;if(!dragging&&Math.abs(dy)>Math.abs(dx)+8){tracking=false;return}if(Math.abs(dx)>8)dragging=true;if(dragging){e.preventDefault();set(Math.max(-92,Math.min(0,origin+dx)))}},{passive:false});
+  row.addEventListener("touchend",e=>{if(!tracking)return;const dx=e.changedTouches[0].clientX-startX;set(origin+dx<-46?-92:0);tracking=false;if(dragging){face.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation()},{capture:true,once:true})}},{passive:true});
+ });
+}
+
 function renderDayCard(d){
   const open=selectedDay===d.id;
   return `<div class="card"><div class="row"><div><div class="eyebrow">${esc(d.label||"Einheit")}</div><div class="plan-card-title">${esc(d.name)}</div><div class="muted">${d.exercises.length} Übungen</div></div>${btn(open?"Schließen":"Bearbeiten","day:"+d.id,"mini")}</div>
@@ -240,7 +257,7 @@ function renderHistory(){
   <details><summary class="link-btn">Details</summary>${(s.exercises||[]).map(e=>`<div class="history-ex"><strong>${esc(e.nameSnapshot||ex(e.exerciseId)?.name||"Übung")}</strong><br>${(e.sets||[]).filter(z=>z.completed!==false).map(z=>`${z.kg??"—"} kg × ${z.reps??"—"}`).join(" · ")}</div>`).join("")}</details></div>`).join(""):`<div class="card empty">Noch keine Trainings gespeichert.</div>`}`;
 }
 function renderProgress(){
-  const body=latestBody(), total=db.sessions.length, recent=db.sessions.filter(s=>new Date(s.startedAt||s.localDate)>new Date(Date.now()-30*864e5)).length;
+  const body=latestBody(), total=db.sessions.length, recent=(db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate)>new Date(Date.now()-30*864e5)).length;
   return `<div class="eyebrow">Entwicklung</div><h1 class="page-title">Fortschritt</h1>
   <div class="grid2"><div class="card"><div class="eyebrow">30 Tage</div><div class="kpi">${recent}</div><div class="muted">Trainings</div></div><div class="card"><div class="eyebrow">Gesamt</div><div class="kpi">${total}</div><div class="muted">gespeicherte Sessions</div></div></div>
   <div class="card"><div class="eyebrow">Körperdaten</div><div class="metric-list" style="margin-top:12px"><div class="metric-line"><span>Gewicht</span><strong>${bodyVal(body.weight)??"—"}${bodyVal(body.weight)!=null?" kg":""}</strong></div><div class="metric-line"><span>Körperfett</span><strong>${bodyVal(body.fat)??"—"}${bodyVal(body.fat)!=null?" %":""}</strong></div></div></div>`;
@@ -248,10 +265,10 @@ function renderProgress(){
 
 function muscleScores(days){
   const cutoff=Date.now()-days*864e5, scores={};
-  db.sessions.filter(s=>new Date(s.startedAt||s.localDate).getTime()>=cutoff).forEach(s=>(s.exercises||[]).forEach(se=>{
-    const x=ex(se.exerciseId);if(!x)return;
+  (db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate).getTime()>=cutoff).forEach(s=>(s.exercises||[]).forEach(se=>{
+    const x=ex(se.exerciseId);if(!x&&!se.musclesSnapshot)return;
     const completed=(se.sets||[]).filter(z=>z.completed!==false&&z.kind!=="warmup").length;
-    for(const [m,w] of Object.entries(x.muscles||{}))scores[m]=(scores[m]||0)+completed*Number(w||0);
+    for(const [m,w] of Object.entries(se.musclesSnapshot||x?.muscles||{}))scores[m]=(scores[m]||0)+completed*Number(w||0);
   }));
   return scores;
 }
@@ -286,30 +303,56 @@ function anatomyZones(view,scores,max){
     <span class="heat-zone z-calves-l l${lv("calves")}"></span><span class="heat-zone z-calves-r l${lv("calves")}"></span>`;
 }
 function anatomyView(view,scores,max){
-  const src=view==="front"?"assets/heatmap-front.png":"assets/heatmap-back.png";
-  const label=view==="front"?"Vorderseite":"Rückseite";
-  return `<div class="anatomy-card"><div class="eyebrow">${label}</div><div class="anatomy-wrap ${view}" style="margin-top:10px"><img src="${src}" alt="Anatomische Muskelansicht ${label}">${anatomyZones(view,scores,max)}</div></div>`;
+ const label=view==="front"?"Vorderseite":"Rückseite";
+ return `<div class="anatomy-card"><div class="eyebrow">${label}</div><div class="anatomy-wrap anatomy-canvas-wrap"><canvas class="heat-canvas" data-heat-view="${view}" width="768" height="1024" role="img" aria-label="Anatomische Muskelansicht ${label}"></canvas></div></div>`;
 }
+const HEAT_GROUPS=["chest", "lats", "upper_back", "traps", "front_delts", "side_delts", "rear_delts", "biceps", "triceps", "forearms", "abs", "obliques", "erectors", "quads", "hamstrings", "glutes", "calves"];
+const heatImages={};
+function loadHeatImage(src){
+ if(!heatImages[src])heatImages[src]=new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src});
+ return heatImages[src];
+}
+async function paintHeatmaps(scores,max){
+ for(const canvas of document.querySelectorAll("[data-heat-view]")){
+  const view=canvas.dataset.heatView,ctx=canvas.getContext("2d");
+  if(!ctx)continue;
+  try{
+   const [base,mask]=await Promise.all([loadHeatImage("assets/heatmap-"+view+".png"),loadHeatImage("assets/heatmap-mask-"+view+".png")]);
+   if(!canvas.isConnected)continue;
+   const w=768,h=1024;ctx.clearRect(0,0,w,h);ctx.drawImage(base,0,0,w,h);
+   const off=document.createElement("canvas");off.width=w;off.height=h;
+   const oc=off.getContext("2d",{willReadFrequently:true});oc.drawImage(mask,0,0,w,h);
+   const data=oc.getImageData(0,0,w,h),a=data.data;
+   for(let i=0;i<a.length;i+=4){
+    const group=HEAT_GROUPS[a[i]-1],v=group?Number(scores[group]||0):0;
+    if(!v||!max||!a[i+1]){a[i+3]=0;continue}
+    const r=v/max,coverage=a[i+1]/255;
+    const c=r>.75?[239,72,49]:r>.5?[235,124,49]:r>.25?[225,165,62]:[206,174,94];
+    a[i]=c[0];a[i+1]=c[1];a[i+2]=c[2];a[i+3]=Math.round((r>.75?.72:r>.5?.60:r>.25?.48:.35)*255*coverage);
+   }
+   oc.putImageData(data,0,0);ctx.drawImage(off,0,0);
+  }catch(err){console.error("Heatmap asset could not be loaded",err)}
+ }
+}
+
 function completedSetsInRange(days){
   const cutoff=Date.now()-days*864e5;
   return (db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate).getTime()>=cutoff)
     .reduce((sum,s)=>sum+(s.exercises||[]).reduce((n,e)=>n+(e.sets||[]).filter(z=>z.kind!=="warmup"&&z.completed!==false).length,0),0);
 }
 function renderHeatmap(){
-  const scores=muscleScores(heatRange), max=Math.max(0,...Object.values(scores)), totalSets=completedSetsInRange(heatRange);
-  const ranked=Object.entries(scores).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  return `<div class="eyebrow">Analyse</div><h1 class="page-title">Muskel-Heatmap</h1>
-  <div class="range-tabs"><button data-range="30" class="${heatRange===30?"active":""}">30 Tage</button><button data-range="90" class="${heatRange===90?"active":""}">90 Tage</button><button data-range="365" class="${heatRange===365?"active":""}">12 Monate</button></div>
-  <div class="card compact" style="margin-bottom:14px">
-    <div class="row"><div><div class="eyebrow">Auswertung</div><div class="muted" style="margin-top:5px">${totalSets} absolvierte Arbeitssätze im Zeitraum</div></div><span class="tag">${ranked.length} Muskelgruppen</span></div>
-  </div>
-  <div class="heat-layout">${anatomyView("front",scores,max)}${anatomyView("back",scores,max)}</div>
-  <div class="card" style="margin-top:14px">
-    <div class="eyebrow">Trainingsreiz</div>
-    ${ranked.length?`<div class="muscle-rank" style="margin-top:14px">${ranked.map(([m,v])=>`<div class="muscle-rank-row"><span>${esc(seed.muscleGroups[m]||m)}</span><div class="bar"><span style="width:${max?Math.round(v/max*100):0}%"></span></div><strong>${v.toFixed(1)} P</strong></div>`).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}
-    <div class="heat-legend-scale"><div><i></i>Niedrig</div><div><i></i>Moderat</div><div><i></i>Hoch</div><div><i></i>Sehr hoch</div></div>
-    <div class="score-help"><strong>Was bedeutet ein Reizpunkt?</strong><br>BodyPlan gewichtet jeden absolvierten Arbeitssatz mit der Muskelbeteiligung der Übung. Beispiel: 3 Sätze Bankdrücken × Brust-Gewichtung 1,0 = 3,0 P für die Brust. Eine sekundäre Gewichtung von 0,5 ergibt 1,5 P. Die Körperfarben zeigen die Belastung <strong>relativ zur am stärksten trainierten Muskelgruppe</strong> im gewählten Zeitraum.</div>
-  </div>`;
+ const scores=muscleScores(heatRange),max=Math.max(0,...Object.values(scores)),totalSets=completedSetsInRange(heatRange);
+ const ranked=Object.entries(scores).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+ return `<div class="eyebrow">Analyse</div><h1 class="page-title">Muskel-Heatmap</h1>
+ <div class="range-tabs"><button data-range="30" class="${heatRange===30?"active":""}">30 Tage</button><button data-range="90" class="${heatRange===90?"active":""}">90 Tage</button><button data-range="365" class="${heatRange===365?"active":""}">12 Monate</button></div>
+ <div class="heat-summary"><div><strong>${totalSets}</strong><span>Arbeitssätze</span></div><div><strong>${ranked.length}</strong><span>Muskelgruppen</span></div></div>
+ <div class="heat-layout">${anatomyView("front",scores,max)}${anatomyView("back",scores,max)}</div>
+ <div class="card" style="margin-top:14px"><div class="eyebrow">Deine Muskelbelastung</div>
+ <p class="muted" style="margin:9px 0 15px">Je länger der Balken, desto stärker wurde die Muskelgruppe im gewählten Zeitraum beansprucht.</p>
+ ${ranked.length?`<div class="muscle-rank">${ranked.map(([m,v])=>`<div class="muscle-simple"><div class="muscle-simple-head"><span>${esc(seed.muscleGroups[m]||m)}</span><strong>${Math.round(v/max*100)}%</strong></div><div class="bar"><span style="width:${Math.round(v/max*100)}%"></span></div></div>`).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}
+ <div class="heat-legend-scale"><div><i></i>Niedrig</div><div><i></i>Moderat</div><div><i></i>Hoch</div><div><i></i>Sehr hoch</div></div>
+ <details class="heat-method"><summary>Wie wird die Belastung berechnet?</summary><p>BodyPlan zählt absolvierte Arbeitssätze und gewichtet sie nach der Muskelbeteiligung der Übung. Ein Satz kann mehrere Muskelgruppen beanspruchen. Die Prozentwerte vergleichen die Muskelgruppen innerhalb des gewählten Zeitraums: 100 % ist die am stärksten belastete Gruppe. Sie sind keine Messung von Muskelwachstum, Erholung oder Trainingsqualität.</p><p>Beispiel: 3 Sätze Bankdrücken mit Brustgewichtung 1,0 ergeben 3 Reizpunkte. Eine sekundäre Gewichtung von 0,5 ergibt 1,5 Punkte. Historische Übungen ohne eindeutige Zuordnung werden nicht geschätzt.</p></details>
+ </div>`;
 }
 function renderSettings(){
   const opts=[["next","Nächste Einheit"],["week","Wochenfortschritt"],["last","Letztes Training"],["body","Körperfortschritt"],["prs","Persönliche Rekorde"],["heatmap","Muskelbelastung"],["habits","Gewohnheiten"]];
@@ -333,6 +376,14 @@ function handleAction(a,el){
   if(op==="newexercise"){let n=prompt("Name der neuen Übung");if(!n?.trim())return;db.exercises.push(newExercise(n.trim()));save();return render()}
   if(op==="newplan"){let n=prompt("Name des Trainingsplans");if(!n?.trim())return;let p=normalizePlan({name:n.trim(),status:"draft",days:[],rules:""});db.plans.push(p);selectedPlan=p.id;save();return render()}
   if(op==="activate"){db.plans.forEach(p=>{if(p.status==="active")p.status="draft"});let p=plan();p.status="active";db.activePlanId=p.id;save();return render()}
+  if(op==="deleteplan"){
+    const target=db.plans.find(p=>p.id===id);if(!target)return;
+    if(id===db.activePlanId){alert("Aktiven Plan zuerst wechseln oder archivieren.");return}
+    if(getJSON(ACTIVE_KEY,null)?.planId===id){alert("Dieser Plan wird gerade trainiert. Beende oder verwerfe zuerst das Training.");return}
+    if(!confirm(`„${target.name}“ endgültig löschen? Gespeicherte Trainings und Übungsdaten bleiben erhalten.`))return;
+    db.plans=db.plans.filter(p=>p.id!==id);if(selectedPlan===id){selectedPlan=null;selectedDay=null}
+    save();return render();
+  }
   if(op==="archive"){let p=plan();p.status=p.status==="archived"?"draft":"archived";if(db.activePlanId===p.id&&p.status==="archived")db.activePlanId=null;save();return render()}
   if(op==="duplicate"){let p=normalizePlan(plan());p.name+=" · Kopie";p.status="draft";db.plans.push(p);selectedPlan=p.id;selectedDay=null;save();return render()}
   if(op==="addday"){let d={id:uid(),name:"Neue Einheit",label:String(plan().days.length+1),weekday:null,exercises:[]};plan().days.push(d);selectedDay=d.id;save();return render()}
@@ -401,7 +452,7 @@ function openSession(dayId){
   if(!active||active.dayId!==dayId){
     active={id:uid(),planId:p.id,dayId:d.id,title:`${d.label||""} · ${d.name}`.replace(/^ · /,""),planName:p.name,startedAt:now(),localDate:localISO(),exercises:d.exercises.map(pe=>{
       const x=ex(pe.exerciseId);
-      return{id:uid(),exerciseId:pe.exerciseId,nameSnapshot:x?.name||"Übung",permanentNote:x?.notes||"",sessionNote:"",sets:pe.sets.map(s=>({id:uid(),kind:s.kind||"working",repsMin:s.repsMin,repsMax:s.repsMax,kg:"",reps:"",completed:false}))}
+      return{id:uid(),exerciseId:pe.exerciseId,nameSnapshot:x?.name||"Übung",musclesSnapshot:clone(x?.muscles||{}),permanentNote:x?.notes||"",sessionNote:"",sets:pe.sets.map(s=>({id:uid(),kind:s.kind||"working",repsMin:s.repsMin,repsMax:s.repsMax,kg:"",reps:"",completed:false}))}
     })};
     setJSON(ACTIVE_KEY,active)
   }

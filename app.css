@@ -336,3 +336,32 @@ textarea{min-height:78px;resize:vertical}
 .back .z-side-delts-l{left:27.8%;top:20.0%;width:9.2%;height:10.0%;clip-path:ellipse(48% 50% at 50% 50%)}
 .back .z-side-delts-r{right:27.8%;top:20.0%;width:9.2%;height:10.0%;clip-path:ellipse(48% 50% at 50% 50%)}
 .back .z-erectors{left:44.0%;top:27.0%;width:12.0%;height:22.5%;clip-path:polygon(25% 0,45% 2%,50% 100%,55% 2%,75% 0,100% 95%,65% 100%,50% 90%,35% 100%,0 95%)}
+
+/* Beta 4: native-feeling plan actions */
+.swipe-row{position:relative;overflow:hidden;border-radius:17px;margin-bottom:14px;touch-action:pan-y}
+.swipe-row .card{margin:0}
+.swipe-face{position:relative;z-index:1;background:#171717;transition:transform .18s ease;will-change:transform}
+.swipe-actions{position:absolute;inset:0;display:flex;justify-content:flex-end;align-items:stretch;background:#b83c35}
+.swipe-delete{width:92px;border:0;border-radius:0;background:#b83c35;color:white;font-weight:700;font-size:14px}
+.archive-fold{margin-top:25px;border-top:1px solid #292929;padding-top:17px}
+.archive-fold>summary{cursor:pointer;font-size:18px;font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between}
+.archive-fold>summary::-webkit-details-marker{display:none}
+.archive-fold>summary:after{content:"⌄";color:#d6aa58;font-size:24px;font-weight:400;margin-left:12px}
+.archive-fold[open]>summary:after{transform:rotate(180deg)}
+.archive-fold>summary span{margin-left:auto;color:#888;font-size:12px;font-weight:500}
+.archive-content{padding-top:16px}
+.archive-content .card{background:#141414}
+/* Pixel-registered anatomy; no floating CSS muscle shapes. */
+.anatomy-canvas-wrap{width:100%;aspect-ratio:3/4;overflow:hidden}
+.heat-canvas{display:block;width:100%;height:auto;aspect-ratio:3/4}
+.heat-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.heat-summary>div{border:1px solid #303030;border-radius:14px;padding:14px 16px;background:#171717}
+.heat-summary strong{display:block;font-size:25px;line-height:1.2;color:#e0b65f}
+.heat-summary span{display:block;font-size:11px;color:#999;margin-top:5px}
+.muscle-simple{margin-bottom:16px}
+.muscle-simple-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:13px}
+.muscle-simple-head strong{color:#d6aa58;font-size:12px}
+.muscle-simple .bar{height:6px}
+.heat-method{margin-top:20px;border-top:1px solid #292929;padding-top:15px}
+.heat-method summary{color:#c9a55e;font-size:12px;cursor:pointer}
+.heat-method p{color:#999;font-size:12px;line-height:1.65;margin:12px 0 0}
