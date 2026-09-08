@@ -10,7 +10,7 @@ const localISO=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padS
 const mondayOf=d=>{let x=new Date(d);x.setHours(0,0,0,0);let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x};
 const fmtDate=iso=>{if(!iso)return"—";let d=new Date(iso);return isNaN(d)?"—":d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const fmtTime=s=>{s=Math.max(0,Math.floor(s||0));return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
-let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,sessionTick=null,restTick=null,dashboardTick=null;
+let editingBodyId=null;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,bodyPeriod=90,sessionTick=null,restTick=null,dashboardTick=null;
 
 function getJSON(k,f=null){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
 function setJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -47,6 +47,47 @@ function migrateFresh(){
   return {schemaVersion:2,createdAt:now(),updatedAt:now(),exercises,plans:[p],activePlanId:p.id,sessions,settings:{dashboard:["next","week","last","body"],habitsEnabled:false},migration:{source:"v44",at:now(),historyCount:oldHist.length}};
 }
 
+const DASHBOARD_CORE=["next","week","last"];
+const DEFAULT_MUSCLE_WEIGHT={primary:1,secondary:.5,tertiary:.25};
+function normalizeMuscleMap(e){
+  e.muscles=e.muscles&&typeof e.muscles==="object"?e.muscles:{};
+  e.muscles=Object.fromEntries(Object.entries(e.muscles).filter(([k,v])=>seed.muscleGroups[k]&&Number(v)>0).map(([k,v])=>[k,Math.min(1,Number(v))]));
+  if(e.primaryMuscle&&!seed.muscleGroups[e.primaryMuscle])e.primaryMuscle="";
+  if(!e.primaryMuscle)e.primaryMuscle=Object.entries(e.muscles).sort((a,b)=>b[1]-a[1])[0]?.[0]||"";
+  if(e.primaryMuscle&&!e.muscles[e.primaryMuscle])e.muscles[e.primaryMuscle]=1;
+  return e;
+}
+function setMuscleRole(e,role,muscle){
+  const weights={primary:1,secondary:.5,tertiary:.25};
+  const roles=e.muscleRoles||{};
+  const old=roles[role];
+  if(old&&e.muscles[old]===weights[role])delete e.muscles[old];
+  if(role==="primary")e.primaryMuscle=muscle||"";
+  if(muscle){
+    for(const [r,k] of Object.entries(roles))if(r!==role&&k===muscle)delete roles[r];
+    roles[role]=muscle;
+    e.muscles[muscle]=weights[role];
+  }else delete roles[role];
+  if(role==="primary"&&!muscle)e.primaryMuscle="";
+  e.muscleRoles=roles;
+  e.mappingCustomized=true;
+  e.updatedAt=now();
+}
+function exerciseRoles(e){
+  const roles={...(e.muscleRoles||{})};
+  const entries=Object.entries(e.muscles||{}).filter(([k,v])=>seed.muscleGroups[k]&&Number(v)>0).sort((a,b)=>b[1]-a[1]);
+  roles.primary=e.primaryMuscle||roles.primary||entries[0]?.[0]||"";
+  const used=new Set([roles.primary,...Object.values(roles).filter(Boolean)]);
+  for(const role of ["secondary","tertiary"]){
+    if(!roles[role]){const found=entries.find(([k])=>!used.has(k));if(found){roles[role]=found[0];used.add(found[0])}}
+  }
+  return roles;
+}
+function muscleLabel(k){return seed.muscleGroups[k]||"Nicht zugeordnet"}
+function muscleSelect(e,role,label){
+  const value=exerciseRoles(e)[role]||"";
+  return `<div class="form-field"><label>${label}</label><select data-action="musclerole:${e.id}:${role}"><option value="">${role==="primary"?"Nicht zugeordnet":"Keine"}</option>${Object.entries(seed.muscleGroups).map(([k,v])=>`<option value="${k}" ${value===k?"selected":""}>${esc(v)}</option>`).join("")}</select></div>`;
+}
 function normalizeName(s){return String(s||"").trim().toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")}
 function repairMuscleMappings(){
   if(!seed?.exercises||!db?.exercises)return false;
@@ -58,7 +99,7 @@ function repairMuscleMappings(){
   let changed=false;
   db.exercises.forEach(e=>{
     const s=seedMap.get(normalizeName(e.name)) || (e.aliases||[]).map(a=>seedMap.get(normalizeName(a))).find(Boolean);
-    if(!s)return;
+    if(!s||e.mappingCustomized)return;
     const empty=!e.muscles||Object.keys(e.muscles).length===0;
     if(empty&&s.muscles&&Object.keys(s.muscles).length){
       e.muscles=clone(s.muscles); e.primaryMuscle=e.primaryMuscle||s.primaryMuscle||""; changed=true;
@@ -66,7 +107,7 @@ function repairMuscleMappings(){
   });
   (db.sessions||[]).forEach(sess=>(sess.exercises||[]).forEach(se=>{
     let linked=db.exercises.find(e=>e.id===se.exerciseId);
-    if(linked&&linked.muscles&&Object.keys(linked.muscles).length)return;
+    if(linked&&(linked.mappingCustomized||linked.muscles&&Object.keys(linked.muscles).length))return;
     const s=seedMap.get(normalizeName(se.nameSnapshot));
     if(!s)return;
     if(linked){
@@ -78,16 +119,26 @@ function repairMuscleMappings(){
   }));
   return changed;
 }
-function init(){
-  db=getJSON(DB_KEY,null);
-  if(!db){db=migrateFresh()}
+function normalizeDatabase(){
   db.schemaVersion=2;
   db.settings=db.settings||{dashboard:["next","week","last","body"],habitsEnabled:false};
   db.sessions=db.sessions||[];db.plans=db.plans||[];db.exercises=db.exercises||[];
   repairMuscleMappings();
-  save();bindShell();render();restoreActiveBanner();
+  db.exercises.forEach(normalizeMuscleMap);
+  (db.sessions||[]).forEach(sess=>(sess.exercises||[]).forEach(se=>{
+    if(!se.musclesSnapshot){const linked=ex(se.exerciseId);if(linked?.muscles&&Object.keys(linked.muscles).length)se.musclesSnapshot=clone(linked.muscles)}
+  }));
+  db.settings.dashboard=(db.settings.dashboard||DASHBOARD_CORE).filter(k=>DASHBOARD_CORE.includes(k));
+  if(!db.settings.dashboard.length)db.settings.dashboard=[...DASHBOARD_CORE];
+  db.bodyEntries=Array.isArray(db.bodyEntries)?db.bodyEntries:[];
+  db.plans.forEach(p=>{if(p.status==="archived")p.hiddenLegacy=true});
 }
-function activePlan(){return db.plans.find(p=>p.id===db.activePlanId)||db.plans.find(p=>p.status==="active")||db.plans[0]}
+function init(){
+  db=getJSON(DB_KEY,null);
+  if(!db)db=migrateFresh();
+  normalizeDatabase();save();bindShell();render();restoreActiveBanner();
+}
+function activePlan(){return db.plans.find(p=>p.id===db.activePlanId)||db.plans.find(p=>p.status==="active")||db.plans.find(p=>p.status!=="archived")||null}
 function plan(){return db.plans.find(p=>p.id===selectedPlan)}
 function day(){return plan()?.days.find(d=>d.id===selectedDay)}
 function ex(id){return db.exercises.find(e=>e.id===id)}
@@ -101,13 +152,62 @@ function nextDay(){
   return p.days.find(d=>!completed.has(d.id))||p.days[0];
 }
 function lastSession(){return [...db.sessions].sort((a,b)=>new Date(b.startedAt||b.localDate)-new Date(a.startedAt||a.localDate))[0]||null}
-function latestBody(){
-  const weight=getJSON("bp3_bodyWeightHistory",[]), fat=getJSON("bp3_bodyFatHistory",[]);
-  const pick=a=>Array.isArray(a)&&a.length?a[a.length-1]:null;
-  return {weight:pick(weight),fat:pick(fat)}
+function parseBodyNumber(v){
+ if(v===null||v===undefined||v==="")return null;
+ const n=Number(String(v).replace(",","."));
+ return Number.isFinite(n)?n:null;
 }
-function bodyVal(x){if(x==null)return null;if(typeof x==="number")return x;return x.value??x.weight??x.kg??x.bodyFat??null}
+function bodyHistory(){
+ const entries=[];
+ const add=(arr,kind)=>{if(!Array.isArray(arr))return;arr.forEach((x,i)=>{
+  const value=parseBodyNumber(bodyVal(x));if(value===null)return;
+  const date=typeof x==="object"&&x!==null?(x.date||x.localDate||x.localIso||x.iso||x.ts||x.createdAt||x.timestamp):null;
+  entries.push({id:"legacy_"+kind+"_"+i,date:typeof date==="number"?localISO(new Date(date)):String(date||"").slice(0,10)||null,[kind]:value,source:"legacy"});
+ })};
+ add(getJSON("bp3_bodyWeightHistory",[]),"weight");
+ add(getJSON("bp3_bodyFatHistory",[]),"fat");
+ return [...entries,...(db.bodyEntries||[])].filter(x=>x.date&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function latestBody(){
+ const entries=bodyHistory(),pick=k=>[...entries].reverse().find(e=>e[k]!=null)?.[k]??null;
+ return {weight:pick("weight"),fat:pick("fat")};
+}
+function bodyVal(x){if(x==null)return null;if(typeof x==="number")return x;return x.value??x.weight??x.kg??x.bodyFat??x.fat??null}
+function fmtBody(v,unit=""){return v==null?"—":Number(v).toLocaleString("de-CH",{maximumFractionDigits:1})+unit}
+function bodyDelta(kind,days){
+ const entries=bodyHistory().filter(e=>e[kind]!=null);
+ const current=entries.at(-1),before=[...entries].reverse().find(e=>e.date<=localISO(new Date(Date.now()-days*864e5)));
+ return current&&before&&current!==before?current[kind]-before[kind]:null;
+}
+function bodyChart(kind,days){
+ const cutoff=localISO(new Date(Date.now()-days*864e5));
+ const entries=bodyHistory().filter(e=>e[kind]!=null&&e.date>=cutoff);
+ if(entries.length<2)return `<div class="chart-empty">Mindestens zwei Messungen erforderlich, um einen Verlauf anzuzeigen.</div>`;
+ const values=entries.map(e=>e[kind]),min=Math.min(...values),max=Math.max(...values),span=Math.max(max-min,kind==="weight"?1:.5);
+ const first=new Date(entries[0].date+"T12:00:00").getTime(),last=new Date(entries.at(-1).date+"T12:00:00").getTime();
+ const points=entries.map(e=>`${20+(new Date(e.date+"T12:00:00").getTime()-first)/Math.max(1,last-first)*280},${112-(e[kind]-min)/span*85}`).join(" ");
+ return `<div class="body-chart"><div class="chart-range"><span>${fmtBody(max)}</span><span>${fmtBody(min)}</span></div><svg viewBox="0 0 320 130" preserveAspectRatio="none" role="img" aria-label="Verlauf ${kind==="weight"?"Gewicht":"Körperfett"}"><line x1="20" y1="112" x2="300" y2="112" stroke="#303030"/><line x1="20" y1="69" x2="300" y2="69" stroke="#252525"/><line x1="20" y1="27" x2="300" y2="27" stroke="#252525"/><polyline points="${points}" fill="none" stroke="#d4a853" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>${entries.map(e=>{const x=20+(new Date(e.date+"T12:00:00").getTime()-first)/Math.max(1,last-first)*280,y=112-(e[kind]-min)/span*85;return `<circle cx="${x}" cy="${y}" r="3" fill="#e4b75b"/>`}).join("")}</svg><div class="chart-dates"><span>${fmtDate(entries[0].date)}</span><span>${fmtDate(entries.at(-1).date)}</span></div></div>`;
+}
 
+function openBodyDialog(id=null){
+ editingBodyId=id;const dialog=$("#bodyDialog");$("#bodyDate").value=localISO();$("#bodyWeight").value="";$("#bodyFat").value="";
+ if(id){const e=db.bodyEntries.find(x=>x.id===id);if(e){$("#bodyDate").value=e.date;$("#bodyWeight").value=e.weight??"";$("#bodyFat").value=e.fat??"";$("#bodyDialogTitle").textContent="Messung bearbeiten"}}
+ else $("#bodyDialogTitle").textContent="Messung erfassen";
+ dialog.hidden=false;$("#bodyWeight").focus();
+}
+function closeBodyDialog(){$("#bodyDialog").hidden=true;editingBodyId=null}
+function saveBodyMeasurement(event){
+ event.preventDefault();
+ const date=$("#bodyDate").value,weight=parseBodyNumber($("#bodyWeight").value),fat=parseBodyNumber($("#bodyFat").value);
+ if(!date||date>localISO()){alert("Bitte ein gültiges Datum bis heute auswählen.");return}
+ if(weight===null&&fat===null){alert("Bitte mindestens einen Messwert eingeben.");return}
+ if(weight!==null&&(weight<20||weight>500)||fat!==null&&(fat<1||fat>70)){alert("Bitte die Messwerte überprüfen.");return}
+ const entry={id:uid(),date,createdAt:now(),source:"bodyplan2"};
+ if(weight!==null)entry.weight=weight;if(fat!==null)entry.fat=fat;
+ if(editingBodyId){const i=db.bodyEntries.findIndex(e=>e.id===editingBodyId);if(i>=0){const previous=db.bodyEntries[i];entry.id=editingBodyId;entry.createdAt=previous.createdAt||now();if(weight===null&&previous.weight!=null)entry.weight=previous.weight;if(fat===null&&previous.fat!=null)entry.fat=previous.fat;db.bodyEntries[i]=entry}else db.bodyEntries.push(entry)}
+ else db.bodyEntries.push(entry);
+ save();closeBodyDialog();render();
+}
 function openDrawer(){ $("#drawer").classList.add("open");$("#drawerBackdrop").classList.add("open");$("#drawer").setAttribute("aria-hidden","false") }
 function closeDrawer(){ $("#drawer").classList.remove("open");$("#drawerBackdrop").classList.remove("open");$("#drawer").setAttribute("aria-hidden","true") }
 function bindShell(){
@@ -116,6 +216,9 @@ function bindShell(){
   $$(".drawer-nav button[data-page]").forEach(b=>b.onclick=()=>{page=b.dataset.page;selectedPlan=null;selectedDay=null;closeDrawer();render()});
   $("#backupBtn").onclick=backup;$("#importBtn").onclick=()=>$("#importFile").click();
   $("#importFile").onchange=importBackup;
+  $("#closeBodyDialog").onclick=closeBodyDialog;
+  $("#bodyDialog").addEventListener("click",e=>{if(e.target.id==="bodyDialog")closeBodyDialog()});
+  $("#bodyForm").addEventListener("submit",saveBodyMeasurement);
   $("#closeSession").onclick=closeSession;
   $("#finishSession").onclick=finishSession;$("#abortSession").onclick=abortSession;
   $$(".rest-actions button").forEach(b=>b.onclick=()=>startRest(Number(b.dataset.rest)));
@@ -135,8 +238,12 @@ function bindPageActions(){
     const ev=(["INPUT","TEXTAREA","SELECT"].includes(el.tagName))?"change":"click";
     el.addEventListener(ev,()=>handleAction(el.dataset.action,el))
   });
-  const s=$("#librarySearch");if(s)s.addEventListener("input",()=>{query=s.value;render()});
-  $$(".range-tabs button").forEach(b=>b.onclick=()=>{heatRange=Number(b.dataset.range);render()});
+  const s=$("#librarySearch");if(s)s.addEventListener("input",()=>{
+ query=s.value;const pos=s.selectionStart;render();const next=$("#librarySearch");
+ if(next){next.focus();try{next.setSelectionRange(pos,pos)}catch{}}
+ });
+  $$(".range-tabs button[data-range]").forEach(b=>b.onclick=()=>{heatRange=Number(b.dataset.range);render()});
+  $$("[data-body-range]").forEach(b=>b.onclick=()=>{bodyPeriod=Number(b.dataset.bodyRange);render()});
 }
 function btn(label,action,cls="secondary"){return `<button class="${cls}" data-action="${action}">${esc(label)}</button>`}
 function field(label,value,action,type="text"){return `<div class="form-field"><label>${esc(label)}</label><input type="${type}" value="${esc(value)}" data-action="${action}"></div>`}
@@ -174,16 +281,14 @@ function renderDashboard(){
     ${n?`<div class="hero-meta">
       <span class="hero-chip"><strong>${n.exercises?.length||0}</strong> Übungen</span>
       ${p?.targetMinutes?`<span class="hero-chip">ca. <strong>${p.targetMinutes}</strong> Min</span>`:""}
-      <span class="hero-chip"><strong>${week.length}</strong> / ${p?.days?.length||0} diese Woche</span>
+
     </div>
     <div class="actions">${btn("Training starten","start:"+n.id,"primary")}${btn("Plan ansehen","openplan:"+p.id)}</div>`:""}
   </div>`;
   if(cards.includes("week"))html+=`<div class="card"><div class="eyebrow">Wochenfortschritt</div><div class="kpi">${week.length} / ${p?.days?.length||0}</div><div class="bar"><span style="width:${Math.min(100,(week.length/(p?.days?.length||1))*100)}%"></span></div><div class="muted" style="margin-top:10px">${week.length===0?"Die Woche beginnt mit deiner ersten Einheit.":week.length>=(p?.days?.length||0)?"Trainingswoche abgeschlossen.":"Noch "+((p?.days?.length||0)-week.length)+" Einheit"+(((p?.days?.length||0)-week.length)===1?"":"en")+" offen."}</div></div>`;
   if(cards.includes("last"))html+=`<div class="card"><div class="eyebrow">Letztes Training</div>${last?`<div class="hero-title" style="font-size:24px">${esc(last.title)}</div><div class="muted">${fmtDate(last.startedAt||last.localDate)}${last.durationSec?` · ${Math.round(last.durationSec/60)} Min`:``}</div><div class="actions">${btn("Historie öffnen","page:history")}</div>`:`<div class="empty">Noch kein Training gespeichert.</div>`}</div>`;
-  if(cards.includes("body"))html+=`<div class="card"><div class="eyebrow">Körper</div><div class="grid2" style="margin-top:10px"><div><div class="small">Gewicht</div><div class="kpi" style="font-size:27px">${bodyVal(body.weight)??"—"}${bodyVal(body.weight)!=null?" kg":""}</div></div><div><div class="small">KFA</div><div class="kpi" style="font-size:27px">${bodyVal(body.fat)??"—"}${bodyVal(body.fat)!=null?" %":""}</div></div></div><div class="actions">${btn("Fortschritt öffnen","page:progress")}</div></div>`;
-  if(cards.includes("prs"))html+=`<div class="card"><div class="eyebrow">Persönliche Rekorde</div><div class="muted" style="margin-top:8px">Rekorde werden aus deinen gespeicherten Arbeitssätzen abgeleitet.</div><div class="actions">${btn("Historie öffnen","page:history")}</div></div>`;
-  if(cards.includes("heatmap"))html+=`<div class="card"><div class="eyebrow">Muskelbelastung</div><div class="muted" style="margin-top:8px">Sieh, welche Muskelgruppen dein Training zuletzt am stärksten belastet hat.</div><div class="actions">${btn("Heatmap öffnen","page:heatmap")}</div></div>`;
-  if(cards.includes("habits")&&db.settings.habitsEnabled)html+=`<div class="card"><div class="eyebrow">Gewohnheiten</div><div class="muted" style="margin-top:8px">Deine Daily-Consistency-Daten bleiben optional verfügbar.</div></div>`;
+  if(cards.includes("last")&&last){} 
+  html+=`<div class="dashboard-shortcuts"><button data-action="page:progress"><span>↗</span><strong>Fortschritt</strong><small>Messwerte & Verlauf</small></button><button data-action="page:heatmap"><span>◉</span><strong>Heatmap</strong><small>Muskelbelastung</small></button></div>`;
   return html;
 }
 function planListCard(p){
@@ -193,23 +298,24 @@ function planListCard(p){
 function renderPlans(){
  if(selectedPlan){
   const p=plan();if(!p){selectedPlan=null;return renderPlans()}
-  return `<div class="row"><button class="link-btn" data-action="allplans">‹ Alle Pläne</button><span class="tag">${esc(p.status||"draft")}</span></div>
+  const active=p.id===db.activePlanId;
+  return `<div class="row"><button class="link-btn" data-action="allplans">‹ Alle Pläne</button><span class="tag">${active?"Aktiv":"Entwurf"}</span></div>
   <div class="eyebrow" style="margin-top:18px">Trainingsplan</div><h1 class="page-title">${esc(p.name)}</h1>
   ${field("Planname",p.name,"planname:"+p.id)}
-  <div class="actions">${btn("Als aktiven Plan setzen","activate:"+p.id,"primary")}${btn("Duplizieren","duplicate:"+p.id)}${btn(p.status==="archived"?"Reaktivieren":"Archivieren","archive:"+p.id)}${btn("Plan löschen","deleteplan:"+p.id,"mini danger")}</div>
+  <div class="actions">${!active?btn("Als aktiven Plan setzen","activate:"+p.id,"primary"):""}${btn("Duplizieren","duplicate:"+p.id)}${!active?btn("Plan löschen","deleteplan:"+p.id,"mini danger"):""}</div>
   <div class="section-head"><h2>Einheiten</h2>${btn("+ Einheit","addday","mini")}</div>
   ${p.days.map(d=>renderDayCard(d)).join("")}
   <div class="form-field"><label>Planregeln</label><textarea data-action="planrules:${p.id}">${esc(p.rules||"")}</textarea></div>`;
  }
- const archived=db.plans.filter(p=>p.status==="archived");
+ const visible=db.plans.filter(p=>p.status!=="archived"&&!p.hiddenLegacy);
  return `<div class="row top"><div><div class="eyebrow">Training</div><h1 class="page-title">Trainingspläne</h1></div>${btn("+ Neu","newplan","primary")}</div>
- ${db.plans.filter(p=>p.status!=="archived").map(planListCard).join("")}
- ${archived.length?`<details class="archive-fold"><summary>Archiv <span>${archived.length}</span></summary><div class="archive-content">${archived.map(planListCard).join("")}</div></details>`:""}`;
+ ${visible.map(planListCard).join("")}
+ ${visible.length===1?`<div class="plan-empty"><div class="eyebrow">Deine Planung</div><p>Hier erscheinen deine weiteren Trainingspläne. Du kannst einen neuen Plan erstellen oder den aktuellen als Vorlage duplizieren.</p>${btn("Neuen Plan erstellen","newplan","secondary")}</div>`:""}`;
 }
 function bindPlanSwipes(){
  document.querySelectorAll(".swipe-row").forEach(row=>{
   const face=row.querySelector(".swipe-face");let startX=0,startY=0,origin=0,dragging=false,tracking=false;
-  const set=x=>{face.style.transform=`translateX(${x}px)`;row.classList.toggle("revealed",x<0)};
+  const set=x=>{if(x<0)document.querySelectorAll(".swipe-row.revealed").forEach(other=>{if(other!==row){other.classList.remove("revealed");other.querySelector(".swipe-face").style.transform="translateX(0px)"}});face.style.transform=`translateX(${x}px)`;row.classList.toggle("revealed",x<0)};
   row.addEventListener("touchstart",e=>{if(e.target.closest("button"))return;startX=e.touches[0].clientX;startY=e.touches[0].clientY;origin=row.classList.contains("revealed")?-92:0;tracking=true;dragging=false},{passive:true});
   row.addEventListener("touchmove",e=>{if(!tracking)return;const dx=e.touches[0].clientX-startX,dy=e.touches[0].clientY-startY;if(!dragging&&Math.abs(dy)>Math.abs(dx)+8){tracking=false;return}if(Math.abs(dx)>8)dragging=true;if(dragging){e.preventDefault();set(Math.max(-92,Math.min(0,origin+dx)))}},{passive:false});
   row.addEventListener("touchend",e=>{if(!tracking)return;const dx=e.changedTouches[0].clientX-startX;set(origin+dx<-46?-92:0);tracking=false;if(dragging){face.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation()},{capture:true,once:true})}},{passive:true});
@@ -237,17 +343,21 @@ function renderPlanExercise(e,i){
 }
 
 function renderLibrary(){
-  const list=db.exercises.filter(e=>(e.name+" "+(seed.muscleGroups[e.primaryMuscle]||"")).toLowerCase().includes(query.toLowerCase()));
-  return `<div class="row top"><div><div class="eyebrow">Training</div><h1 class="page-title">Übungsbibliothek</h1></div>${btn("+ Neu","newexercise","primary")}</div>
-  <input id="librarySearch" placeholder="Übung oder Muskelgruppe suchen" value="${esc(query)}" style="margin-bottom:14px">
-  ${list.map(e=>`<div class="library-card"><div class="row top"><div><div class="exercise-name">${esc(e.name)}</div><div class="exercise-meta">${esc(seed.muscleGroups[e.primaryMuscle]||"Muskelgruppe nicht zugeordnet")}${e.equipment?` · ${esc(e.equipment)}`:""}</div></div>${btn(e._open?"Schließen":"Bearbeiten","editexercise:"+e.id,"mini")}</div>
-  ${e._open?renderExerciseEditor(e):""}</div>`).join("")}`;
+ const list=db.exercises.filter(e=>(e.name+" "+Object.keys(e.muscles||{}).map(muscleLabel).join(" ")+" "+(e.equipment||"")).toLowerCase().includes(query.toLowerCase()));
+ return `<div class="row top"><div><div class="eyebrow">Training</div><h1 class="page-title">Übungsbibliothek</h1></div>${btn("+ Neu","newexercise","primary")}</div>
+ <input id="librarySearch" type="search" placeholder="Übung oder Muskelgruppe suchen" value="${esc(query)}" style="margin-bottom:14px" autocomplete="off">
+ ${list.map(e=>`<div class="library-card"><div class="row top"><div><div class="exercise-name">${esc(e.name)}</div><div class="exercise-meta">${esc(muscleLabel(e.primaryMuscle))}${e.equipment?` · ${esc(e.equipment)}`:""}</div></div>${btn(e._open?"Schließen":"Bearbeiten","editexercise:"+e.id,"mini")}</div>${e._open?renderExerciseEditor(e):""}</div>`).join("")}
+ ${!list.length?`<div class="card empty">Keine Übung gefunden. Du kannst eine neue Übung anlegen.</div>`:""}`;
 }
 function renderExerciseEditor(e){
-  return `${field("Name",e.name,"exname:"+e.id)}${field("Equipment",e.equipment||"","equipment:"+e.id)}
-  <div class="form-field"><label>Primäre Muskelgruppe</label><select data-action="primary:${e.id}"><option value="">Nicht zugeordnet</option>${Object.entries(seed.muscleGroups).map(([k,v])=>`<option value="${k}" ${e.primaryMuscle===k?"selected":""}>${v}</option>`).join("")}</select></div>
-  <div class="form-field"><label>Dauerhafte Notiz</label><textarea data-action="globalnote:${e.id}">${esc(e.notes||"")}</textarea></div>
-  <details><summary>Muskelgewichtung</summary><div class="muted" style="margin-bottom:8px">Relative Beteiligung pro Arbeitssatz von 0 bis 1.</div>${Object.entries(seed.muscleGroups).map(([k,v])=>`<div class="settings-row"><span class="small">${esc(v)}</span><input style="width:90px" type="number" min="0" max="1" step=".05" value="${e.muscles?.[k]??0}" data-action="muscle:${e.id}:${k}"></div>`).join("")}</details>`;
+ return `${field("Name",e.name,"exname:"+e.id)}${field("Equipment",e.equipment||"","equipment:"+e.id)}
+ <div class="muscle-role-panel"><div class="eyebrow">Muskelbeteiligung</div><p class="muted">Wähle die wichtigsten beteiligten Muskelgruppen. Die Gewichtung wird automatisch für die Heatmap übernommen.</p>
+ ${muscleSelect(e,"primary","Primäre Muskelgruppe")}
+ ${muscleSelect(e,"secondary","Sekundäre Muskelgruppe")}
+ ${muscleSelect(e,"tertiary","Weitere Muskelgruppe")}
+ <div class="role-weight-note">Primär 100 % <span>·</span> Sekundär 50 % <span>·</span> Weitere 25 %</div>
+ <details class="subtle-details"><summary>Erweiterte Muskelgewichtung</summary><p class="muted">Optional: Weitere Muskelgruppen ergänzen oder die Beteiligung individuell anpassen. Die Werte sind Schätzungen, keine biomechanischen Messungen.</p>${Object.entries(seed.muscleGroups).map(([k,v])=>`<div class="settings-row"><span class="small">${esc(v)}</span><input class="weight-input" type="number" min="0" max="1" step=".05" value="${e.muscles?.[k]??0}" data-action="muscle:${e.id}:${k}" aria-label="Gewichtung ${esc(v)}"></div>`).join("")}</details></div>
+ <div class="form-field"><label>Dauerhafte Notiz</label><textarea data-action="globalnote:${e.id}" placeholder="Geräteeinstellung, Griff, Sitzposition …">${esc(e.notes||"")}</textarea></div>`;
 }
 
 function renderHistory(){
@@ -257,10 +367,18 @@ function renderHistory(){
   <details><summary class="link-btn">Details</summary>${(s.exercises||[]).map(e=>`<div class="history-ex"><strong>${esc(e.nameSnapshot||ex(e.exerciseId)?.name||"Übung")}</strong><br>${(e.sets||[]).filter(z=>z.completed!==false).map(z=>`${z.kg??"—"} kg × ${z.reps??"—"}`).join(" · ")}</div>`).join("")}</details></div>`).join(""):`<div class="card empty">Noch keine Trainings gespeichert.</div>`}`;
 }
 function renderProgress(){
-  const body=latestBody(), total=db.sessions.length, recent=(db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate)>new Date(Date.now()-30*864e5)).length;
-  return `<div class="eyebrow">Entwicklung</div><h1 class="page-title">Fortschritt</h1>
-  <div class="grid2"><div class="card"><div class="eyebrow">30 Tage</div><div class="kpi">${recent}</div><div class="muted">Trainings</div></div><div class="card"><div class="eyebrow">Gesamt</div><div class="kpi">${total}</div><div class="muted">gespeicherte Sessions</div></div></div>
-  <div class="card"><div class="eyebrow">Körperdaten</div><div class="metric-list" style="margin-top:12px"><div class="metric-line"><span>Gewicht</span><strong>${bodyVal(body.weight)??"—"}${bodyVal(body.weight)!=null?" kg":""}</strong></div><div class="metric-line"><span>Körperfett</span><strong>${bodyVal(body.fat)??"—"}${bodyVal(body.fat)!=null?" %":""}</strong></div></div></div>`;
+ const body=latestBody(),total=db.sessions.length,recent=(db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate)>new Date(Date.now()-30*864e5)).length;
+ const entries=bodyHistory().slice().reverse();
+ return `<div class="eyebrow">Entwicklung</div><h1 class="page-title">Fortschritt</h1>
+ <div class="progress-overview"><div class="card"><div class="eyebrow">30 Tage</div><div class="kpi">${recent}</div><div class="muted">Trainings</div></div><div class="card"><div class="eyebrow">Gesamt</div><div class="kpi">${total}</div><div class="muted">gespeicherte Sessions</div></div></div>
+ <div class="card"><div class="row"><div><div class="eyebrow">Körperentwicklung</div><h2 style="margin:8px 0 0">Deine Messwerte</h2></div>${btn("+ Erfassen","newbody","primary mini")}</div>
+ <div class="body-stats"><div><span>Gewicht</span><strong>${fmtBody(body.weight," kg")}</strong></div><div><span>Körperfett</span><strong>${fmtBody(body.fat," %")}</strong></div></div>
+ <div class="range-tabs body-period"><button data-body-range="30" class="${bodyPeriod===30?"active":""}">30 Tage</button><button data-body-range="90" class="${bodyPeriod===90?"active":""}">90 Tage</button><button data-body-range="365" class="${bodyPeriod===365?"active":""}">12 Monate</button></div>
+ <div class="body-chart-section"><div class="row"><strong>Gewicht</strong><span class="muted">kg</span></div>${bodyChart("weight",bodyPeriod)}</div>
+ <div class="body-chart-section"><div class="row"><strong>Körperfett</strong><span class="muted">%</span></div>${bodyChart("fat",bodyPeriod)}</div>
+ <details class="subtle-details"><summary>Messverlauf anzeigen</summary><div class="measurement-list">${entries.map(e=>`<div class="measurement-row"><div><strong>${fmtDate(e.date)}</strong><div class="muted">${e.weight!=null?fmtBody(e.weight," kg"):""}${e.weight!=null&&e.fat!=null?" · ":""}${e.fat!=null?fmtBody(e.fat," %"):""}</div></div>${e.source!=="legacy"?`<div class="measurement-actions">${btn("Bearbeiten","editbody:"+e.id,"mini")}${btn("Löschen","deletebody:"+e.id,"mini danger")}</div>`:""}</div>`).join("")||'<div class="empty">Noch keine Messungen vorhanden.</div>'}</div></details>
+ </div>
+ <p class="muted progress-note">Messungen bleiben auf diesem Gerät gespeichert. Gewicht und Körperfett können unabhängig voneinander erfasst werden. Körperfettwerte verschiedener Messmethoden sind nur eingeschränkt vergleichbar.</p>`;
 }
 
 function muscleScores(days){
@@ -271,36 +389,6 @@ function muscleScores(days){
     for(const [m,w] of Object.entries(se.musclesSnapshot||x?.muscles||{}))scores[m]=(scores[m]||0)+completed*Number(w||0);
   }));
   return scores;
-}
-function level(v,max){if(!v||!max)return 0;const r=v/max;return r>.75?4:r>.5?3:r>.25?2:1}
-function svgBody(view,scores,max){
-  const cls=m=>`muscle-shape l${level(scores[m]||0,max)}`;
-  if(view==="front")return `<svg viewBox="0 0 220 460" aria-label="Körper Vorderseite"><circle class="body-outline" cx="110" cy="35" r="24"/><path class="body-outline" d="M80 64 Q110 52 140 64 L155 185 Q142 230 136 286 L145 430 L116 430 L110 300 L104 430 L75 430 L84 286 Q78 230 65 185 Z"/><path class="${cls("chest")}" d="M78 83 Q95 68 108 84 L106 125 Q88 132 75 115 Z"/><path class="${cls("chest")}" d="M142 83 Q125 68 112 84 L114 125 Q132 132 145 115 Z"/><path class="${cls("front_delts")}" d="M66 79 Q72 62 91 66 L82 100 Q69 102 62 91 Z"/><path class="${cls("front_delts")}" d="M154 79 Q148 62 129 66 L138 100 Q151 102 158 91 Z"/><path class="${cls("biceps")}" d="M58 104 Q70 96 78 106 L70 157 Q61 161 53 150 Z"/><path class="${cls("biceps")}" d="M162 104 Q150 96 142 106 L150 157 Q159 161 167 150 Z"/><path class="${cls("abs")}" d="M91 130 Q110 122 129 130 L128 205 Q110 216 92 205 Z"/><path class="${cls("quads")}" d="M83 232 Q98 220 106 239 L103 330 Q86 337 78 321 Z"/><path class="${cls("quads")}" d="M137 232 Q122 220 114 239 L117 330 Q134 337 142 321 Z"/><path class="${cls("calves")}" d="M79 334 Q94 328 101 344 L96 414 Q82 422 74 405 Z"/><path class="${cls("calves")}" d="M141 334 Q126 328 119 344 L124 414 Q138 422 146 405 Z"/></svg>`;
-  return `<svg viewBox="0 0 220 460" aria-label="Körper Rückseite"><circle class="body-outline" cx="110" cy="35" r="24"/><path class="body-outline" d="M80 64 Q110 52 140 64 L155 185 Q142 230 136 286 L145 430 L116 430 L110 300 L104 430 L75 430 L84 286 Q78 230 65 185 Z"/><path class="${cls("traps")}" d="M88 66 L110 57 L132 66 L124 106 L96 106 Z"/><path class="${cls("rear_delts")}" d="M65 79 Q73 61 91 67 L83 100 Q69 103 62 91 Z"/><path class="${cls("rear_delts")}" d="M155 79 Q147 61 129 67 L137 100 Q151 103 158 91 Z"/><path class="${cls("lats")}" d="M82 103 Q98 91 107 106 L103 177 Q84 180 74 157 Z"/><path class="${cls("lats")}" d="M138 103 Q122 91 113 106 L117 177 Q136 180 146 157 Z"/><path class="${cls("upper_back")}" d="M94 106 Q110 98 126 106 L123 170 Q110 181 97 170 Z"/><path class="${cls("triceps")}" d="M58 104 Q70 96 78 106 L70 157 Q61 161 53 150 Z"/><path class="${cls("triceps")}" d="M162 104 Q150 96 142 106 L150 157 Q159 161 167 150 Z"/><path class="${cls("glutes")}" d="M86 191 Q102 179 108 198 L105 234 Q89 242 80 224 Z"/><path class="${cls("glutes")}" d="M134 191 Q118 179 112 198 L115 234 Q131 242 140 224 Z"/><path class="${cls("hamstrings")}" d="M82 236 Q98 228 105 244 L102 329 Q85 335 78 319 Z"/><path class="${cls("hamstrings")}" d="M138 236 Q122 228 115 244 L118 329 Q135 335 142 319 Z"/><path class="${cls("calves")}" d="M79 334 Q94 328 101 344 L96 414 Q82 422 74 405 Z"/><path class="${cls("calves")}" d="M141 334 Q126 328 119 344 L124 414 Q138 422 146 405 Z"/></svg>`;
-}
-function anatomyZones(view,scores,max){
-  const lv=m=>level(scores[m]||0,max);
-  if(view==="front")return `
-    <span class="heat-zone z-chest l${lv("chest")}"></span>
-    <span class="heat-zone z-front-delts-l l${lv("front_delts")}"></span><span class="heat-zone z-front-delts-r l${lv("front_delts")}"></span>
-    <span class="heat-zone z-side-delts-l l${lv("side_delts")}"></span><span class="heat-zone z-side-delts-r l${lv("side_delts")}"></span>
-    <span class="heat-zone z-biceps-l l${lv("biceps")}"></span><span class="heat-zone z-biceps-r l${lv("biceps")}"></span>
-    <span class="heat-zone z-forearms-l l${lv("forearms")}"></span><span class="heat-zone z-forearms-r l${lv("forearms")}"></span>
-    <span class="heat-zone z-abs l${lv("abs")}"></span>
-    <span class="heat-zone z-obliques-l l${lv("obliques")}"></span><span class="heat-zone z-obliques-r l${lv("obliques")}"></span>
-    <span class="heat-zone z-quads-l l${lv("quads")}"></span><span class="heat-zone z-quads-r l${lv("quads")}"></span>
-    <span class="heat-zone z-calves-l l${lv("calves")}"></span><span class="heat-zone z-calves-r l${lv("calves")}"></span>`;
-  return `
-    <span class="heat-zone z-traps l${lv("traps")}"></span>
-    <span class="heat-zone z-rear-delts-l l${lv("rear_delts")}"></span><span class="heat-zone z-rear-delts-r l${lv("rear_delts")}"></span>
-    <span class="heat-zone z-side-delts-l l${lv("side_delts")}"></span><span class="heat-zone z-side-delts-r l${lv("side_delts")}"></span>
-    <span class="heat-zone z-upper-back l${lv("upper_back")}"></span>
-    <span class="heat-zone z-lats l${lv("lats")}"></span>
-    <span class="heat-zone z-erectors l${lv("erectors")}"></span>
-    <span class="heat-zone z-triceps-l l${lv("triceps")}"></span><span class="heat-zone z-triceps-r l${lv("triceps")}"></span>
-    <span class="heat-zone z-glutes l${lv("glutes")}"></span>
-    <span class="heat-zone z-hamstrings-l l${lv("hamstrings")}"></span><span class="heat-zone z-hamstrings-r l${lv("hamstrings")}"></span>
-    <span class="heat-zone z-calves-l l${lv("calves")}"></span><span class="heat-zone z-calves-r l${lv("calves")}"></span>`;
 }
 function anatomyView(view,scores,max){
  const label=view==="front"?"Vorderseite":"Rückseite";
@@ -355,17 +443,19 @@ function renderHeatmap(){
  </div>`;
 }
 function renderSettings(){
-  const opts=[["next","Nächste Einheit"],["week","Wochenfortschritt"],["last","Letztes Training"],["body","Körperfortschritt"],["prs","Persönliche Rekorde"],["heatmap","Muskelbelastung"],["habits","Gewohnheiten"]];
-  return `<div class="eyebrow">BodyPlan</div><h1 class="page-title">Einstellungen</h1>
-  <div class="card"><div class="section-head" style="margin:0 0 8px"><h2>Dashboard</h2></div>${opts.map(([k,l])=>{let on=db.settings.dashboard.includes(k);return `<div class="settings-row"><span>${esc(l)}</span><button class="toggle ${on?"on":""}" data-action="tile:${k}" aria-label="${esc(l)}"></button></div>`}).join("")}</div>
-  <div class="card"><h2 style="margin:0 0 8px;font-size:19px">Gewohnheiten</h2><div class="settings-row"><div><strong>Daily Challenge</strong><div class="muted">Optional anzeigen, historische Daten bleiben erhalten.</div></div><button class="toggle ${db.settings.habitsEnabled?"on":""}" data-action="habits"></button></div></div>
-  <div class="card"><h2 style="margin:0 0 8px;font-size:19px">Daten</h2><div class="muted">Deine Daten werden weiterhin lokal auf diesem Gerät gespeichert.</div><div class="actions">${btn("Backup erstellen","backup","primary")}${btn("Backup importieren","import")}</div></div>`;
+ const opts=[["next","Nächste Einheit"],["week","Wochenfortschritt"],["last","Letztes Training"]];
+ return `<div class="eyebrow">BodyPlan</div><h1 class="page-title">Einstellungen</h1>
+ <div class="card"><div class="section-head" style="margin:0 0 8px"><h2>Dashboard</h2></div><p class="muted">Wähle die Informationen, die du auf deiner Startseite sehen möchtest.</p>${opts.map(([k,l])=>{let on=db.settings.dashboard.includes(k);return `<div class="settings-row"><span>${esc(l)}</span><button class="toggle ${on?"on":""}" data-action="tile:${k}" role="switch" aria-checked="${on}" aria-label="${esc(l)}"></button></div>`}).join("")}</div>
+ <div class="card"><h2 style="margin:0 0 8px;font-size:19px">Gewohnheiten</h2><div class="settings-row"><div><strong>Daily Challenge</strong><div class="muted">Optional anzeigen, historische Daten bleiben erhalten.</div></div><button class="toggle ${db.settings.habitsEnabled?"on":""}" data-action="habits" role="switch" aria-checked="${!!db.settings.habitsEnabled}"></button></div></div>
+ <div class="card"><h2 style="margin:0 0 8px;font-size:19px">Daten</h2><div class="muted">Deine Daten werden weiterhin lokal auf diesem Gerät gespeichert. Erstelle vor Updates oder einem Gerätewechsel ein Backup.</div><div class="actions">${btn("Backup erstellen","backup","primary")}${btn("Backup importieren","import")}</div></div>`;
 }
-
 function handleAction(a,el){
   const [op,id,arg]=a.split(":");
   if(op==="page"){page=id;return render()}
   if(op==="backup")return backup();
+  if(op==="newbody")return openBodyDialog();
+  if(op==="editbody")return openBodyDialog(id);
+  if(op==="deletebody"){if(confirm("Diese Messung löschen?")){db.bodyEntries=db.bodyEntries.filter(e=>e.id!==id);save();render()}return}
   if(op==="import")return $("#importFile").click();
   if(op==="allplans"){selectedPlan=null;selectedDay=null;return render()}
   if(op==="openplan"){selectedPlan=id;selectedDay=null;page="plans";return render()}
@@ -373,19 +463,19 @@ function handleAction(a,el){
   if(op==="start")return openSession(id);
   if(op==="editexercise"){let e=ex(id);e._open=!e._open;return render()}
   if(op==="toggleex"){let e=day()?.exercises.find(x=>x.id===id);if(e)e._open=!e._open;return render()}
-  if(op==="newexercise"){let n=prompt("Name der neuen Übung");if(!n?.trim())return;db.exercises.push(newExercise(n.trim()));save();return render()}
+  if(op==="newexercise"){let n=prompt("Name der neuen Übung");if(!n?.trim())return;let e=newExercise(n.trim());e._open=true;db.exercises.push(e);query="";save();return render()}
   if(op==="newplan"){let n=prompt("Name des Trainingsplans");if(!n?.trim())return;let p=normalizePlan({name:n.trim(),status:"draft",days:[],rules:""});db.plans.push(p);selectedPlan=p.id;save();return render()}
-  if(op==="activate"){db.plans.forEach(p=>{if(p.status==="active")p.status="draft"});let p=plan();p.status="active";db.activePlanId=p.id;save();return render()}
+  if(op==="activate"){if(getJSON(ACTIVE_KEY,null)){alert("Bitte beende oder verwerfe zuerst das laufende Training, bevor du den aktiven Plan wechselst.");return}db.plans.forEach(p=>{if(p.status==="active")p.status="draft"});let p=plan();p.status="active";db.activePlanId=p.id;save();return render()}
   if(op==="deleteplan"){
     const target=db.plans.find(p=>p.id===id);if(!target)return;
-    if(id===db.activePlanId){alert("Aktiven Plan zuerst wechseln oder archivieren.");return}
+    if(id===db.activePlanId){alert("Der aktive Plan kann nicht gelöscht werden. Aktiviere zuerst einen anderen Plan.");return}
     if(getJSON(ACTIVE_KEY,null)?.planId===id){alert("Dieser Plan wird gerade trainiert. Beende oder verwerfe zuerst das Training.");return}
     if(!confirm(`„${target.name}“ endgültig löschen? Gespeicherte Trainings und Übungsdaten bleiben erhalten.`))return;
     db.plans=db.plans.filter(p=>p.id!==id);if(selectedPlan===id){selectedPlan=null;selectedDay=null}
     save();return render();
   }
-  if(op==="archive"){let p=plan();p.status=p.status==="archived"?"draft":"archived";if(db.activePlanId===p.id&&p.status==="archived")db.activePlanId=null;save();return render()}
-  if(op==="duplicate"){let p=normalizePlan(plan());p.name+=" · Kopie";p.status="draft";db.plans.push(p);selectedPlan=p.id;selectedDay=null;save();return render()}
+
+  if(op==="duplicate"){let p=normalizePlan(plan());p.name+=" · Kopie";p.status="draft";p.hiddenLegacy=false;db.plans.push(p);selectedPlan=p.id;selectedDay=null;save();return render()}
   if(op==="addday"){let d={id:uid(),name:"Neue Einheit",label:String(plan().days.length+1),weekday:null,exercises:[]};plan().days.push(d);selectedDay=d.id;save();return render()}
   if(op==="duplicateday"){let d=clone(day());d.id=uid();d.name+=" · Kopie";d.exercises.forEach(e=>{e.id=uid();e.sets.forEach(s=>s.id=uid())});plan().days.push(d);selectedDay=d.id;save();return render()}
   if(op==="removeday"){if(confirm("Einheit aus dem Plan entfernen? Gespeicherte Trainings bleiben erhalten.")){plan().days=plan().days.filter(d=>d.id!==selectedDay);selectedDay=null;save();render()}return}
@@ -409,8 +499,18 @@ function handleAction(a,el){
   let val=el.type==="checkbox"?el.checked:el.value;
   if(op==="planname"||op==="planrules"){let p=db.plans.find(p=>p.id===id);p[op==="planname"?"name":"rules"]=val;save();return}
   if(op==="dayname"||op==="daylabel"){day()[op==="dayname"?"name":"label"]=val;save();return}
-  if(op==="exname"||op==="equipment"||op==="primary"||op==="globalnote"){let e=ex(id);e[{exname:"name",equipment:"equipment",primary:"primaryMuscle",globalnote:"notes"}[op]]=val;e.updatedAt=now();save();return}
-  if(op==="muscle"){let e=ex(id),v=Math.max(0,Math.min(1,Number(val)||0));if(v)e.muscles[arg]=v;else delete e.muscles[arg];save();return}
+  if(op==="musclerole"){
+    const e=ex(id),muscle=el.value,role=arg;
+    if(!e||!["primary","secondary","tertiary"].includes(role))return;
+    const roles=exerciseRoles(e);
+    if(muscle&&Object.entries(roles).some(([r,k])=>r!==role&&k===muscle)){
+      alert("Diese Muskelgruppe ist bereits ausgewählt. Wähle eine andere oder entferne zuerst die bestehende Zuordnung.");
+      return render();
+    }
+    e.muscleRoles=roles;setMuscleRole(e,role,muscle);save();return render();
+  }
+  if(op==="exname"||op==="equipment"||op==="primary"||op==="globalnote"){let e=ex(id);e[{exname:"name",equipment:"equipment",primary:"primaryMuscle",globalnote:"notes"}[op]]=val;if(op==="primary"&&val)e.muscles[val]=1;e.updatedAt=now();save();return}
+  if(op==="muscle"){let e=ex(id),v=Math.max(0,Math.min(1,Number(val)||0));if(v)e.muscles[arg]=v;else delete e.muscles[arg];e.mappingCustomized=true;e.updatedAt=now();save();return}
   if(op==="superset"||op==="plannote"){entry()[op==="superset"?"supersetGroup":"notes"]=val||null;save();return}
   if(op==="setmin"||op==="setmax"){let s=entry().sets.find(s=>s.id===arg);s[op==="setmin"?"repsMin":"repsMax"]=Math.max(0,Number(val)||0);save();return}
 }
@@ -534,7 +634,9 @@ function finishSession(){
   let a=getJSON(ACTIVE_KEY,null);if(!a)return;
   const workSets=a.exercises.flatMap(e=>e.sets).filter(s=>s.kind!=="warmup");
   if(!workSets.some(s=>s.completed)){if(!confirm("Noch kein Satz ist als erledigt markiert. Training trotzdem speichern?"))return}
-  a.durationSec=Math.round((Date.now()-new Date(a.startedAt).getTime())/1000);a.savedAt=now();a.source="bodyplan2";
+  a.durationSec=Math.max(0,Math.round((Date.now()-new Date(a.startedAt).getTime())/1000));a.savedAt=now();a.source="bodyplan2";
+  if(db.sessions.some(s=>s.id===a.id)){alert("Dieses Training wurde bereits gespeichert.");return}
+  a.exercises.forEach(e=>{e.sets=e.sets.filter(z=>z.completed);});
   db.sessions.push(a);save();
   localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);
   clearInterval(restTick);restTick=null;
@@ -550,7 +652,7 @@ function abortSession(){
 }
 async function importBackup(e){
   const f=e.target.files[0];if(!f)return;
-  try{const data=JSON.parse(await f.text()), incoming=data.app||data.alpha;if(!incoming||![1,2].includes(incoming.schemaVersion))throw Error("Unbekanntes Backup-Format");if(!confirm("Aktuelle BodyPlan-Daten durch dieses Backup ersetzen?"))return;backup();db=stripTransient(clone(incoming));db.schemaVersion=2;save();page="dashboard";selectedPlan=null;selectedDay=null;render()}catch(err){alert("Import fehlgeschlagen: "+err.message)}finally{e.target.value=""}
+  try{const data=JSON.parse(await f.text()), incoming=data.app||data.alpha;if(!incoming||![1,2].includes(incoming.schemaVersion))throw Error("Unbekanntes Backup-Format");if(!confirm("Aktuelle BodyPlan-Daten durch dieses Backup ersetzen? Nicht gesicherte Änderungen gehen verloren."))return;backup();localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);db=stripTransient(clone(incoming));db.schemaVersion=2;normalizeDatabase();save();$("#sessionOverlay").classList.remove("open");page="dashboard";selectedPlan=null;selectedDay=null;render()}catch(err){alert("Import fehlgeschlagen: "+err.message)}finally{e.target.value=""}
 }
 
 Promise.all(["exercise-seed.json","starter-plan.json"].map(u=>fetch(u,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(u);return r.json()})))

@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="BodyPlan">
 <meta name="theme-color" content="#080808">
 <title>BodyPlan</title>
-<link rel="manifest" href="manifest.json?v=200b4">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=200b4">
-<link rel="stylesheet" href="app.css?v=200b4">
+<link rel="manifest" href="manifest.json?v=200b5">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=200b5">
+<link rel="stylesheet" href="app.css?v=200b5">
 </head>
 <body>
 <header class="topbar">
@@ -68,7 +68,8 @@
   </section>
 </div>
 
+<div class="dialog-backdrop" id="bodyDialog" hidden><section class="body-dialog" role="dialog" aria-modal="true" aria-labelledby="bodyDialogTitle"><div class="row"><div><div class="eyebrow">Körperdaten</div><h2 id="bodyDialogTitle">Messung erfassen</h2></div><button class="icon-close" id="closeBodyDialog" aria-label="Schließen">×</button></div><form id="bodyForm"><div class="form-field"><label for="bodyDate">Datum</label><input id="bodyDate" type="date" required></div><div class="grid2"><div class="form-field"><label for="bodyWeight">Gewicht (kg)</label><input id="bodyWeight" type="number" inputmode="decimal" min="20" max="500" step="0.1" placeholder="z. B. 72,5"></div><div class="form-field"><label for="bodyFat">Körperfett (%)</label><input id="bodyFat" type="number" inputmode="decimal" min="1" max="70" step="0.1" placeholder="z. B. 12,0"></div></div><p class="muted">Mindestens einen Wert eingeben. Leere Felder verändern bestehende Messwerte nicht.</p><button class="primary full" type="submit">Messung speichern</button></form></section></div>
 <input id="importFile" type="file" accept=".json" hidden>
-<script src="app.js?v=200b4"></script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js").catch(()=>{})}</script></body>
+<script src="app.js?v=200b5"></script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js?v=200b5").catch(()=>{})}</script></body>
 </html>
