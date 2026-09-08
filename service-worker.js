@@ -1,5 +1,14 @@
-const CACHE_NAME='bodyplan-v2-beta1-201';
-const ASSETS=['./','./index.html','./bodyplan2.html?v=201','./bodyplan2.html','./alpha.css?v=201','./alpha.css','./alpha.js?v=201','./alpha.js','./exercise-seed.json','./starter-plan.json','./legacy-plans.json','./manifest.json','./legacy-v44.html','./icons/icon-v44-192.png','./icons/icon-v44-512.png','./apple-touch-icon-v44.png','./favicon.png'];
-self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting()});
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('bodyplan-')&&k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim()});
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request,{cache:'no-store'}).then(r=>{if(r&&r.ok){let cp=r.clone();caches.open(CACHE_NAME).then(c=>c.put(event.request,cp))}return r}).catch(()=>caches.match(event.request).then(r=>r||caches.match('./bodyplan2.html'))))});
+const CACHE_NAME='bodyplan-2';
+const ASSETS=[
+'./','./index.html','./app.css','./app.js',
+'./exercise-seed.json','./starter-plan.json',
+'./manifest.json','./apple-touch-icon.png',
+'./icons/icon-192.png','./icons/icon-512.png',
+'./assets/heatmap-front.png','./assets/heatmap-back.png'
+];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',event=>{
+ if(event.request.method!=='GET')return;
+ event.respondWith(fetch(event.request,{cache:'no-store'}).then(r=>{const copy=r.clone();caches.open(CACHE_NAME).then(c=>c.put(event.request,copy));return r;}).catch(()=>caches.match(event.request)));
+});
