@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BodyPlan">
   <title>BodyPlan v36</title>
-  <link rel="manifest" href="manifest.json?v=41">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v40.png?v=39">
-  <link rel="apple-touch-icon" href="apple-touch-icon-v40.png?v=39">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-v40-192.png?v=39">
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-v40-512.png?v=39">
+  <link rel="manifest" href="manifest.json?v=44">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v44.png?v=44">
+  <link rel="apple-touch-icon" href="apple-touch-icon-v44.png?v=44">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-v44-192.png?v=44">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-v44-512.png?v=44">
   
   
   <meta name="theme-color" content="#080808">
@@ -264,14 +264,62 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
 
 </style>
 
+
+<style id="bodyplan-v43-daily-challenge">
+.daily.daily-three{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.daily.daily-three .daily-item{padding:13px 10px;min-width:0}
+.daily.daily-three .daily-num{font-size:32px}
+.daily.daily-three .daily-lbl{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.daily.daily-three .daily-note{font-size:10px;white-space:nowrap}
+.daily.daily-three .habit-btn{min-height:40px;font-size:10px;letter-spacing:2px;padding:9px 6px;white-space:nowrap}
+.daily-consistency-card{min-height:214px}
+.daily-ytd-grid{gap:6px}
+.daily-ytd-grid div{padding-top:6px}
+.daily-ytd-grid strong{font-size:22px}
+.daily-ytd-grid span{font-size:11px}
+.dc-metric-grid{grid-template-columns:1fr;gap:10px}
+@media (max-width:390px){.daily.daily-three{gap:6px}.daily.daily-three .daily-item{padding:12px 8px}.daily.daily-three .daily-num{font-size:28px}.daily.daily-three .daily-lbl{font-size:11px}.daily.daily-three .daily-note{font-size:9px}.daily.daily-three .habit-btn{font-size:9px;letter-spacing:1.4px}}
+</style>
+<style id="bodyplan-v43-dc-analytics-grid">.dc-split{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:560px){.dc-split{grid-template-columns:1fr 1fr 1fr}}.dc-record-grid{grid-template-columns:repeat(2,1fr)}@media(min-width:560px){.dc-record-grid{grid-template-columns:repeat(4,1fr)}}</style>
+<style id="bodyplan-v44-daily-performance">
+.performance-daily .daily-item{display:flex;flex-direction:column;min-height:190px}
+.performance-daily .daily-title{font-weight:800;font-size:13px;white-space:normal;line-height:1.2;min-height:31px}
+.performance-daily .daily-note{font-style:normal;color:#bdbdbd;margin-top:2px;white-space:normal}
+.performance-daily .daily-note strong{color:#d4a853;font-weight:800}
+.daily-input-label{font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:#aaa;margin:12px 0 5px}
+.daily-performance-input{width:100%;height:45px;border-radius:8px;border:1px solid #342b16;background:#080808;color:#fff;font-family:'Bebas Neue';font-size:27px;letter-spacing:1px;text-align:center;padding:5px;outline:none}
+.daily-performance-input:focus{border-color:#d4a853;box-shadow:0 0 0 2px #d4a85320}
+.performance-daily .habit-btn{margin-top:auto}
+.performance-daily .habit-btn.done{background:#d4a853;color:#080808;border-color:#d4a853}
+.daily-goals-panel{padding:0;overflow:hidden}
+.daily-goals-panel summary{padding:16px;cursor:pointer;color:#d4a853;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:11px}
+.daily-goals-panel[open] summary{border-bottom:1px solid #1b1b1b}
+.daily-goals-panel>div,.daily-goals-panel>button{margin-left:15px;margin-right:15px}
+.daily-goals-panel>.dc-metric-sub{margin-bottom:15px}
+.daily-goals-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:15px}
+.daily-goals-grid label{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:#aaa}
+.daily-goals-grid input{display:block;width:100%;margin-top:6px;background:#080808;border:1px solid #2a2a2a;border-radius:8px;color:#fff;padding:11px 6px;text-align:center;font-size:16px}
+.dc-performance-records{display:grid;gap:9px;margin-top:12px}
+.dc-performance-row{background:#0e0e0e;border:1px solid #1b1b1b;border-radius:10px;padding:12px}
+.dc-performance-name{font-weight:800;font-size:13px;margin-bottom:9px}
+.dc-performance-values{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.dc-performance-value{background:#090909;border-radius:8px;padding:9px 6px;text-align:center}
+.dc-performance-value strong{display:block;font-family:'Bebas Neue';font-size:23px;color:#d4a853;font-weight:400;line-height:1}
+.dc-performance-value span{display:block;font-size:7px;letter-spacing:1.3px;text-transform:uppercase;color:#999;margin-top:4px}
+@media(max-width:390px){.performance-daily .daily-item{padding:11px 7px;min-height:184px}.performance-daily .daily-title{font-size:11px}.daily-performance-input{font-size:23px;height:42px}.daily-goals-grid{grid-template-columns:1fr}.dc-performance-values{gap:5px}.dc-performance-value strong{font-size:20px}}
+</style>
 </head>
 <body>
 <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)toggleMenu(false)"><div class="menu-sheet"><div class="menu-goal">NAVIGATION</div><button class="menu-item" onclick="showAppPage('dashboard')"><span class="mi-ico">⌂</span>Dashboard</button><button class="menu-item" onclick="showAppPage('progress')"><span class="mi-ico">📈</span>Fortschritt</button><button class="menu-item" onclick="showAppPage('daily-consistency')"><span class="mi-ico">🔥</span>Daily Consistency</button><button class="menu-item" onclick="showAppPage('muscles')"><span class="mi-ico">💪</span>Muskel-Heatmap</button><button class="menu-item" onclick="showAppPage('history')"><span class="mi-ico">📊</span>Trainingshistorie</button><button class="menu-item" onclick="showAppPage('plan')"><span class="mi-ico">🏋️</span>Trainingsplan</button><button class="menu-item" onclick="showAppPage('alternative')"><span class="mi-ico">🏝️</span>Alternative Trainingseinheiten</button><div class="menu-sep"></div><button class="menu-item" onclick="exportData()"><span class="mi-ico">⬇️</span>Daten exportieren</button><button class="menu-item" onclick="triggerImport()"><span class="mi-ico">⬆️</span>Daten importieren</button><div class="menu-sep"></div><button class="menu-item" onclick="toggleMenu(false)"><span class="mi-ico">✕</span>Schließen</button><input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)"></div></div>
 <div class="header"><div class="header-row"><div class="brand-home" onclick="showAppPage('dashboard')" role="button" aria-label="Zur Startseite"><div class="wordmark">BODY<em>PLAN</em></div></div><button class="menu-btn" id="menuBtn" onclick="toggleMenu(true)" aria-label="Menü"><span></span><span></span><span></span></button></div><div class="tabs"><button class="tab active" onclick="switchTab('training', this)">🏋️ Training</button><button class="tab" onclick="switchTab('ernaehrung', this)">🥗 Ernährung</button></div></div>
 <div id="tab-training" class="page">
   <div id="page-dashboard" class="app-page">
-    <div class="section-label">Täglich — jeden Tag</div><div class="daily"><div class="daily-item"><div class="daily-num">25</div><div class="daily-lbl">Liegestütze</div><div class="daily-note">Täglich erfassen</div><button class="habit-btn" id="pushupDoneBtn" onclick="toggleDailyHabit('pushups')">Erledigt</button></div><div class="daily-item"><div class="daily-num">10</div><div class="daily-lbl">Klimmzüge</div><div class="daily-note">Täglich erfassen</div><button class="habit-btn" id="pullupDoneBtn" onclick="toggleDailyHabit('pullups')">Erledigt</button></div></div>
-    <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="weekStatus">🔴</span> <span id="doneCount">0</span>/4</div><div class="dash-sub"><span id="weekPercent">0</span>% erreicht</div><div class="bar"><span id="weekBar" style="width:0%"></span></div><div class="dash-sub"><span id="weekRemaining">Noch 4 Einheiten</span><br><span id="prevWeekText">Vorwoche: –</span></div></div><div class="dash-card daily-consistency-card"><div class="dash-label">Daily Consistency</div><div class="daily-consistency-top"><div class="daily-streak-box"><div class="dash-num">🔥 <span id="dailyStreak">0</span></div><div class="daily-mini-label">aktuelle Serie</div></div><div class="daily-streak-box"><div class="dash-num">🏆 <span id="dailyBestStreak">0</span></div><div class="daily-mini-label">längste Serie</div></div></div><div class="daily-ytd-grid"><div><strong id="dailyPushupsYtd">0</strong><span>Liegestütze YTD</span></div><div><strong id="dailyPullupsYtd">0</strong><span>Klimmzüge YTD</span></div></div></div><div class="dash-card"><div class="dash-label">Monatsziel</div><div class="dash-num"><span id="monthlyDone">0</span>/<span id="monthlyTarget">16</span></div><div class="dash-sub"><span id="monthlyPercent">0</span>% erreicht</div><div class="bar"><span id="monthlyBar" style="width:0%"></span></div><div class="dash-sub monthly-meta"><span id="prevMonthGoal">Vormonat: –</span><br><span id="bestMonthGoal">Beste Monatsquote: –</span></div></div><div class="dash-card body-progress-card"><div class="dash-label">Körperfortschritt</div><div class="body-progress-row"><span>Gewicht</span><strong id="bodyWeightGoalLine">– / 75 kg</strong></div><div class="bar body-progress-bar"><span id="bodyWeightGoalBar" style="width:0%"></span></div><div class="body-progress-row"><span>KFA</span><strong id="bodyFatGoalLine">– / 10 %</strong></div><div class="bar body-progress-bar"><span id="bodyFatGoalBar" style="width:0%"></span></div></div></div>
+    <div class="section-label">Täglich — jeden Tag</div><div class="daily daily-three performance-daily">
+      <div class="daily-item"><div class="daily-lbl daily-title">Liegestütze</div><div class="daily-note">Minimum: <strong id="pushupsMinimumLabel">25</strong></div><label class="daily-input-label" for="pushupsTodayInput">Heute</label><input class="daily-performance-input" id="pushupsTodayInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0"><button class="habit-btn" id="pushupDoneBtn" onclick="saveDailyPerformance('pushups')">Speichern</button></div>
+      <div class="daily-item"><div class="daily-lbl daily-title">Klimmzüge</div><div class="daily-note">Minimum: <strong id="pullupsMinimumLabel">10</strong></div><label class="daily-input-label" for="pullupsTodayInput">Heute</label><input class="daily-performance-input" id="pullupsTodayInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0"><button class="habit-btn" id="pullupDoneBtn" onclick="saveDailyPerformance('pullups')">Speichern</button></div>
+      <div class="daily-item"><div class="daily-lbl daily-title">Kniebeugen</div><div class="daily-note">Minimum: <strong id="squatsMinimumLabel">40</strong></div><label class="daily-input-label" for="squatsTodayInput">Heute</label><input class="daily-performance-input" id="squatsTodayInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0"><button class="habit-btn" id="squatDoneBtn" onclick="saveDailyPerformance('squats')">Speichern</button></div>
+    </div>
+    <div class="section-label">Heute</div><div class="dashboard"><div class="dash-card wide"><div class="dash-label">Nächste Einheit</div><div class="dash-num" id="nextWorkout">Pull</div><div class="dash-sub" id="nextWorkoutSub">55 Min · Rücken/Bizeps</div><button class="primary-btn" onclick="openSession(nextWorkoutId)">Training starten</button></div><div class="dash-card"><div class="dash-label">Woche</div><div class="dash-num"><span id="weekStatus">🔴</span> <span id="doneCount">0</span>/4</div><div class="dash-sub"><span id="weekPercent">0</span>% erreicht</div><div class="bar"><span id="weekBar" style="width:0%"></span></div><div class="dash-sub"><span id="weekRemaining">Noch 4 Einheiten</span><br><span id="prevWeekText">Vorwoche: –</span></div></div><div class="dash-card daily-consistency-card"><div class="dash-label">Daily Consistency</div><div class="daily-consistency-top"><div class="daily-streak-box"><div class="dash-num">🔥 <span id="dailyStreak">0</span></div><div class="daily-mini-label">aktuelle Serie</div></div><div class="daily-streak-box"><div class="dash-num">🏆 <span id="dailyBestStreak">0</span></div><div class="daily-mini-label">längste Serie</div></div></div><div class="daily-ytd-grid"><div><strong id="dailyPushupsYtd">0</strong><span>Liegestütze YTD</span></div><div><strong id="dailyPullupsYtd">0</strong><span>Klimmzüge YTD</span></div><div><strong id="dailySquatsYtd">0</strong><span>Kniebeugen YTD</span></div></div></div><div class="dash-card"><div class="dash-label">Monatsziel</div><div class="dash-num"><span id="monthlyDone">0</span>/<span id="monthlyTarget">16</span></div><div class="dash-sub"><span id="monthlyPercent">0</span>% erreicht</div><div class="bar"><span id="monthlyBar" style="width:0%"></span></div><div class="dash-sub monthly-meta"><span id="prevMonthGoal">Vormonat: –</span><br><span id="bestMonthGoal">Beste Monatsquote: –</span></div></div><div class="dash-card body-progress-card"><div class="dash-label">Körperfortschritt</div><div class="body-progress-row"><span>Gewicht</span><strong id="bodyWeightGoalLine">– / 75 kg</strong></div><div class="bar body-progress-bar"><span id="bodyWeightGoalBar" style="width:0%"></span></div><div class="body-progress-row"><span>KFA</span><strong id="bodyFatGoalLine">– / 10 %</strong></div><div class="bar body-progress-bar"><span id="bodyFatGoalBar" style="width:0%"></span></div></div></div>
     <div class="section-label">Workout Check</div><div id="checks"></div><button class="secondary-btn" onclick="resetWeek()">Woche zurücksetzen</button>
     <div class="section-label">Persönliche Rekorde</div><div id="prTracker" class="pr-grid"></div>
   </div>
@@ -297,7 +345,7 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
     <div class="section-label">Daily Consistency</div>
     <div class="panel">
       <div class="heatmap-title">Daily Consistency Analytics</div>
-      <div class="heatmap-sub">Monatliche Auswertung deiner täglichen Liegestütze und Klimmzüge. Ziel: 25 Liegestütze und 10 Klimmzüge pro Tag.</div>
+      <div class="heatmap-sub">Monatliche Auswertung deiner tatsächlich erfassten Wiederholungen. Die Mindestziele bestimmen, ob ein Tag für deine Serie zählt.</div>
       <div class="dc-summary-grid">
         <div class="dc-summary-card"><div class="num" id="dcCurrentMonthDays">0/0</div><div class="lbl">erfüllte Tage</div></div>
         <div class="dc-summary-card"><div class="num" id="dcCurrentMonthQuote">0%</div><div class="lbl">Monatsquote</div></div>
@@ -314,23 +362,46 @@ input[type="date"].date-input{-webkit-appearance:none;appearance:none;line-heigh
           <div class="bar"><span id="dcPullupsBar" style="width:0%"></span></div>
           <div class="dc-metric-sub" id="dcPullupsSub">0% des Monatsziels</div>
         </div>
+        <div class="dc-metric">
+          <div class="dc-metric-head"><div class="dc-metric-title">Kniebeugen</div><div class="dc-metric-value" id="dcSquatsNow">0/0</div></div>
+          <div class="bar"><span id="dcSquatsBar" style="width:0%"></span></div>
+          <div class="dc-metric-sub" id="dcSquatsSub">0% des Monatsziels</div>
+        </div>
       </div>
     </div>
+
+    <div class="section-label">Mindestziele</div>
+    <details class="dc-accordion panel daily-goals-panel" id="dailyGoalsAccordion">
+      <summary>Mindestziele für künftige Tage anpassen</summary>
+      <div class="daily-goals-grid">
+        <label>Liegestütze<input id="dailyGoalPushups" type="number" inputmode="numeric" min="1" step="1"></label>
+        <label>Klimmzüge<input id="dailyGoalPullups" type="number" inputmode="numeric" min="1" step="1"></label>
+        <label>Kniebeugen<input id="dailyGoalSquats" type="number" inputmode="numeric" min="1" step="1"></label>
+      </div>
+      <button class="primary-btn" onclick="saveDailyGoals()">Mindestziele speichern</button>
+      <div class="dc-metric-sub">Änderungen gelten ab dem nächsten neu erfassten Tag. Historische Tagesziele und Leistungen bleiben unverändert.</div>
+    </details>
     <div class="section-label">Monatsvergleich</div>
     <div class="panel">
-      <div class="heatmap-sub">Vergleich ab dem ersten BodyPlan-Monat. Ein Tag zählt nur, wenn Liegestütze und Klimmzüge erledigt sind.</div>
+      <div class="heatmap-sub">Vergleich ab dem ersten BodyPlan-Monat. Ein Tag zählt nur, wenn Liegestütze, Klimmzüge und Kniebeugen erledigt sind.</div>
       <div id="dcMonthChart" class="dc-month-chart"></div>
       <details class="dc-accordion" id="dcMonthAccordion">
         <summary>Monatsdetails anzeigen</summary>
         <div id="dcMonthComparison" class="dc-month-list"></div>
       </details>
     </div>
+
+    <div class="section-label">Leistungsrekorde</div>
+    <div class="panel">
+      <div class="heatmap-sub">Höchste tatsächlich erfasste Leistung nach Zeitraum.</div>
+      <div id="dcPerformanceRecords" class="dc-performance-records"></div>
+    </div>
     <div class="section-label">Rekorde & Gesamtleistung</div>
     <div class="panel">
       <div class="dc-record-grid">
         <div class="dc-record"><strong id="dcRecordStreak">0</strong><span>längste Serie</span></div>
         <div class="dc-record"><strong id="dcRecordPushups">0</strong><span>Liegestütze gesamt</span></div>
-        <div class="dc-record"><strong id="dcRecordPullups">0</strong><span>Klimmzüge gesamt</span></div>
+        <div class="dc-record"><strong id="dcRecordPullups">0</strong><span>Klimmzüge gesamt</span></div><div class="dc-record"><strong id="dcRecordSquats">0</strong><span>Kniebeugen gesamt</span></div>
       </div>
       <div class="dc-metric-sub" id="dcBestMonthText" style="margin-top:12px">Noch kein Monatsrekord vorhanden.</div>
     </div>
@@ -407,125 +478,75 @@ function drawCharts(){drawLineChart('bodyWeight',get('bodyWeightHistory',[]));dr
 function addProtein(g){const today=localISO();let p=get('protein',{date:today,value:0});if(p.date!==today)p={date:today,value:0};p.value+=g;set('protein',p);renderProtein()}function resetProtein(){set('protein',{date:localISO(),value:0});renderProtein()}function renderProtein(){const today=localISO();let p=get('protein',{date:today,value:0});if(p.date!==today)p={date:today,value:0};['proteinNow','proteinNow2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=p.value});const bar=document.getElementById('proteinBar');if(bar)bar.style.width=Math.min(100,p.value/172*100)+'%'}
 
 function todayIso(){return localISO()}
-function dailyTarget(type){return type==='pushups'?25:10}
+function defaultDailyGoals(){return {pushups:25,pullups:10,squats:40}}
+function getDailyGoals(){const raw=get('dailyChallengeGoals',null);const d=defaultDailyGoals();return {pushups:Math.max(1,Number(raw&&raw.pushups)||d.pushups),pullups:Math.max(1,Number(raw&&raw.pullups)||d.pullups),squats:Math.max(1,Number(raw&&raw.squats)||d.squats)}}
+function dailyTarget(type){return getDailyGoals()[type]}
 function getDailyHabits(){return get('dailyHabits',{})||{}}
 function setDailyHabits(data){set('dailyHabits',data)}
-function toggleDailyHabit(type){
-  const today=todayIso();
-  const data=getDailyHabits();
-  if(!data[today])data[today]={pushups:0,pullups:0};
-  data[today][type]=data[today][type]>=dailyTarget(type)?0:dailyTarget(type);
-  if((data[today].pushups||0)===0&&(data[today].pullups||0)===0)delete data[today];
-  setDailyHabits(data);
-  renderDailyHabits();
+function inferredEntryTargets(entry){
+  if(entry&&entry.targets)return {pushups:Number(entry.targets.pushups||25),pullups:Number(entry.targets.pullups||10),squats:Number(entry.targets.squats||0)};
+  const hasSquats=entry&&Object.prototype.hasOwnProperty.call(entry,'squats');
+  if(!hasSquats)return {pushups:25,pullups:10,squats:0};
+  return {pushups:Number(entry.pushups||0)>=50?50:25,pullups:Number(entry.pullups||0)>=20?20:10,squats:40};
 }
-function isDailyComplete(entry){return entry&&(entry.pushups||0)>=25&&(entry.pullups||0)>=10}
-function dailyStreakCount(data){
-  let streak=0;
-  const start=new Date();
-  // UX: If today is not complete yet, keep yesterday's completed streak visible.
-  // The streak only breaks after a fully missed day.
-  if(!isDailyComplete(data[localISO(start)])) start.setDate(start.getDate()-1);
-  while(true){
-    const iso=localISO(start);
-    if(isDailyComplete(data[iso])){streak++;start.setDate(start.getDate()-1)}else break;
-  }
-  return streak;
+function entryTargets(entry){return inferredEntryTargets(entry||{})}
+function saveDailyPerformance(type){
+  const inputMap={pushups:'pushupsTodayInput',pullups:'pullupsTodayInput',squats:'squatsTodayInput'};
+  const input=document.getElementById(inputMap[type]);if(!input)return;
+  const raw=String(input.value).trim();if(raw===''){alert('Bitte trage die tatsächlich absolvierte Anzahl ein.');input.focus();return}
+  const value=Math.max(0,Math.round(Number(raw)));if(!Number.isFinite(value)){alert('Bitte gib eine gültige Zahl ein.');return}
+  const today=todayIso();const data=getDailyHabits();const goals=getDailyGoals();
+  const existing=data[today]||{pushups:0,pullups:0,squats:0,targets:{...goals}};
+  if(!existing.targets)existing.targets={...goals};
+  existing[type]=value;existing.updatedAt=new Date().toISOString();data[today]=existing;
+  if(Number(existing.pushups||0)===0&&Number(existing.pullups||0)===0&&Number(existing.squats||0)===0)delete data[today];
+  setDailyHabits(data);renderDailyHabits();
 }
-function dailyBestStreakCount(data){
-  const completed=Object.keys(data).filter(iso=>isDailyComplete(data[iso])).sort();
-  let best=0,current=0,prev=null;
-  completed.forEach(iso=>{
-    const d=parseLocalISODate(iso);
-    if(prev){
-      const diff=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(prev.getFullYear(),prev.getMonth(),prev.getDate()))/86400000);
-      current=diff===1?current+1:1;
-    }else{current=1}
-    if(current>best)best=current;
-    prev=d;
-  });
-  return best;
+function saveDailyGoals(){
+  const ids={pushups:'dailyGoalPushups',pullups:'dailyGoalPullups',squats:'dailyGoalSquats'};const next={};
+  for(const [type,id] of Object.entries(ids)){const v=Math.round(Number(document.getElementById(id)?.value));if(!Number.isFinite(v)||v<1){alert('Alle Mindestziele müssen mindestens 1 sein.');return}next[type]=v}
+  set('dailyChallengeGoals',next);renderDailyHabits();alert('Mindestziele gespeichert. Historische Einträge bleiben unverändert.');
 }
-function dailyYearStats(data){
-  const now=new Date();
-  const year=now.getFullYear();
-  const start=new Date(year,0,1);
-  const daysPassed=Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate())-start)/86400000)+1;
-  let pushups=0,pullups=0,completeDays=0;
-  Object.entries(data).forEach(([iso,val])=>{
-    if(!iso.startsWith(String(year)+'-'))return;
-    pushups+=Number(val.pushups||0);
-    pullups+=Number(val.pullups||0);
-    if(isDailyComplete(val))completeDays++;
-  });
-  return {pushups,pullups,completeDays,daysPassed,quote:daysPassed?Math.round(completeDays/daysPassed*100):0};
-}
+function isDailyComplete(entry){if(!entry)return false;const t=entryTargets(entry);return Number(entry.pushups||0)>=t.pushups&&Number(entry.pullups||0)>=t.pullups&&Number(entry.squats||0)>=t.squats}
+function dailyStreakCount(data){let streak=0;const start=new Date();if(!isDailyComplete(data[localISO(start)]))start.setDate(start.getDate()-1);while(true){const iso=localISO(start);if(isDailyComplete(data[iso])){streak++;start.setDate(start.getDate()-1)}else break}return streak}
+function dailyBestStreakCount(data){const completed=Object.keys(data).filter(iso=>/^\d{4}-\d{2}-\d{2}$/.test(iso)&&isDailyComplete(data[iso])).sort();let best=0,current=0,prev=null;completed.forEach(iso=>{const d=parseLocalISODate(iso);if(prev){const diff=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(prev.getFullYear(),prev.getMonth(),prev.getDate()))/86400000);current=diff===1?current+1:1}else current=1;if(current>best)best=current;prev=d});return best}
+function dailyYearStats(data){const now=new Date(),year=now.getFullYear(),start=new Date(year,0,1);const daysPassed=Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate())-start)/86400000)+1;let pushups=0,pullups=0,squats=0,completeDays=0;Object.entries(data).forEach(([iso,val])=>{if(!iso.startsWith(String(year)+'-'))return;pushups+=Number(val.pushups||0);pullups+=Number(val.pullups||0);squats+=Number(val.squats||0);if(isDailyComplete(val))completeDays++});return {pushups,pullups,squats,completeDays,daysPassed,quote:daysPassed?Math.round(completeDays/daysPassed*100):0}}
 function daysInMonth(y,m){return new Date(y,m+1,0).getDate()}
 function monthKeyDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
 function monthLabelFromKey(key){const [y,m]=key.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('de-CH',{month:'short',year:'2-digit'})}
+function isoForMonthDay(y,m,d){return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
 function dailyMonthStats(data,key){
-  const [y,m]=key.split('-').map(Number);const days=daysInMonth(y,m-1);let pushups=0,pullups=0,completeDays=0;
-  Object.entries(data).forEach(([iso,val])=>{if(!iso.startsWith(key+'-'))return;pushups+=Number(val.pushups||0);pullups+=Number(val.pullups||0);if(isDailyComplete(val))completeDays++});
-  const pushTarget=days*25,pullTarget=days*10;
-  const pushPct=pushTarget?Math.round(pushups/pushTarget*100):0;
-  const pullPct=pullTarget?Math.round(pullups/pullTarget*100):0;
-  const quote=days?Math.round(completeDays/days*100):0;
-  return {key,days,pushups,pullups,completeDays,pushTarget,pullTarget,pushPct,pullPct,quote};
+  const [y,m]=key.split('-').map(Number),days=daysInMonth(y,m-1),goals=getDailyGoals();let pushups=0,pullups=0,squats=0,completeDays=0,pushTarget=0,pullTarget=0,squatTarget=0,recordedDays=0;
+  for(let day=1;day<=days;day++){const iso=isoForMonthDay(y,m,day),val=data[iso];const t=val?entryTargets(val):goals;pushTarget+=t.pushups;pullTarget+=t.pullups;squatTarget+=t.squats;if(val){recordedDays++;pushups+=Number(val.pushups||0);pullups+=Number(val.pullups||0);squats+=Number(val.squats||0);if(isDailyComplete(val))completeDays++}}
+  const pushPct=pushTarget?Math.round(pushups/pushTarget*100):0,pullPct=pullTarget?Math.round(pullups/pullTarget*100):0,squatPct=squatTarget?Math.round(squats/squatTarget*100):0,quote=days?Math.round(completeDays/days*100):0;
+  return {key,days,pushups,pullups,squats,completeDays,recordedDays,pushTarget,pullTarget,squatTarget,pushPct,pullPct,squatPct,quote};
 }
 function compareMonthKeys(a,b){return a.localeCompare(b)}
 function addMonthsToKey(key,n){const [y,m]=key.split('-').map(Number);return monthKeyDate(new Date(y,m-1+n,1))}
-function getDailyConsistencyMonthKeys(data){
-  const nowKey=monthKeyDate(new Date());
-  const floor='2026-06';
-  const dataKeys=Object.keys(data||{}).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).map(k=>k.slice(0,7)).sort();
-  let start=dataKeys.length?dataKeys[0]:nowKey;
-  if(compareMonthKeys(start,floor)<0)start=floor;
-  if(compareMonthKeys(start,nowKey)>0)start=nowKey;
-  const arr=[];let k=start;
-  while(compareMonthKeys(k,nowKey)<=0){arr.push(k);k=addMonthsToKey(k,1)}
-  return arr;
+function getDailyConsistencyMonthKeys(data){const nowKey=monthKeyDate(new Date()),floor='2026-06';const dataKeys=Object.keys(data||{}).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).map(k=>k.slice(0,7)).sort();let start=dataKeys.length?dataKeys[0]:nowKey;if(compareMonthKeys(start,floor)<0)start=floor;if(compareMonthKeys(start,nowKey)>0)start=nowKey;const arr=[];let k=start;while(compareMonthKeys(k,nowKey)<=0){arr.push(k);k=addMonthsToKey(k,1)}return arr}
+function renderDailyMonthChart(months){const chart=document.getElementById('dcMonthChart');if(!chart)return;if(!months.length){chart.innerHTML='<div class="consistency-empty">Noch keine Monatsdaten vorhanden.</div>';return}chart.innerHTML=months.map(m=>`<div class="dc-chart-col"><div class="dc-chart-pct">${m.quote}%</div><div class="dc-chart-bar" style="height:${Math.max(3,Math.min(100,m.quote))}%"></div><div class="dc-chart-label">${monthLabelFromKey(m.key)}</div></div>`).join('')}
+function aggregateDailyPerformanceRecords(data){
+  const types=['pushups','pullups','squats'];const out={};types.forEach(t=>out[t]={day:0,week:0,month:0});const weeks={},months={};
+  Object.entries(data).forEach(([iso,v])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))return;const d=parseLocalISODate(iso);const temp=new Date(d);temp.setHours(0,0,0,0);temp.setDate(temp.getDate()+3-((temp.getDay()+6)%7));const week1=new Date(temp.getFullYear(),0,4);const week=`${temp.getFullYear()}-${String(1+Math.round(((temp-week1)/86400000-3+((week1.getDay()+6)%7))/7)).padStart(2,'0')}`;const month=iso.slice(0,7);weeks[week]??={pushups:0,pullups:0,squats:0};months[month]??={pushups:0,pullups:0,squats:0};types.forEach(t=>{const n=Number(v[t]||0);out[t].day=Math.max(out[t].day,n);weeks[week][t]+=n;months[month][t]+=n})});
+  types.forEach(t=>{out[t].week=Math.max(0,...Object.values(weeks).map(v=>v[t]));out[t].month=Math.max(0,...Object.values(months).map(v=>v[t]))});return out;
 }
-function renderDailyMonthChart(months){
-  const chart=document.getElementById('dcMonthChart');if(!chart)return;
-  if(!months.length){chart.innerHTML='<div class="consistency-empty">Noch keine Monatsdaten vorhanden.</div>';return}
-  chart.innerHTML=months.map(m=>`<div class="dc-chart-col"><div class="dc-chart-pct">${m.quote}%</div><div class="dc-chart-bar" style="height:${Math.max(3,Math.min(100,m.quote))}%"></div><div class="dc-chart-label">${monthLabelFromKey(m.key)}</div></div>`).join('');
-}
+function renderDailyPerformanceRecords(data){const el=document.getElementById('dcPerformanceRecords');if(!el)return;const r=aggregateDailyPerformanceRecords(data),labels={pushups:'Liegestütze',pullups:'Klimmzüge',squats:'Kniebeugen'};el.innerHTML=Object.keys(labels).map(t=>`<div class="dc-performance-row"><div class="dc-performance-name">${labels[t]}</div><div class="dc-performance-values"><div class="dc-performance-value"><strong>${r[t].day.toLocaleString('de-CH')}</strong><span>bester Tag</span></div><div class="dc-performance-value"><strong>${r[t].week.toLocaleString('de-CH')}</strong><span>beste Woche</span></div><div class="dc-performance-value"><strong>${r[t].month.toLocaleString('de-CH')}</strong><span>bester Monat</span></div></div></div>`).join('')}
 function renderDailyConsistencyAnalytics(){
-  const data=getDailyHabits();const keys=getDailyConsistencyMonthKeys(data);const months=keys.map(k=>dailyMonthStats(data,k));const current=months[months.length-1]||dailyMonthStats(data,monthKeyDate(new Date()));
-  const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
-  setText('dcCurrentMonthDays',`${current.completeDays}/${current.days}`);setText('dcCurrentMonthQuote',`${current.quote}%`);
-  setText('dcPushupsNow',`${current.pushups.toLocaleString('de-CH')}/${current.pushTarget.toLocaleString('de-CH')}`);
-  setText('dcPullupsNow',`${current.pullups.toLocaleString('de-CH')}/${current.pullTarget.toLocaleString('de-CH')}`);
-  setText('dcPushupsSub',`${current.pushPct}% des Monatsziels · ${monthLabelFromKey(current.key)}`);setText('dcPullupsSub',`${current.pullPct}% des Monatsziels · ${monthLabelFromKey(current.key)}`);
-  const pb=document.getElementById('dcPushupsBar');if(pb)pb.style.width=Math.min(100,current.pushPct)+'%';const cb=document.getElementById('dcPullupsBar');if(cb)cb.style.width=Math.min(100,current.pullPct)+'%';
-  const best=months.length?months.reduce((a,b)=>b.quote>a.quote?b:a,months[0]):current;setText('dcBestMonthQuote',best?`${best.quote}%`:'–');
-  renderDailyMonthChart(months);
-  const list=document.getElementById('dcMonthComparison');if(list){list.innerHTML=months.slice().reverse().map(m=>`<div class="dc-month-row"><div class="dc-month-top"><div class="dc-month-name">${monthLabelFromKey(m.key)}</div><div class="dc-month-percent">${m.quote}%</div></div><div class="bar"><span style="width:${Math.min(100,m.quote)}%"></span></div><div class="dc-month-meta">${m.completeDays}/${m.days} Tage erfüllt · ${m.pushups.toLocaleString('de-CH')}/${m.pushTarget.toLocaleString('de-CH')} Liegestütze · ${m.pullups.toLocaleString('de-CH')}/${m.pullTarget.toLocaleString('de-CH')} Klimmzüge</div></div>`).join('')}
-  const allPush=Object.values(data).reduce((sum,v)=>sum+Number(v.pushups||0),0);const allPull=Object.values(data).reduce((sum,v)=>sum+Number(v.pullups||0),0);
-  setText('dcRecordStreak',dailyBestStreakCount(data));setText('dcRecordPushups',allPush.toLocaleString('de-CH'));setText('dcRecordPullups',allPull.toLocaleString('de-CH'));
-  const bt=document.getElementById('dcBestMonthText');if(bt)bt.textContent=best?`Bester Monat: ${monthLabelFromKey(best.key)} · ${best.completeDays}/${best.days} erfüllte Tage · ${best.quote}% Monatsquote.`:'Noch kein Monatsrekord vorhanden.';
+  const data=getDailyHabits(),keys=getDailyConsistencyMonthKeys(data),months=keys.map(k=>dailyMonthStats(data,k)),current=months[months.length-1]||dailyMonthStats(data,monthKeyDate(new Date()));const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+  setText('dcCurrentMonthDays',`${current.completeDays}/${current.days}`);setText('dcCurrentMonthQuote',`${current.quote}%`);setText('dcPushupsNow',`${current.pushups.toLocaleString('de-CH')}/${current.pushTarget.toLocaleString('de-CH')}`);setText('dcPullupsNow',`${current.pullups.toLocaleString('de-CH')}/${current.pullTarget.toLocaleString('de-CH')}`);setText('dcSquatsNow',`${current.squats.toLocaleString('de-CH')}/${current.squatTarget.toLocaleString('de-CH')}`);
+  const avg=(n,d)=>d?Math.round(n/d):0;setText('dcPushupsSub',`${current.pushPct}% des Solls · Ø ${avg(current.pushups,current.recordedDays)} pro erfasstem Tag`);setText('dcPullupsSub',`${current.pullPct}% des Solls · Ø ${avg(current.pullups,current.recordedDays)} pro erfasstem Tag`);setText('dcSquatsSub',`${current.squatPct}% des Solls · Ø ${avg(current.squats,current.recordedDays)} pro erfasstem Tag`);
+  const pb=document.getElementById('dcPushupsBar');if(pb)pb.style.width=Math.min(100,current.pushPct)+'%';const cb=document.getElementById('dcPullupsBar');if(cb)cb.style.width=Math.min(100,current.pullPct)+'%';const sb=document.getElementById('dcSquatsBar');if(sb)sb.style.width=Math.min(100,current.squatPct)+'%';
+  const best=months.length?months.reduce((a,b)=>b.quote>a.quote?b:a,months[0]):current;setText('dcBestMonthQuote',best?`${best.quote}%`:'–');renderDailyMonthChart(months);
+  const list=document.getElementById('dcMonthComparison');if(list)list.innerHTML=months.slice().reverse().map(m=>`<div class="dc-month-row"><div class="dc-month-top"><div class="dc-month-name">${monthLabelFromKey(m.key)}</div><div class="dc-month-percent">${m.quote}%</div></div><div class="bar"><span style="width:${Math.min(100,m.quote)}%"></span></div><div class="dc-month-meta">${m.completeDays}/${m.days} Tage erfüllt · ${m.pushups.toLocaleString('de-CH')}/${m.pushTarget.toLocaleString('de-CH')} Liegestütze · ${m.pullups.toLocaleString('de-CH')}/${m.pullTarget.toLocaleString('de-CH')} Klimmzüge · ${m.squats.toLocaleString('de-CH')}/${m.squatTarget.toLocaleString('de-CH')} Kniebeugen</div></div>`).join('');
+  const allPush=Object.values(data).reduce((sum,v)=>sum+Number(v.pushups||0),0),allPull=Object.values(data).reduce((sum,v)=>sum+Number(v.pullups||0),0),allSquats=Object.values(data).reduce((sum,v)=>sum+Number(v.squats||0),0);setText('dcRecordStreak',dailyBestStreakCount(data));setText('dcRecordPushups',allPush.toLocaleString('de-CH'));setText('dcRecordPullups',allPull.toLocaleString('de-CH'));setText('dcRecordSquats',allSquats.toLocaleString('de-CH'));const bt=document.getElementById('dcBestMonthText');if(bt)bt.textContent=best?`Bester Monat: ${monthLabelFromKey(best.key)} · ${best.completeDays}/${best.days} erfüllte Tage · ${best.quote}% Monatsquote.`:'Noch kein Monatsrekord vorhanden.';renderDailyPerformanceRecords(data);
+  const goals=getDailyGoals();[['dailyGoalPushups',goals.pushups],['dailyGoalPullups',goals.pullups],['dailyGoalSquats',goals.squats]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v});
 }
 function renderDailyHabits(){
-  const data=getDailyHabits();
-  const today=todayIso();
-  const entry=data[today]||{};
-  const pBtn=document.getElementById('pushupDoneBtn');
-  const cBtn=document.getElementById('pullupDoneBtn');
-  if(pBtn){const done=(entry.pushups||0)>=25;pBtn.classList.toggle('done',done);pBtn.innerHTML=done?'Erledigt <span class="checkmark">✓</span>':'Erledigt'}
-  if(cBtn){const done=(entry.pullups||0)>=10;cBtn.classList.toggle('done',done);cBtn.innerHTML=done?'Erledigt <span class="checkmark">✓</span>':'Erledigt'}
-  const stats=dailyYearStats(data);
-  const streak=dailyStreakCount(data);
-  const bestStreak=dailyBestStreakCount(data);
-  const streakEl=document.getElementById('dailyStreak');if(streakEl)streakEl.textContent=streak;
-  const bestEl=document.getElementById('dailyBestStreak');if(bestEl)bestEl.textContent=bestStreak;
-  const py=document.getElementById('dailyPushupsYtd');if(py)py.textContent=stats.pushups.toLocaleString('de-CH');
-  const cy=document.getElementById('dailyPullupsYtd');if(cy)cy.textContent=stats.pullups.toLocaleString('de-CH');
-  const q=document.getElementById('dailyQuote');if(q)q.textContent=stats.quote;
-  const qb=document.getElementById('dailyQuoteBar');if(qb)qb.style.width=Math.min(100,stats.quote)+'%';
-  renderDailyConsistencyAnalytics();
+  const data=getDailyHabits(),today=todayIso(),entry=data[today]||{},goals=getDailyGoals();
+  const specs=[['pushups','pushupsTodayInput','pushupDoneBtn','pushupsMinimumLabel'],['pullups','pullupsTodayInput','pullupDoneBtn','pullupsMinimumLabel'],['squats','squatsTodayInput','squatDoneBtn','squatsMinimumLabel']];
+  specs.forEach(([type,inputId,btnId,minId])=>{const input=document.getElementById(inputId),btn=document.getElementById(btnId),min=document.getElementById(minId),value=Number(entry[type]||0),done=value>=goals[type];if(min)min.textContent=goals[type];if(input&&document.activeElement!==input)input.value=value||'';if(btn){btn.classList.toggle('done',done);btn.innerHTML=value>0?(done?`Gespeichert ✓`:`Aktualisieren`):'Speichern'}});
+  const stats=dailyYearStats(data),streak=dailyStreakCount(data),bestStreak=dailyBestStreakCount(data);const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};setText('dailyStreak',streak);setText('dailyBestStreak',bestStreak);setText('dailyPushupsYtd',stats.pushups.toLocaleString('de-CH'));setText('dailyPullupsYtd',stats.pullups.toLocaleString('de-CH'));setText('dailySquatsYtd',stats.squats.toLocaleString('de-CH'));renderDailyConsistencyAnalytics();
 }
-
-
 
 function getLastMetricValue(id){const arr=get(id+'History',[]);return arr.length?arr[arr.length-1].value:null}
 function fmtNum(v,d=1){if(v==null||isNaN(v))return '–';return Number(v).toFixed(d).replace('.',',')}
@@ -1086,9 +1107,10 @@ function importData(event){
   reader.readAsText(file);
 }
 
-if('serviceWorker'in navigator){navigator.serviceWorker.register('service-worker.js')}
+if('serviceWorker'in navigator){navigator.serviceWorker.register('service-worker.js?v=44')}
 render();
 </script>
+<div id="bp2-entry" style="max-width:620px;margin:12px auto;padding:0 18px"><a href="alpha.html" style="display:block;text-align:center;padding:12px;border:1px solid #d4a85355;border-radius:10px;background:#0f0d07;color:#d4a853;font:700 12px sans-serif;text-decoration:none;letter-spacing:1px">BODYPLAN 2.0 ALPHA · PLAN-EDITOR ÖFFNEN →</a></div>
 </body>
 </html>
 <!-- BodyPlan v27/v28 CSS refinements -->

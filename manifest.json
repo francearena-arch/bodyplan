@@ -2,7 +2,7 @@
   "name": "BodyPlan",
   "short_name": "BodyPlan",
   "description": "Training, Ernährung und Fortschrittstracking für iPhone.",
-  "start_url": "./index.html?v=39",
+  "start_url": "./index.html?v=44",
   "scope": "./",
   "display": "standalone",
   "background_color": "#080808",
@@ -10,12 +10,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icons/icon-v40-192.png",
+      "src": "icons/icon-v44-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icons/icon-v40-512.png",
+      "src": "icons/icon-v44-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

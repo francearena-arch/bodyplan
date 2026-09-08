@@ -1,0 +1,23 @@
+
+const fs=require("fs"),vm=require("vm"),assert=require("assert");
+const source=fs.readFileSync(process.argv[2],"utf8");
+const seed=JSON.parse(fs.readFileSync(process.argv[3]));
+const starter=JSON.parse(fs.readFileSync(process.argv[4]));
+const legacy=JSON.parse(fs.readFileSync(process.argv[5]));
+const store=new Map([["bp3_history",JSON.stringify([{wid:"push",title:"Push",iso:"2026-07-01",exercises:[{name:"Bankdrücken",sets:[{kg:80,reps:8}]}]}])],["bp3_field_push_0_0_note",JSON.stringify("Bank Stufe 4")]]);
+const storage={get length(){return store.size},key:i=>[...store.keys()][i],getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v)};
+const dummy={innerHTML:"",value:"",dataset:{},classList:{toggle(){}}};
+const ctx={console,crypto:require("crypto").webcrypto,localStorage:storage,document:{getElementById:()=>dummy,querySelectorAll:()=>[],addEventListener(){}},Date,JSON,Map,Set,Math,String,Number,Array,Object,Blob,URL,fetch(){},confirm(){return true},prompt(){return null},setTimeout};
+vm.createContext(ctx);
+vm.runInContext(source.slice(0,source.indexOf('document.addEventListener("click"')),ctx);
+vm.runInContext("seed="+JSON.stringify(seed)+";starter="+JSON.stringify(starter)+";legacy="+JSON.stringify(legacy)+";db=migrate();",ctx);
+let db=vm.runInContext("db",ctx);
+assert.equal(db.sessions.length,1);
+assert.equal(db.sessions[0].exercises[0].sets[0].kg,80);
+assert.equal(db.exercises.find(e=>e.name==="Bankdrücken").notes,"Bank Stufe 4");
+assert.equal(db.plans[0].days.length,3);
+assert.equal(db.plans[0].days[2].exercises[4].supersetGroup,"ss1");
+assert.equal(db.plans[0].days[2].exercises[5].supersetGroup,"ss1");
+assert.equal(store.get("bp3_field_push_0_0_note"),JSON.stringify("Bank Stufe 4"));
+assert.equal(db.legacySnapshot.bp3_history,store.get("bp3_history"));
+console.log("Migration, notes, original sets, supersets and legacy preservation: PASS");

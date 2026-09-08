@@ -1,0 +1,772 @@
+{
+  "muscleGroups": {
+    "chest": "Brust",
+    "lats": "Latissimus",
+    "upper_back": "Rückenmitte",
+    "traps": "Trapez",
+    "front_delts": "Vordere Schulter",
+    "side_delts": "Seitliche Schulter",
+    "rear_delts": "Hintere Schulter",
+    "biceps": "Bizeps",
+    "triceps": "Trizeps",
+    "forearms": "Unterarme",
+    "abs": "Bauch",
+    "obliques": "Seitlicher Bauch",
+    "erectors": "Rückenstrecker",
+    "quads": "Quadrizeps",
+    "hamstrings": "Beinbeuger",
+    "glutes": "Gesäß",
+    "calves": "Waden"
+  },
+  "exercises": [
+    {
+      "id": "ex_bankdrucken",
+      "name": "Bankdrücken",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_schulterdrucken-kh",
+      "name": "Schulterdrücken (KH)",
+      "muscles": {
+        "front_delts": 1,
+        "side_delts": 0.5,
+        "triceps": 0.5
+      },
+      "primaryMuscle": "front_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_schragbank-kh-oben",
+      "name": "Schrägbank KH (oben)",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_schulter-standing-multi-flight",
+      "name": "Schulter Standing Multi Flight",
+      "muscles": {
+        "side_delts": 1
+      },
+      "primaryMuscle": "side_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_dips",
+      "name": "Dips",
+      "muscles": {
+        "chest": 0.8,
+        "triceps": 1,
+        "front_delts": 0.3
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_trizeps-pushdown",
+      "name": "Trizeps Pushdown",
+      "muscles": {
+        "triceps": 1,
+        "chest": 0.3
+      },
+      "primaryMuscle": "triceps",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_klimmzuge-zusatzgewicht",
+      "name": "Klimmzüge (Zusatzgewicht)",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_trap-bar-kreuzheben",
+      "name": "Trap Bar Kreuzheben",
+      "muscles": {
+        "hamstrings": 1,
+        "glutes": 0.7,
+        "erectors": 0.5
+      },
+      "primaryMuscle": "hamstrings",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_latzug-weit",
+      "name": "Latzug weit",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_face-pulls",
+      "name": "Face Pulls",
+      "muscles": {
+        "rear_delts": 1,
+        "upper_back": 0.6,
+        "traps": 0.3
+      },
+      "primaryMuscle": "rear_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_bizeps-curls-kh",
+      "name": "Bizeps Curls (KH)",
+      "muscles": {
+        "biceps": 1,
+        "forearms": 0.2
+      },
+      "primaryMuscle": "biceps",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_kniebeuge",
+      "name": "Kniebeuge",
+      "muscles": {
+        "quads": 1,
+        "glutes": 0.6,
+        "hamstrings": 0.2
+      },
+      "primaryMuscle": "quads",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_romanian-deadlift",
+      "name": "Romanian Deadlift",
+      "muscles": {
+        "hamstrings": 1,
+        "glutes": 0.7,
+        "erectors": 0.5
+      },
+      "primaryMuscle": "hamstrings",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_beinbeuger-liegend",
+      "name": "Beinbeuger liegend",
+      "muscles": {
+        "hamstrings": 1
+      },
+      "primaryMuscle": "hamstrings",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_wadenheben-stehend",
+      "name": "Wadenheben stehend",
+      "muscles": {
+        "calves": 1
+      },
+      "primaryMuscle": "calves",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_hanging-leg-raises",
+      "name": "Hanging Leg Raises",
+      "muscles": {
+        "abs": 1,
+        "obliques": 0.3
+      },
+      "primaryMuscle": "abs",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_schulterdrucken-sz-kh",
+      "name": "Schulterdrücken (SZ/KH)",
+      "muscles": {
+        "front_delts": 1,
+        "side_delts": 0.5,
+        "triceps": 0.5
+      },
+      "primaryMuscle": "front_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_seitheben-kabel",
+      "name": "Seitheben Kabel",
+      "muscles": {
+        "side_delts": 1
+      },
+      "primaryMuscle": "side_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_einarmiges-kh-rudern",
+      "name": "Einarmiges KH-Rudern",
+      "muscles": {
+        "upper_back": 1,
+        "lats": 0.7,
+        "biceps": 0.4,
+        "rear_delts": 0.3
+      },
+      "primaryMuscle": "upper_back",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_dips-zusatzgewicht",
+      "name": "Dips (Zusatzgewicht)",
+      "muscles": {
+        "chest": 0.8,
+        "triceps": 1,
+        "front_delts": 0.3
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_ab-wheel-rollout",
+      "name": "Ab Wheel Rollout",
+      "muscles": {
+        "abs": 1,
+        "obliques": 0.3
+      },
+      "primaryMuscle": "abs",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_deficit-push-ups",
+      "name": "Deficit Push-ups",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_pike-push-ups",
+      "name": "Pike Push-ups",
+      "muscles": {
+        "front_delts": 1,
+        "side_delts": 0.5,
+        "triceps": 0.5
+      },
+      "primaryMuscle": "front_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_diamond-push-ups",
+      "name": "Diamond Push-ups",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_push-up-hold-unten",
+      "name": "Push-up Hold unten",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_klimmzuge",
+      "name": "Klimmzüge",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [
+        "Pull-ups"
+      ],
+      "source": "seed"
+    },
+    {
+      "id": "ex_chin-ups",
+      "name": "Chin-ups",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_scapula-pull-ups",
+      "name": "Scapula Pull-ups",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_handtuch-isometrics",
+      "name": "Handtuch-Isometrics",
+      "muscles": {},
+      "primaryMuscle": "",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_bulgarian-split-squats",
+      "name": "Bulgarian Split Squats",
+      "muscles": {
+        "quads": 1,
+        "glutes": 0.6,
+        "hamstrings": 0.2
+      },
+      "primaryMuscle": "quads",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_single-leg-rdl",
+      "name": "Single-Leg RDL",
+      "muscles": {
+        "hamstrings": 1,
+        "glutes": 0.7,
+        "erectors": 0.5
+      },
+      "primaryMuscle": "hamstrings",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_wall-sit",
+      "name": "Wall Sit",
+      "muscles": {
+        "quads": 1,
+        "glutes": 0.6,
+        "hamstrings": 0.2
+      },
+      "primaryMuscle": "quads",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_single-leg-calf-raises",
+      "name": "Single-Leg Calf Raises",
+      "muscles": {
+        "calves": 1
+      },
+      "primaryMuscle": "calves",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_plank-side-plank",
+      "name": "Plank + Side Plank",
+      "muscles": {
+        "abs": 1,
+        "obliques": 0.3
+      },
+      "primaryMuscle": "abs",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_pull-ups",
+      "name": "Pull-ups",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_push-ups-breit",
+      "name": "Push-ups breit",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_y-t-w-raises-am-boden",
+      "name": "Y-T-W Raises am Boden",
+      "muscles": {
+        "rear_delts": 1,
+        "upper_back": 0.6,
+        "traps": 0.3
+      },
+      "primaryMuscle": "rear_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_hollow-body-hold",
+      "name": "Hollow Body Hold",
+      "muscles": {
+        "abs": 1,
+        "obliques": 0.3
+      },
+      "primaryMuscle": "abs",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_schragbankdrucken-mit-kurzhanteln",
+      "name": "Schrägbankdrücken mit Kurzhanteln",
+      "muscles": {
+        "chest": 1,
+        "triceps": 0.5,
+        "front_delts": 0.4
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [
+        "Schrägbank KH (oben)"
+      ],
+      "source": "seed"
+    },
+    {
+      "id": "ex_brustgestutztes-rudern",
+      "name": "Brustgestütztes Rudern",
+      "muscles": {
+        "upper_back": 1,
+        "lats": 0.7,
+        "biceps": 0.4,
+        "rear_delts": 0.3
+      },
+      "primaryMuscle": "upper_back",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_kabelrudern",
+      "name": "Kabelrudern",
+      "muscles": {
+        "upper_back": 1,
+        "lats": 0.7,
+        "biceps": 0.4,
+        "rear_delts": 0.3
+      },
+      "primaryMuscle": "upper_back",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_decline-sit-ups-mit-zusatzgewicht",
+      "name": "Decline Sit-ups mit Zusatzgewicht",
+      "muscles": {
+        "abs": 1,
+        "obliques": 0.3
+      },
+      "primaryMuscle": "abs",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_beinpresse",
+      "name": "Beinpresse",
+      "muscles": {
+        "quads": 1,
+        "glutes": 0.6,
+        "hamstrings": 0.2
+      },
+      "primaryMuscle": "quads",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_bulgarian-split-squat",
+      "name": "Bulgarian Split Squat",
+      "muscles": {
+        "quads": 1,
+        "glutes": 0.6,
+        "hamstrings": 0.2
+      },
+      "primaryMuscle": "quads",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [
+        "Bulgarian Split Squats"
+      ],
+      "source": "seed"
+    },
+    {
+      "id": "ex_schulterdrucken-maschine",
+      "name": "Schulterdrücken Maschine",
+      "muscles": {
+        "front_delts": 1,
+        "side_delts": 0.5,
+        "triceps": 0.5
+      },
+      "primaryMuscle": "front_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_latzug-neutral",
+      "name": "Latzug neutral",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_latzug-moderat-weit",
+      "name": "Latzug moderat weit",
+      "muscles": {
+        "lats": 1,
+        "biceps": 0.5,
+        "upper_back": 0.3
+      },
+      "primaryMuscle": "lats",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_wadenheben",
+      "name": "Wadenheben",
+      "muscles": {
+        "calves": 1
+      },
+      "primaryMuscle": "calves",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_seitheben",
+      "name": "Seitheben",
+      "muscles": {
+        "side_delts": 1
+      },
+      "primaryMuscle": "side_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    },
+    {
+      "id": "ex_seitheben-am-kabel",
+      "name": "Seitheben am Kabel",
+      "muscles": {
+        "side_delts": 1
+      },
+      "primaryMuscle": "side_delts",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [
+        "Seitheben Kabel"
+      ],
+      "source": "seed"
+    },
+    {
+      "id": "ex_dips-mit-zusatzgewicht",
+      "name": "Dips mit Zusatzgewicht",
+      "muscles": {
+        "chest": 0.8,
+        "triceps": 1,
+        "front_delts": 0.3
+      },
+      "primaryMuscle": "chest",
+      "equipment": "",
+      "type": "strength",
+      "notes": "",
+      "aliases": [],
+      "source": "seed"
+    }
+  ]
+}
