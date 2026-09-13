@@ -10,7 +10,7 @@ const localISO=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padS
 const mondayOf=d=>{let x=new Date(d);x.setHours(0,0,0,0);let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x};
 const fmtDate=iso=>{if(!iso)return"—";let d=new Date(iso);return isNaN(d)?"—":d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const fmtTime=s=>{s=Math.max(0,Math.floor(s||0));return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
-let exercisePicker=null,exercisePickerQuery="",exercisePickerMuscle="",exercisePickerEquipment="",exercisePickerSelected=new Set();let editingBodyId=null;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,bodyPeriod=90,sessionTick=null,restTick=null,dashboardTick=null;
+let exercisePicker=null,exercisePickerQuery="",exercisePickerMuscle="",exercisePickerEquipment="",exercisePickerSelected=new Set();let editingBodyId=null;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,heatView="front",bodyPeriod=90,sessionTick=null,restTick=null,dashboardTick=null;
 
 function getJSON(k,f=null){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
 function setJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -357,6 +357,7 @@ function bindPageActions(){
  if(next){next.focus();try{next.setSelectionRange(pos,pos)}catch{}}
  });
   $$(".range-tabs button[data-range]").forEach(b=>b.onclick=()=>{heatRange=Number(b.dataset.range);render()});
+  $$("[data-heat-view-tab]").forEach(b=>b.onclick=()=>{heatView=b.dataset.heatViewTab;render()});
   $$("[data-body-range]").forEach(b=>b.onclick=()=>{bodyPeriod=Number(b.dataset.bodyRange);render()});
 }
 function btn(label,action,cls="secondary"){return `<button class="${cls}" data-action="${action}">${esc(label)}</button>`}
@@ -560,7 +561,7 @@ function renderHeatmap(){
 function renderSettings(){
  const opts=[["next","Nächste Einheit"],["week","Wochenfortschritt"],["last","Letztes Training"]];
  return `<div class="eyebrow">BodyPlan</div><h1 class="page-title">Einstellungen</h1>
- <div class="card"><div class="section-head" style="margin:0 0 8px"><h2>Dashboard</h2></div><p class="muted">Wähle die Informationen, die du auf deiner Startseite sehen möchtest.</p>${opts.map(([k,l])=>{let on=db.settings.dashboard.includes(k);return `<div class="settings-row"><span>${esc(l)}</span><button class="toggle ${on?"on":""}" data-action="tile:${k}" role="switch" aria-checked="${on}" aria-label="${esc(l)}"></button></div>`}).join("")}</div><button class="toggle ${db.settings.habitsEnabled?"on":""}" data-action="habits" role="switch" aria-checked="${!!db.settings.habitsEnabled}"></button></div></div>
+ <div class="card"><div class="section-head" style="margin:0 0 8px"><h2>Dashboard</h2></div><p class="muted">Wähle die Informationen, die du auf deiner Startseite sehen möchtest.</p>${opts.map(([k,l])=>{let on=db.settings.dashboard.includes(k);return `<div class="settings-row"><span>${esc(l)}</span><button class="toggle ${on?"on":""}" data-action="tile:${k}" role="switch" aria-checked="${on}" aria-label="${esc(l)}"></button></div>`}).join("")}</div>
  <div class="card"><h2 style="margin:0 0 8px;font-size:19px">Daten</h2><div class="muted">Deine Daten werden weiterhin lokal auf diesem Gerät gespeichert. Erstelle vor Updates oder einem Gerätewechsel ein Backup.</div><div class="actions">${btn("Backup erstellen","backup","primary")}${btn("Backup importieren","import")}</div></div>`;
 }
 function handleAction(a,el){
@@ -769,5 +770,3 @@ async function importBackup(e){
 Promise.all(["exercise-seed.json","starter-plan.json"].map(u=>fetch(u,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(u);return r.json()})))
 .then(([s,p])=>{seed=s;starter=p;init()})
 .catch(err=>{$("#app").innerHTML=`<div class="card"><div class="eyebrow">BodyPlan</div><h1 class="page-title">Start fehlgeschlagen</h1><div class="muted">${esc(err.message)}</div></div>`});
-
-document.addEventListener("click",e=>{const b=e.target.closest("[data-heat-view-tab]");if(!b)return;heatView=b.dataset.heatViewTab;render();});

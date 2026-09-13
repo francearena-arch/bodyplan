@@ -1,7 +1,21 @@
-# Beta 6 – Qualitätsprüfung
+# BodyPlan 2.0 Beta 7.1 – QA
 
-Durchgeführt: JavaScript-Syntaxprüfung, Logikregression für Planerhaltung und Löschung, Muskelgewichtungen, historische Trainingsdaten und Körpermessungen. Chromium-Integrationstest für die vollständige Planerstellung, Bibliothekssuche, Muskelgruppenfilter, Übungsauswahl, eigene Übungen, Ersetzen einer Übung und Einstellungen. Responsive Overflow-Prüfung bei 320, 375, 390, 430 und 768 Pixeln. Visuelle Prüfung des neuen Selektors bei 390 Pixeln. Die Anatomie-Masken wurden bytegenau mit Beta 5 verglichen und nicht verändert.
+## Behobene Regressionen
+- Heatmap konnte wegen eines nicht initialisierten `heatView`-States nicht gerendert werden.
+- Nach dem Entfernen des Gewohnheiten-Bereichs war in den Einstellungen ein verwaister Toggle im Markup verblieben.
 
-Die Tests liefen in einer isolierten Chromium-Umgebung. Native iOS-Picker, VoiceOver, der produktive Service-Worker-Update-Lebenszyklus und die tatsächlichen Bestandsdaten auf dem iPhone wurden nicht vollständig getestet. Das Release ist deshalb weiterhin als Beta gekennzeichnet.
+## Durchgeführte Tests
+- JavaScript-Syntaxprüfung mit Node.
+- Browser-Integrationstest in Chromium auf 390 × 844 px.
+- Heatmap-Aufruf über die Dashboard-Kachel.
+- Heatmap-Aufruf über das Burgermenü.
+- Vorderseite/Rückseite-Switch.
+- Heatmap-Berechnung mit einer repräsentativen gespeicherten Trainingseinheit.
+- Einstellungen: exakt drei Dashboard-Schalter, kein verwaister Toggle, Gewohnheiten nicht sichtbar.
+- Ein-/Ausblenden von „Letztes Training“ und Rückwirkung auf das Dashboard.
+- Navigation durch Dashboard, Trainingspläne, Übungsbibliothek, Historie, Fortschritt, Muskel-Heatmap und Einstellungen.
+- Prüfung auf horizontales Overflow auf Mobile.
+- Prüfung aller Service-Worker-Assets und ZIP-Integrität.
 
-Vor dem produktiven Einsatz: Backup erstellen, deployen, Daten kontrollieren und die zentralen Abläufe auf dem iPhone prüfen. Bei Problemen keine Website-Daten löschen.
+## Grenze
+Der Test wurde in einer isolierten Chromium-Umgebung durchgeführt. Der finale iOS-Home-Screen-/Safari-Test und der echte GitHub-Pages-Service-Worker-Lifecycle können nur auf dem Zielgerät vollständig verifiziert werden.
