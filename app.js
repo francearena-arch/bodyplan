@@ -529,8 +529,8 @@ async function paintHeatmaps(scores,max){
     const group=HEAT_GROUPS[a[i]-1],v=group?Number(scores[group]||0):0;
     if(!v||!max||!a[i+1]){a[i+3]=0;continue}
     const r=v/max,coverage=a[i+1]/255;
-    const c=r>.75?[239,72,49]:r>.5?[235,124,49]:r>.25?[225,165,62]:[206,174,94];
-    a[i]=c[0];a[i+1]=c[1];a[i+2]=c[2];a[i+3]=Math.round((r>.75?.72:r>.5?.60:r>.25?.48:.35)*255*coverage);
+    const c=r>=.75?[255,55,42]:r>=.5?[255,126,35]:r>=.25?[235,176,62]:[190,145,55];
+    a[i]=c[0];a[i+1]=c[1];a[i+2]=c[2];a[i+3]=Math.round((r>=.75?.88:r>=.5?.76:r>=.25?.64:.52)*255*coverage);
    }
    oc.putImageData(data,0,0);ctx.drawImage(off,0,0);
   }catch(err){console.error("Heatmap asset could not be loaded",err)}
@@ -548,11 +548,12 @@ function renderHeatmap(){
  return `<div class="eyebrow">Analyse</div><h1 class="page-title">Muskel-Heatmap</h1>
  <div class="range-tabs"><button data-range="30" class="${heatRange===30?"active":""}">30 Tage</button><button data-range="90" class="${heatRange===90?"active":""}">90 Tage</button><button data-range="365" class="${heatRange===365?"active":""}">12 Monate</button></div>
  <div class="heat-summary"><div><strong>${totalSets}</strong><span>Arbeitssätze</span></div><div><strong>${ranked.length}</strong><span>Muskelgruppen</span></div></div>
- <div class="heat-layout">${anatomyView("front",scores,max)}${anatomyView("back",scores,max)}</div>
+ <div class="heat-view-tabs" role="tablist" aria-label="Körperansicht"><button data-heat-view-tab="front" class="${heatView==="front"?"active":""}">Vorderseite</button><button data-heat-view-tab="back" class="${heatView==="back"?"active":""}">Rückseite</button></div>
+ <div class="heat-layout">${anatomyView(heatView,scores,max)}</div>
  <div class="card" style="margin-top:14px"><div class="eyebrow">Deine Muskelbelastung</div>
- <p class="muted" style="margin:9px 0 15px">Je länger der Balken, desto stärker wurde die Muskelgruppe im gewählten Zeitraum beansprucht.</p>
- ${ranked.length?`<div class="muscle-rank">${ranked.map(([m,v])=>`<div class="muscle-simple"><div class="muscle-simple-head"><span>${esc(seed.muscleGroups[m]||m)}</span><strong>${Math.round(v/max*100)}%</strong></div><div class="bar"><span style="width:${Math.round(v/max*100)}%"></span></div></div>`).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}
- <div class="heat-legend-scale"><div><i></i>Niedrig</div><div><i></i>Moderat</div><div><i></i>Hoch</div><div><i></i>Sehr hoch</div></div>
+ <p class="muted" style="margin:9px 0 15px">Relative Belastung im gewählten Zeitraum. 100 % entspricht deiner am stärksten beanspruchten Muskelgruppe.</p>
+ ${ranked.length?`<div class="muscle-rank">${ranked.map(([m,v])=>{const pct=Math.round(v/max*100),level=pct>=75?"Sehr hoch":pct>=50?"Hoch":pct>=25?"Moderat":"Niedrig",cls=pct>=75?"very-high":pct>=50?"high":pct>=25?"moderate":"low";return `<div class="muscle-simple ${cls}"><div class="muscle-simple-head"><span>${esc(seed.muscleGroups[m]||m)}</span><strong>${level} <small>${pct}%</small></strong></div><div class="bar"><span style="width:${pct}%"></span></div></div>`}).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}
+ <div class="heat-legend-scale heat-legend-clear"><div><i></i><span>Niedrig<small>1–24 %</small></span></div><div><i></i><span>Moderat<small>25–49 %</small></span></div><div><i></i><span>Hoch<small>50–74 %</small></span></div><div><i></i><span>Sehr hoch<small>75–100 %</small></span></div></div>
  <details class="heat-method"><summary>Wie wird die Belastung berechnet?</summary><p>BodyPlan zählt absolvierte Arbeitssätze und gewichtet sie nach der Muskelbeteiligung der Übung. Ein Satz kann mehrere Muskelgruppen beanspruchen. Die Prozentwerte vergleichen die Muskelgruppen innerhalb des gewählten Zeitraums: 100 % ist die am stärksten belastete Gruppe. Sie sind keine Messung von Muskelwachstum, Erholung oder Trainingsqualität.</p><p>Beispiel: 3 Sätze Bankdrücken mit Brustgewichtung 1,0 ergeben 3 Reizpunkte. Eine sekundäre Gewichtung von 0,5 ergibt 1,5 Punkte. Historische Übungen ohne eindeutige Zuordnung werden nicht geschätzt.</p></details>
  </div>`;
 }
@@ -768,3 +769,5 @@ async function importBackup(e){
 Promise.all(["exercise-seed.json","starter-plan.json"].map(u=>fetch(u,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(u);return r.json()})))
 .then(([s,p])=>{seed=s;starter=p;init()})
 .catch(err=>{$("#app").innerHTML=`<div class="card"><div class="eyebrow">BodyPlan</div><h1 class="page-title">Start fehlgeschlagen</h1><div class="muted">${esc(err.message)}</div></div>`});
+
+document.addEventListener("click",e=>{const b=e.target.closest("[data-heat-view-tab]");if(!b)return;heatView=b.dataset.heatViewTab;render();});

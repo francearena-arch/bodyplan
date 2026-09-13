@@ -1,22 +1,15 @@
-# BodyPlan 2.0 Beta 6
+# BodyPlan 2.0 Beta 7
+
+Focused heatmap UX release.
+
+## Changes
+- Front/back anatomy is now switched via a compact segmented control; only one view is shown at a time.
+- Baked-in external anatomy labels are removed from the visible asset area to prevent front/back label collisions.
+- Heatmap intensity uses a clearer four-level scale with stronger visual contrast.
+- Muscle load rows show both an understandable category and the relative percentage.
+- Thresholds are explicit: Low 1–24%, Moderate 25–49%, High 50–74%, Very high 75–100%.
+- Calculation details remain collapsed by default.
+- Existing local BodyPlan data/storage is unchanged.
 
 ## Update
-1. In der bisherigen App unter Einstellungen ein JSON-Backup erstellen und sicher aufbewahren.
-2. Den vollständigen Inhalt dieser ZIP in das bestehende Repository hochladen und gleichnamige Dateien ersetzen. Die Ordnerstruktur beibehalten.
-3. Nach dem Deployment die App schließen und erneut öffnen. Bei einem alten Cache die Website in Safari neu laden. Keine Website-Daten löschen und die Home-Screen-App nicht deinstallieren.
-4. Vorhandene Trainings, Pläne, Übungen, Notizen und Körpermessungen kontrollieren.
-
-## Änderungen
-- Neue Trainingspläne werden über ein integriertes Formular angelegt und enthalten direkt eine erste bearbeitbare Einheit.
-- Der redundante zweite Erstellen-Button wurde entfernt.
-- Übungen werden über einen durchsuchbaren Bibliotheksdialog ausgewählt. Muskelgruppen- und Equipmentfilter, Mehrfachauswahl und eine Anzeige bereits verwendeter Übungen erleichtern die Planung.
-- Derselbe Dialog wird zum Ersetzen einer Übung verwendet. Neue Übungen können direkt im Dialog mit Name, Equipment und primärer Muskelgruppe angelegt werden.
-- Der funktionslose Gewohnheitenbereich wurde aus den Einstellungen entfernt. Historische Daten bleiben erhalten.
-- Planaktionen sind auf kleinen Displays übersichtlicher angeordnet. Der aktive Plan zeigt keine irreführende Lösch-Swipe-Aktion.
-- Navigation setzt die Scrollposition zurück, während Eingaben und Übungsauswahl ihren Kontext behalten.
-
-## Daten
-Die Datenbank bp4_bodyplan_v2 und vorhandene bp3_-Daten bleiben unverändert kompatibel. Es findet keine automatische Löschung historischer Daten statt. Die Anatomie-Assets und die Muskelgewichtungslogik entsprechen Beta 5. Ein Backup-Import ersetzt weiterhin die aktuellen Daten und erfordert eine Bestätigung.
-
-## Qualitätssicherung
-Siehe QA.md. Browser- und Logiktests wurden durchgeführt. Ein abschließender Test auf dem tatsächlichen iPhone und der produktiven Hosting-Umgebung bleibt erforderlich.
+Replace the repository files with this release. The service-worker cache is versioned as `bodyplan-2-beta7` so old cached application assets are retired after activation.

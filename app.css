@@ -472,3 +472,19 @@ body.picker-open{overflow:hidden}
 #newPlanForm{margin-top:20px}
 #newPlanForm .actions{justify-content:flex-end;margin-top:22px}
 @media(max-width:390px){.plan-management-actions{display:grid;grid-template-columns:1fr 1fr}.plan-management-actions .primary{grid-column:1/-1}.plan-management-actions button{font-size:12px;padding:12px 10px}}
+
+/* Beta 7 — final heatmap UX pass */
+.heat-view-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 14px;padding:4px;border:1px solid #2b2b2b;border-radius:14px;background:#111}
+.heat-view-tabs button{min-height:44px;border:0;border-radius:10px;background:transparent;color:#aaa;font-size:13px;font-weight:700}
+.heat-view-tabs button.active{background:var(--gold);color:#090909}
+.heat-layout{display:block}
+.heat-layout .anatomy-card{margin-bottom:0}
+.muscle-simple-head strong{display:flex;gap:7px;align-items:baseline}
+.muscle-simple-head strong small{color:#858585;font-size:10px;font-weight:600}
+.muscle-simple.low .bar span{background:#be9137}.muscle-simple.moderate .bar span{background:#ebb03e}.muscle-simple.high .bar span{background:#ff7e23}.muscle-simple.very-high .bar span{background:#ff372a}
+.heat-legend-clear{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:18px}
+.heat-legend-clear>div{display:flex;align-items:flex-start;gap:6px;min-width:0}
+.heat-legend-clear i{flex:0 0 20px;margin-top:4px}
+.heat-legend-clear span{font-size:9px;color:#aaa;line-height:1.2}
+.heat-legend-clear small{display:block;margin-top:3px;color:#666;font-size:8px;white-space:nowrap}
+@media(max-width:390px){.heat-legend-clear i{flex-basis:14px}.heat-legend-clear span{font-size:8px}.heat-legend-clear small{font-size:7px}}
