@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "width": 768,
   "height": 1024,
   "groups": [
@@ -21,5 +21,5 @@
     "glutes",
     "calves"
   ],
-  "method": "registered pixel masks"
+  "method": "clean-anatomy registered masks"
 }

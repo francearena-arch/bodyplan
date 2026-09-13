@@ -1,21 +1,16 @@
-# BodyPlan 2.0 Beta 7.1 – QA
+# Beta 8 – Qualitätsprüfung
 
-## Behobene Regressionen
-- Heatmap konnte wegen eines nicht initialisierten `heatView`-States nicht gerendert werden.
-- Nach dem Entfernen des Gewohnheiten-Bereichs war in den Einstellungen ein verwaister Toggle im Markup verblieben.
-
-## Durchgeführte Tests
-- JavaScript-Syntaxprüfung mit Node.
-- Browser-Integrationstest in Chromium auf 390 × 844 px.
-- Heatmap-Aufruf über die Dashboard-Kachel.
-- Heatmap-Aufruf über das Burgermenü.
-- Vorderseite/Rückseite-Switch.
-- Heatmap-Berechnung mit einer repräsentativen gespeicherten Trainingseinheit.
-- Einstellungen: exakt drei Dashboard-Schalter, kein verwaister Toggle, Gewohnheiten nicht sichtbar.
-- Ein-/Ausblenden von „Letztes Training“ und Rückwirkung auf das Dashboard.
-- Navigation durch Dashboard, Trainingspläne, Übungsbibliothek, Historie, Fortschritt, Muskel-Heatmap und Einstellungen.
-- Prüfung auf horizontales Overflow auf Mobile.
-- Prüfung aller Service-Worker-Assets und ZIP-Integrität.
+## Geprüft
+- JavaScript-Syntaxprüfung.
+- ZIP-Integrität.
+- alle vom Service Worker referenzierten Assets vorhanden.
+- Front- und Rückseitenasset exakt 768 × 1024 Pixel.
+- transparente Außenbereiche der beiden Anatomy-PNGs geprüft.
+- Masken exakt 768 × 1024 und auf dieselbe Gruppen-ID-Reihenfolge wie die App geprüft.
+- Browser-Test der Heatmap-Navigation über Dashboard und Burgermenü.
+- Front-/Back-Switch im Browser getestet.
+- dynamische Heatmap mit Test-Trainingsdaten für Vorder- und Rückseite gerendert.
+- Einstellungen und übrige Hauptnavigation auf JavaScript-Laufzeitfehler geprüft.
 
 ## Grenze
-Der Test wurde in einer isolierten Chromium-Umgebung durchgeführt. Der finale iOS-Home-Screen-/Safari-Test und der echte GitHub-Pages-Service-Worker-Lifecycle können nur auf dem Zielgerät vollständig verifiziert werden.
+Der Test erfolgt in einer Chromium-Testumgebung. Die finale visuelle Kontrolle auf der iOS-Home-Screen-PWA und der produktiven GitHub-Pages-URL muss nach dem Deployment auf dem iPhone erfolgen.

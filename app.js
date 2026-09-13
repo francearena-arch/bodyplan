@@ -507,7 +507,7 @@ function muscleScores(days){
 }
 function anatomyView(view,scores,max){
  const label=view==="front"?"Vorderseite":"Rückseite";
- return `<div class="anatomy-card"><div class="eyebrow">${label}</div><div class="anatomy-wrap anatomy-canvas-wrap"><canvas class="heat-canvas" data-heat-view="${view}" width="768" height="1024" role="img" aria-label="Anatomische Muskelansicht ${label}"></canvas></div></div>`;
+ return `<div class="anatomy-card anatomy-clean"><div class="anatomy-wrap anatomy-canvas-wrap"><canvas class="heat-canvas" data-heat-view="${view}" width="768" height="1024" role="img" aria-label="Anatomische Muskelansicht ${label}"></canvas></div></div>`;
 }
 const HEAT_GROUPS=["chest", "lats", "upper_back", "traps", "front_delts", "side_delts", "rear_delts", "biceps", "triceps", "forearms", "abs", "obliques", "erectors", "quads", "hamstrings", "glutes", "calves"];
 const heatImages={};

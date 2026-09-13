@@ -488,3 +488,9 @@ body.picker-open{overflow:hidden}
 .heat-legend-clear span{font-size:9px;color:#aaa;line-height:1.2}
 .heat-legend-clear small{display:block;margin-top:3px;color:#666;font-size:8px;white-space:nowrap}
 @media(max-width:390px){.heat-legend-clear i{flex-basis:14px}.heat-legend-clear span{font-size:8px}.heat-legend-clear small{font-size:7px}}
+
+/* Beta 8: clean transparent anatomy assets */
+.anatomy-card.anatomy-clean{background:transparent;padding:8px;border-color:#282828}
+.anatomy-clean .anatomy-wrap{background:transparent!important;border-radius:16px;overflow:hidden}
+.anatomy-clean .heat-canvas{background:transparent}
+@media(max-width:430px){.anatomy-card.anatomy-clean{padding:4px}}
