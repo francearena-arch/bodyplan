@@ -496,6 +496,27 @@ body.picker-open{overflow:hidden}
 @media(max-width:430px){.anatomy-card.anatomy-clean{padding:4px}}
 
 
+/* Beta 10: Progress Intelligence and balanced dashboard */
+.dashboard-tile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.dashboard-tile{min-width:0;min-height:142px;margin:0;padding:17px;background:#111;border:1px solid #292929;border-radius:16px;color:#f5f5f5;text-align:left;display:flex;flex-direction:column;align-items:flex-start}
+.dashboard-tile.wide{grid-column:1/-1}.dashboard-tile-button{width:100%}
+.dashboard-tile strong{font-size:17px;line-height:1.25;margin:12px 0 6px}
+.dashboard-tile small{display:block;color:#8e8e8e;font-size:11px;line-height:1.45;margin-top:auto}
+.dashboard-tile .bar{width:100%;margin:12px 0}.tile-kpi{font-size:31px;font-weight:900;line-height:1;margin:12px 0 7px}
+.dashboard-empty{text-align:center}.dashboard-empty .actions{justify-content:center}
+.block-card h2{font-size:21px;margin:7px 0 0}.block-bar{margin-top:22px;height:10px}
+.block-meta{margin-top:10px;color:#8e8e8e;font-size:11px}.block-meta strong{color:#d4a853}
+.block-setup{margin-top:18px;padding-top:14px;border-top:1px solid #292929}.block-setup p{color:#aaa;font-size:12px;line-height:1.55}
+.progress-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.metric-card{min-width:0;min-height:138px;padding:16px;background:#111;border:1px solid #292929;border-radius:16px;display:flex;flex-direction:column}
+.metric-card>span{color:#d4a853;font-size:10px;font-weight:850;letter-spacing:1.5px;text-transform:uppercase}
+.metric-card>strong{font-size:27px;line-height:1.1;margin:12px 0 8px}.metric-card>small{color:#8d8d8d;font-size:10px;line-height:1.45;margin-top:auto}
+.insight-card{border-color:#57441f;background:linear-gradient(145deg,#17130c,#111)}.insight-card p{margin:10px 0 0;font-size:14px;line-height:1.6}
+.body-stats small{display:block;margin-top:7px;color:#d4a853;font-size:10px}
+.measurement-hint{padding:22px 15px;margin:16px 0;border:1px dashed #303030;border-radius:13px;color:#858585;text-align:center;font-size:12px;line-height:1.55}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+@media(max-width:390px){.dashboard-tile{min-height:132px;padding:14px}.tile-kpi{font-size:27px}.progress-metrics{gap:8px}.metric-card{padding:14px}.metric-card>strong{font-size:24px}}
+
 /* Beta 9: calendar training log and effective-load heatmap */
 .log-calendar-card{padding:14px}.log-month-head{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;text-align:center;margin-bottom:12px}.log-month-head strong{text-transform:capitalize}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendar-weekdays span{text-align:center;color:#777;font-size:10px;padding:4px 0}.calendar-day{position:relative;min-height:42px;padding:7px 2px;border:0;border-radius:10px;background:transparent;color:#aaa}.calendar-day.trained{background:#d4a85322;color:#e4b75b;font-weight:800}.calendar-day.selected{background:#d4a853;color:#090909}.calendar-day i{position:absolute;left:50%;bottom:5px;width:4px;height:4px;transform:translateX(-50%);border-radius:50%;background:currentColor}.calendar-empty{min-height:42px}.log-month-summary{text-align:center;color:#888;font-size:12px;margin-top:12px}.selected-log-head,.history-card-top,.history-metrics{display:flex;align-items:center;justify-content:space-between;gap:10px}.selected-log-head{margin:18px 2px 8px}.history-duration{color:#d4a853;white-space:nowrap}.history-metrics{justify-content:flex-start;flex-wrap:wrap;color:#888;font-size:11px;margin:8px 0}.history-metrics span:not(:last-child)::after{content:" ·";margin-left:6px}.heat-summary-three{grid-template-columns:repeat(3,1fr)}
 
