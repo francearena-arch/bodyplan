@@ -17,7 +17,7 @@ const sessionDate=s=>s.localDate||zonedISO(new Date(s.startedAt||s.savedAt),s.ti
 const sessionClock=s=>{const d=new Date(s.startedAt);return isNaN(d)?"—":new Intl.DateTimeFormat("de-CH",{timeZone:s.timeZone||APP_TIME_ZONE,hour:"2-digit",minute:"2-digit",hour12:false}).format(d)};
 const dateMinusDays=n=>{const p=zonedParts();return new Date(Date.UTC(+p.year,+p.month-1,+p.day-n,12)).toISOString().slice(0,10)};
 const rangeStart=days=>dateMinusDays(Math.max(0,days-1));
-let exercisePicker=null,exercisePickerQuery="",exercisePickerMuscle="",exercisePickerEquipment="",exercisePickerSelected=new Set();let editingBodyId=null;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,heatView="front",bodyPeriod=90,logMonth=zonedISO().slice(0,7),selectedLogDate=null,sessionTick=null,restTick=null,dashboardTick=null;
+let exercisePicker=null,exercisePickerQuery="",exercisePickerMuscle="",exercisePickerEquipment="",exercisePickerSelected=new Set();let editingBodyId=null,blockDateEditing=false;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,heatView="front",bodyPeriod=90,logMonth=zonedISO().slice(0,7),selectedLogDate=null,sessionTick=null,restTick=null,dashboardTick=null;
 
 function getJSON(k,f=null){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
 function setJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -215,29 +215,30 @@ function blockInfo(p=activePlan()){
 function blockSessions(p=activePlan()){
  const info=blockInfo(p);if(!info.configured)return[];
  const endDay=isoDayNumber(info.start)+BLOCK_WEEKS*7;
- return (db.sessions||[]).filter(s=>effectiveSession(s)&&s.planId===p?.id&&isoDayNumber(sessionDate(s))>=isoDayNumber(info.start)&&isoDayNumber(sessionDate(s))<endDay);
+ return (db.sessions||[]).filter(s=>effectiveSession(s)&&s.planId===p?.id&&sessionDate(s)<=zonedISO()&&isoDayNumber(sessionDate(s))>=isoDayNumber(info.start)&&isoDayNumber(sessionDate(s))<endDay);
 }
 function blockCompletion(p=activePlan()){
  const info=blockInfo(p),days=p?.days||[];if(!info.configured||!days.length)return {done:0,due:0,total:days.length*BLOCK_WEEKS,extras:0,percent:0};
  const valid=new Set(days.map(d=>d.id)),unique=new Set(),sessions=blockSessions(p);
  for(const s of sessions){if(!valid.has(s.dayId))continue;const wi=Math.floor((isoDayNumber(sessionDate(s))-isoDayNumber(info.start))/7);if(wi>=0&&wi<BLOCK_WEEKS)unique.add(wi+":"+s.dayId)}
- const due=Math.min(days.length*BLOCK_WEEKS,info.week*days.length),done=unique.size;
+ const completedWeeks=Math.floor(Math.min(info.elapsedDays,BLOCK_WEEKS*7-1)/7),dayInWeek=Math.min(info.elapsedDays,BLOCK_WEEKS*7-1)%7;
+ const due=Math.min(days.length*BLOCK_WEEKS,completedWeeks*days.length+Math.min(days.length,Math.ceil(days.length*(dayInWeek+1)/7))),done=unique.size;
  return {done,due,total:days.length*BLOCK_WEEKS,extras:Math.max(0,sessions.length-done),percent:due?Math.min(100,Math.round(done/due*100)):0};
 }
 function sessionVolume(s){return completedWorkSets(s).reduce((sum,z)=>{const kg=parseBodyNumber(z.kg),reps=Number(z.reps);return sum+(kg!==null&&Number.isFinite(reps)?kg*reps:0)},0)}
 function sessionsBetween(start,end){return (db.sessions||[]).filter(s=>effectiveSession(s)&&sessionDate(s)>=start&&sessionDate(s)<=end)}
 function volumeTrend(){
- const current=sessionsInRange(30).reduce((n,s)=>n+sessionVolume(s),0),previous=sessionsBetween(dateMinusDays(59),dateMinusDays(30)).reduce((n,s)=>n+sessionVolume(s),0);
- return {current,previous,percent:previous>0?Math.round((current-previous)/previous*100):null};
+ const currentSessions=sessionsInRange(30).filter(s=>sessionVolume(s)>0),previousSessions=sessionsBetween(dateMinusDays(59),dateMinusDays(30)).filter(s=>sessionVolume(s)>0);
+ const current=currentSessions.reduce((n,s)=>n+sessionVolume(s),0),previous=previousSessions.reduce((n,s)=>n+sessionVolume(s),0),sufficient=currentSessions.length>=4&&previousSessions.length>=4&&previous>0;
+ return {current,previous,currentCount:currentSessions.length,previousCount:previousSessions.length,sufficient,percent:sufficient?Math.round((current-previous)/previous*100):null};
 }
 function prExerciseIdsSince(start){
  if(!start)return new Set();
  const prior=new Map(),prs=new Set(),sessions=[...(db.sessions||[])].filter(effectiveSession).sort((a,b)=>sessionDate(a).localeCompare(sessionDate(b))||String(a.startedAt||"").localeCompare(String(b.startedAt||"")));
- for(const s of sessions)for(const e of s.exercises||[])for(const z of completedWorkSets({exercises:[e]})){
-   const kg=parseBodyNumber(z.kg),reps=Number(z.reps);if(kg===null||!Number.isFinite(reps)||reps<=0)continue;
-   const history=prior.get(e.exerciseId)||[],dominated=history.some(x=>(x.kg>kg&&x.reps>=reps)||(x.kg===kg&&x.reps>=reps)||(x.kg>=kg&&x.reps>reps));
-   if(sessionDate(s)>=start&&!dominated)prs.add(e.exerciseId);
-   history.push({kg,reps});prior.set(e.exerciseId,history);
+ for(const s of sessions)for(const e of s.exercises||[]){
+   const sets=completedWorkSets({exercises:[e]}).map(z=>({kg:parseBodyNumber(z.kg),reps:Number(z.reps)})).filter(z=>z.kg!==null&&Number.isFinite(z.reps)&&z.reps>0),history=prior.get(e.exerciseId)||[];
+   if(sessionDate(s)>=start&&history.length&&sets.some(z=>!history.some(x=>(x.kg>z.kg&&x.reps>=z.reps)||(x.kg===z.kg&&x.reps>=z.reps)||(x.kg>=z.kg&&x.reps>z.reps))))prs.add(e.exerciseId);
+   history.push(...sets);prior.set(e.exerciseId,history);
  }
  return prs;
 }
@@ -258,6 +259,7 @@ function progressInsight(m){
  if(m.volume.percent!==null&&m.volume.percent>=5)return `Dein Trainingsvolumen ist um ${m.volume.percent} % gestiegen. Achte darauf, dass Technik und Erholung stabil bleiben.`;
  if(m.prs.size)return `${m.prs.size} Übung${m.prs.size===1?"":"en"} mit persönlicher Bestleistung in diesem Block – der Leistungsfortschritt ist messbar.`;
  const last=bodyHistory().at(-1);if(!last||isoDayNumber(zonedISO())-isoDayNumber(last.date)>14)return "Deine letzte Körpermessung ist älter als 14 Tage. Eine neue Messung macht die Entwicklung wieder vergleichbar.";
+ if(m.completion.due&&m.completion.percent>=100)return `Du bist für den heutigen Stand im Plan. Als Nächstes folgt „${nextDay()?.name||"Training"}“.`;
  return "Dein Trainingsblock läuft stabil. Halte die Frequenz konstant und sammle weiter vergleichbare Einheiten.";
 }
 
@@ -476,7 +478,7 @@ function renderDashboard(){
   if(cards.includes("week"))tiles.push(`<div class="dashboard-tile"><div class="eyebrow">Wochenfortschritt</div><div class="tile-kpi">${completedDays.size} / ${p?.days?.length||0}</div><div class="bar"><span style="width:${Math.min(100,(completedDays.size/(p?.days?.length||1))*100)}%"></span></div><small>${completedDays.size>=(p?.days?.length||0)&&p?.days?.length?"Woche abgeschlossen":"Aktuelle Trainingswoche"}</small></div>`);
   if(cards.includes("last"))tiles.push(`<button class="dashboard-tile dashboard-tile-button" data-action="page:history"><div class="eyebrow">Letztes Training</div>${last?`<strong>${esc(last.title)}</strong><small>${fmtDate(sessionDate(last))} · ${sessionClock(last)}</small>`:`<strong>Noch kein Training</strong><small>Trainingslog öffnen</small>`}</button>`);
   if(cards.includes("progress"))tiles.push(`<button class="dashboard-tile dashboard-tile-button" data-action="page:progress"><div class="eyebrow">Dein Fortschritt</div><div class="tile-kpi">${metrics.block.configured?metrics.completion.percent+" %":"—"}</div><small>${metrics.block.configured?`Planerfüllung · Woche ${metrics.block.week}/8`:"Blockstart festlegen"}</small></button>`);
-  if(cards.includes("heatmap")){const sessions=sessionsInRange(30),sets=completedSetsInRange(30);tiles.push(`<button class="dashboard-tile dashboard-tile-button" data-action="page:heatmap"><div class="eyebrow">Muskel-Heatmap</div><div class="tile-kpi">${sessions.length}</div><small>Trainings · ${sets} Arbeitssätze / 30 Tage</small></button>`)}
+  if(cards.includes("heatmap"))tiles.push(`<button class="dashboard-tile dashboard-tile-button heatmap-cta-tile" data-action="page:heatmap"><div class="eyebrow">Muskel-Heatmap</div><div class="heatmap-cta"><strong>Heatmap öffnen</strong><span aria-hidden="true">→</span></div></button>`);
   if(tiles.length){if(tiles.length%2)tiles[tiles.length-1]=tiles.at(-1).replace("dashboard-tile","dashboard-tile wide");html+=`<div class="dashboard-tile-grid">${tiles.join("")}</div>`}
   if(!active&&!cards.length)html+=`<div class="card dashboard-empty"><strong>Dein Dashboard ist leer.</strong><p class="muted">Aktiviere die gewünschten Kacheln in den Einstellungen.</p>${btn("Dashboard konfigurieren","page:settings","primary")}</div>`;
   return html;
@@ -571,15 +573,16 @@ function renderHistory(){
 function renderProgress(){
  const body=latestBody(),entries=bodyHistory().slice().reverse(),m=progressMetrics(),goals=db.settings.bodyGoals;
  const weightCount=bodyHistory().filter(e=>e.weight!=null&&e.date>=rangeStart(bodyPeriod)).length,fatCount=bodyHistory().filter(e=>e.fat!=null&&e.date>=rangeStart(bodyPeriod)).length;
- const volumeLabel=m.volume.percent===null?"Noch kein Vergleich":(m.volume.percent>0?"+":"")+m.volume.percent+" %";
+ const volumeLabel=m.volume.sufficient?(m.volume.percent>0?"+":"")+m.volume.percent+" %":"Daten sammeln";
  return `<div class="eyebrow">Entwicklung</div><h1 class="page-title">Fortschritt</h1>
  <div class="card block-card"><div class="row top"><div><div class="eyebrow">Aktueller Trainingsblock</div><h2>${esc(m.p?.name||"Kein aktiver Plan")}</h2></div>${m.block.configured?`<span class="tag">Woche ${m.block.week}/8</span>`:""}</div>
- ${m.block.configured?`<div class="bar block-bar"><span style="width:${m.block.percent}%"></span></div><div class="row block-meta"><span>Start ${fmtDate(m.block.start)}</span><strong>${m.block.remainingWeeks?m.block.remainingWeeks+" Wochen verbleibend":"Block abgeschlossen"}</strong></div>`:`<div class="block-setup"><p>Für bestehende Pläne wird kein Datum erfunden. Lege einmalig fest, wann dein aktueller 8-Wochen-Block begonnen hat.</p><div class="form-field"><label>Startdatum</label><input type="date" max="${zonedISO()}" data-action="blockstart:${m.p?.id||""}"></div></div>`}</div>
+ ${m.block.configured?`<div class="bar block-bar"><span style="width:${m.block.percent}%"></span></div><div class="row block-meta"><span>Start ${fmtDate(m.block.start)}</span><strong>${m.block.remainingWeeks?m.block.remainingWeeks+" Wochen verbleibend":"Block abgeschlossen"}</strong></div><div class="block-date-action">${btn(blockDateEditing?"Abbrechen":"Startdatum ändern",blockDateEditing?"cancelblockstart":"editblockstart","mini")}</div>`:""}
+ ${blockDateEditing||!m.block.configured?`<div class="block-setup">${!m.block.configured?"<p>Lege einmalig fest, wann dein aktueller 8-Wochen-Block begonnen hat.</p>":""}<div class="form-field"><label>Startdatum</label><input id="blockStartInput" type="date" max="${zonedISO()}" value="${m.block.start||""}"></div><div class="actions">${btn(m.block.configured?"Änderung speichern":"Block starten","saveblockstart:"+ (m.p?.id||""),"primary mini")}</div></div>`:""}</div>
  <div class="progress-metrics">
   <div class="metric-card"><span>Planerfüllung</span><strong>${m.block.configured?m.completion.percent+" %":"—"}</strong><small>${m.completion.done} von ${m.completion.due} fälligen Einheiten${m.completion.extras?" · "+m.completion.extras+" extra":""}</small></div>
   <div class="metric-card"><span>Trainingsfrequenz</span><strong>${m.frequency.toLocaleString("de-CH",{maximumFractionDigits:1})}×</strong><small>pro Woche · Ziel ${m.target}×</small></div>
-  <div class="metric-card"><span>Volumentrend</span><strong>${volumeLabel}</strong><small>letzte 30 vs. vorherige 30 Tage</small></div>
-  <div class="metric-card"><span>Bestleistungen</span><strong>${m.block.configured?m.prs.size:"—"}</strong><small>Übungen mit PR im Block</small></div>
+  <div class="metric-card"><span>Volumentrend</span><strong>${volumeLabel}</strong><small>${m.volume.sufficient?"letzte 30 vs. vorherige 30 Tage":"Vergleich ab 4 Einheiten je Zeitraum"}</small></div>
+  <div class="metric-card"><span>Bestleistungen</span><strong>${m.block.configured?m.prs.size:"—"}</strong><small>${m.prs.size?"Übungen mit PR im Block":"Erste Werte bilden die Ausgangsbasis"}</small></div>
  </div>
  <div class="card insight-card"><div class="eyebrow">Dein nächster Fokus</div><p>${esc(progressInsight(m))}</p></div>
  <div class="card"><div class="row"><div><div class="eyebrow">Körperentwicklung</div><h2 style="margin:8px 0 0">Deine Messwerte</h2></div>${btn("+ Erfassen","newbody","primary mini")}</div>
@@ -690,7 +693,9 @@ function handleAction(a,el){
   if(op==="addset"){let e=entry(),s=clone(e.sets.at(-1)||{kind:"working",repsMin:8,repsMax:12});s.id=uid();e.sets.push(s);save();return render()}
   if(op==="removeset"){let e=entry();e.sets=e.sets.filter(s=>s.id!==arg);save();return render()}
   if(op==="tile"){let arr=db.settings.dashboard,on=arr.includes(id);db.settings.dashboard=on?arr.filter(x=>x!==id):[...arr,id];save();return render()}
-  if(op==="blockstart"){const p=db.plans.find(x=>x.id===id);if(!p)return;const value=el.value;if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||value>zonedISO()){alert("Bitte ein gültiges Startdatum bis heute wählen.");return render()}p.blockStartDate=value;save();return render()}
+  if(op==="editblockstart"){blockDateEditing=true;return render()}
+  if(op==="cancelblockstart"){blockDateEditing=false;return render()}
+  if(op==="saveblockstart"){const p=db.plans.find(x=>x.id===id),value=$("#blockStartInput")?.value;if(!p)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(value||"")||value>zonedISO()){alert("Bitte ein gültiges Startdatum bis heute wählen.");return}if(p.blockStartDate&&p.blockStartDate!==value&&!confirm(`Startdatum wirklich auf den ${fmtDate(value)} ändern? Alle Blockkennzahlen werden neu berechnet. Deine Trainingsdaten bleiben unverändert.`))return;p.blockStartDate=value;blockDateEditing=false;save();return render()}
   if(op==="replace"){if(el.value){entry().exerciseId=el.value;save()}return render()}
   let val=el.type==="checkbox"?el.checked:el.value;
   if(op==="goal"){const n=parseBodyNumber(val);if(n===null||n<0){alert("Bitte einen gültigen Zielwert eingeben.");return render()}const next={...db.settings.bodyGoals,[id]:n};if(next.weightMin>next.weightMax||next.fatMin>next.fatMax){alert("Der Minimalwert darf nicht über dem Maximalwert liegen.");return render()}db.settings.bodyGoals=next;save();return render()}

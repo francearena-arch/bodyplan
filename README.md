@@ -1,7 +1,15 @@
-# BodyPlan 2.0 Beta 10 – Progress Intelligence
+# BodyPlan 2.0 Beta 10.1 – Progress Intelligence Stability
 
 ## Schwerpunkt
 Ein aussagekräftiger Fortschrittsbereich und ein vollständig konfigurierbares, bündiges Dashboard.
+
+## Beta 10.1
+- Ruhige Muskel-Heatmap-Kachel mit ausschließlich „Heatmap öffnen“ und Pfeil.
+- Startdatum des aktiven Trainingsblocks kann jederzeit geändert werden.
+- Vor einer Datumsänderung bestätigt BodyPlan die Neuberechnung der Blockkennzahlen; Trainingsdaten bleiben unverändert.
+- Planerfüllung berücksichtigt nur die bis zum heutigen Blocktag erwartete Anzahl Einheiten.
+- Volumentrend erscheint erst mit mindestens vier gewichtsbasierten Einheiten in beiden 30-Tage-Zeiträumen.
+- Die erste Leistung einer Übung bildet eine Ausgangsbasis und wird nicht automatisch als persönliche Bestleistung gezählt.
 
 ## Änderungen
 - Neuer 8-Wochen-Trainingsblock mit Startdatum, aktueller Woche und Restlaufzeit.
@@ -22,4 +30,3 @@ Vor dem Deployment ein Backup erstellen. Danach die sechs Release-Dateien ersetz
 
 ## Qualitätssicherung
 Siehe `QA.md`.
-

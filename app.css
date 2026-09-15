@@ -503,9 +503,12 @@ body.picker-open{overflow:hidden}
 .dashboard-tile strong{font-size:17px;line-height:1.25;margin:12px 0 6px}
 .dashboard-tile small{display:block;color:#8e8e8e;font-size:11px;line-height:1.45;margin-top:auto}
 .dashboard-tile .bar{width:100%;margin:12px 0}.tile-kpi{font-size:31px;font-weight:900;line-height:1;margin:12px 0 7px}
+.heatmap-cta-tile{justify-content:flex-start}.heatmap-cta{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:auto 0}
+.heatmap-cta strong{margin:0;font-size:16px}.heatmap-cta span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#d4a853;color:#080808;font-size:22px;font-weight:900;flex:0 0 44px}
 .dashboard-empty{text-align:center}.dashboard-empty .actions{justify-content:center}
 .block-card h2{font-size:21px;margin:7px 0 0}.block-bar{margin-top:22px;height:10px}
 .block-meta{margin-top:10px;color:#8e8e8e;font-size:11px}.block-meta strong{color:#d4a853}
+.block-date-action{display:flex;justify-content:flex-start;margin-top:10px}
 .block-setup{margin-top:18px;padding-top:14px;border-top:1px solid #292929}.block-setup p{color:#aaa;font-size:12px;line-height:1.55}
 .progress-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
 .metric-card{min-width:0;min-height:138px;padding:16px;background:#111;border:1px solid #292929;border-radius:16px;display:flex;flex-direction:column}
@@ -519,4 +522,3 @@ body.picker-open{overflow:hidden}
 
 /* Beta 9: calendar training log and effective-load heatmap */
 .log-calendar-card{padding:14px}.log-month-head{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;text-align:center;margin-bottom:12px}.log-month-head strong{text-transform:capitalize}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendar-weekdays span{text-align:center;color:#777;font-size:10px;padding:4px 0}.calendar-day{position:relative;min-height:42px;padding:7px 2px;border:0;border-radius:10px;background:transparent;color:#aaa}.calendar-day.trained{background:#d4a85322;color:#e4b75b;font-weight:800}.calendar-day.selected{background:#d4a853;color:#090909}.calendar-day i{position:absolute;left:50%;bottom:5px;width:4px;height:4px;transform:translateX(-50%);border-radius:50%;background:currentColor}.calendar-empty{min-height:42px}.log-month-summary{text-align:center;color:#888;font-size:12px;margin-top:12px}.selected-log-head,.history-card-top,.history-metrics{display:flex;align-items:center;justify-content:space-between;gap:10px}.selected-log-head{margin:18px 2px 8px}.history-duration{color:#d4a853;white-space:nowrap}.history-metrics{justify-content:flex-start;flex-wrap:wrap;color:#888;font-size:11px;margin:8px 0}.history-metrics span:not(:last-child)::after{content:" ·";margin-left:6px}.heat-summary-three{grid-template-columns:repeat(3,1fr)}
-
