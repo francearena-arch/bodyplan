@@ -1,4 +1,4 @@
-const CACHE_NAME='bodyplan-2-beta8';
+const CACHE_NAME='bodyplan-2-beta9';
 const ASSETS=[
 './','./index.html','./app.css','./app.js',
 './exercise-seed.json','./starter-plan.json',
@@ -13,3 +13,4 @@ self.addEventListener('fetch',event=>{
  if(event.request.method!=='GET')return;
  event.respondWith(fetch(event.request,{cache:'no-store'}).then(r=>{const copy=r.clone();caches.open(CACHE_NAME).then(c=>c.put(event.request,copy));return r;}).catch(()=>caches.match(event.request)));
 });
+

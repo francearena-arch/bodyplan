@@ -1,6 +1,7 @@
 
 "use strict";
 const DB_KEY="bp4_bodyplan_v2", ALPHA_KEY="bp4_alpha1", ACTIVE_KEY="bp4_active_session_v2", REST_KEY="bp4_rest_v2";
+const APP_TIME_ZONE="Europe/Zurich", HEAT_WEEKLY_REFERENCE=12;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const uid=()=>crypto.randomUUID?crypto.randomUUID():"id_"+Date.now()+"_"+Math.random().toString(36).slice(2);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -10,7 +11,13 @@ const localISO=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padS
 const mondayOf=d=>{let x=new Date(d);x.setHours(0,0,0,0);let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x};
 const fmtDate=iso=>{if(!iso)return"—";let d=new Date(iso);return isNaN(d)?"—":d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const fmtTime=s=>{s=Math.max(0,Math.floor(s||0));return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
-let exercisePicker=null,exercisePickerQuery="",exercisePickerMuscle="",exercisePickerEquipment="",exercisePickerSelected=new Set();let editingBodyId=null;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,heatView="front",bodyPeriod=90,sessionTick=null,restTick=null,dashboardTick=null;
+const zonedParts=(date=new Date(),timeZone=APP_TIME_ZONE)=>Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date).filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
+const zonedISO=(date=new Date(),timeZone=APP_TIME_ZONE)=>{const p=zonedParts(date,timeZone);return `${p.year}-${p.month}-${p.day}`};
+const sessionDate=s=>s.localDate||zonedISO(new Date(s.startedAt||s.savedAt),s.timeZone||APP_TIME_ZONE);
+const sessionClock=s=>{const d=new Date(s.startedAt);return isNaN(d)?"—":new Intl.DateTimeFormat("de-CH",{timeZone:s.timeZone||APP_TIME_ZONE,hour:"2-digit",minute:"2-digit",hour12:false}).format(d)};
+const dateMinusDays=n=>{const p=zonedParts();return new Date(Date.UTC(+p.year,+p.month-1,+p.day-n,12)).toISOString().slice(0,10)};
+const rangeStart=days=>dateMinusDays(Math.max(0,days-1));
+let exercisePicker=null,exercisePickerQuery="",exercisePickerMuscle="",exercisePickerEquipment="",exercisePickerSelected=new Set();let editingBodyId=null;let seed,starter,db,page="dashboard",selectedPlan=null,selectedDay=null,query="",heatRange=30,heatView="front",bodyPeriod=90,logMonth=zonedISO().slice(0,7),selectedLogDate=null,sessionTick=null,restTick=null,dashboardTick=null;
 
 function getJSON(k,f=null){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
 function setJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
@@ -142,13 +149,16 @@ function activePlan(){return db.plans.find(p=>p.id===db.activePlanId)||db.plans.
 function plan(){return db.plans.find(p=>p.id===selectedPlan)}
 function day(){return plan()?.days.find(d=>d.id===selectedDay)}
 function ex(id){return db.exercises.find(e=>e.id===id)}
+function completedWorkSets(s){return (s.exercises||[]).flatMap(e=>e.sets||[]).filter(z=>z.kind!=="warmup"&&z.completed!==false)}
+function effectiveSession(s){return completedWorkSets(s).length>0}
 function currentWeekSessions(){
   const start=mondayOf(new Date()).getTime();
-  return db.sessions.filter(s=>s.planId===activePlan()?.id && new Date(s.startedAt||s.localDate).getTime()>=start);
+  return db.sessions.filter(s=>s.planId===activePlan()?.id&&effectiveSession(s)&&new Date(s.startedAt||s.localDate).getTime()>=start);
 }
+function completedWeekDayIds(){return new Set(currentWeekSessions().map(s=>s.dayId).filter(Boolean))}
 function nextDay(){
   const p=activePlan(); if(!p?.days?.length)return null;
-  const completed=new Set(currentWeekSessions().map(s=>s.dayId));
+  const completed=completedWeekDayIds();
   return p.days.find(d=>!completed.has(d.id))||p.days[0];
 }
 function lastSession(){return [...db.sessions].sort((a,b)=>new Date(b.startedAt||b.localDate)-new Date(a.startedAt||a.localDate))[0]||null}
@@ -345,7 +355,7 @@ function render(){
   bindPageActions();
   if(page==="plans"&&!selectedPlan)bindPlanSwipes();
   if(page==="dashboard")startDashboardTicker();
-  if(page==="heatmap"){const scores=muscleScores(heatRange);paintHeatmaps(scores,Math.max(0,...Object.values(scores)))}
+  if(page==="heatmap"){const scores=muscleScores(heatRange);paintHeatmaps(scores,HEAT_WEEKLY_REFERENCE*heatRange/7)}
 }
 function bindPageActions(){
   $$("[data-action]").forEach(el=>{
@@ -386,7 +396,7 @@ function startDashboardTicker(){
   tick();dashboardTick=setInterval(tick,1000);
 }
 function renderDashboard(){
-  const p=activePlan(), n=nextDay(), week=currentWeekSessions(), last=lastSession(), body=latestBody(), cards=db.settings.dashboard||[], active=getJSON(ACTIVE_KEY,null);
+  const p=activePlan(), n=nextDay(), week=currentWeekSessions(), completedDays=completedWeekDayIds(), last=lastSession(), body=latestBody(), cards=db.settings.dashboard||[], active=getJSON(ACTIVE_KEY,null);
   let html=`<div class="dashboard-intro"><div class="eyebrow">BodyPlan</div><h1 class="page-title">${active?"Training in progress":"Dein Training"}</h1></div>`;
   if(active)html+=dashboardActiveCard(active);
   else if(cards.includes("next"))html+=`<div class="workout-hero">
@@ -400,7 +410,7 @@ function renderDashboard(){
     </div>
     <div class="actions">${btn("Training starten","start:"+n.id,"primary")}${btn("Plan ansehen","openplan:"+p.id)}</div>`:""}
   </div>`;
-  if(cards.includes("week"))html+=`<div class="card"><div class="eyebrow">Wochenfortschritt</div><div class="kpi">${week.length} / ${p?.days?.length||0}</div><div class="bar"><span style="width:${Math.min(100,(week.length/(p?.days?.length||1))*100)}%"></span></div><div class="muted" style="margin-top:10px">${week.length===0?"Die Woche beginnt mit deiner ersten Einheit.":week.length>=(p?.days?.length||0)?"Trainingswoche abgeschlossen.":"Noch "+((p?.days?.length||0)-week.length)+" Einheit"+(((p?.days?.length||0)-week.length)===1?"":"en")+" offen."}</div></div>`;
+  if(cards.includes("week"))html+=`<div class="card"><div class="eyebrow">Wochenfortschritt</div><div class="kpi">${completedDays.size} / ${p?.days?.length||0}</div><div class="bar"><span style="width:${Math.min(100,(completedDays.size/(p?.days?.length||1))*100)}%"></span></div><div class="muted" style="margin-top:10px">${completedDays.size===0?"Die Woche beginnt mit deiner ersten Einheit.":completedDays.size>=(p?.days?.length||0)?"Trainingswoche abgeschlossen.":"Noch "+((p?.days?.length||0)-completedDays.size)+" Einheit"+(((p?.days?.length||0)-completedDays.size)===1?"":"en")+" offen."}</div></div>`;
   if(cards.includes("last"))html+=`<div class="card"><div class="eyebrow">Letztes Training</div>${last?`<div class="hero-title" style="font-size:24px">${esc(last.title)}</div><div class="muted">${fmtDate(last.startedAt||last.localDate)}${last.durationSec?` · ${Math.round(last.durationSec/60)} Min`:``}</div><div class="actions">${btn("Historie öffnen","page:history")}</div>`:`<div class="empty">Noch kein Training gespeichert.</div>`}</div>`;
   html+=`<div class="dashboard-shortcuts"><button data-action="page:progress"><span>↗</span><strong>Fortschritt</strong><small>Messwerte & Verlauf</small></button><button data-action="page:heatmap"><span>◉</span><strong>Heatmap</strong><small>Muskelbelastung</small></button></div>`;
   return html;
@@ -475,11 +485,22 @@ function renderExerciseEditor(e){
  <div class="form-field"><label>Dauerhafte Notiz</label><textarea data-action="globalnote:${e.id}" placeholder="Geräteeinstellung, Griff, Sitzposition …">${esc(e.notes||"")}</textarea></div>`;
 }
 
+function shiftLogMonth(delta){const [y,m]=logMonth.split("-").map(Number),d=new Date(Date.UTC(y,m-1+delta,1));logMonth=d.toISOString().slice(0,7);selectedLogDate=null}
+function trainingCalendar(month,sessions){
+ const [y,m]=month.split("-").map(Number),days=new Date(Date.UTC(y,m,0)).getUTCDate(),offset=(new Date(Date.UTC(y,m-1,1)).getUTCDay()+6)%7,counts={};
+ sessions.forEach(s=>{const d=sessionDate(s);counts[d]=(counts[d]||0)+1});
+ const cells=Array.from({length:offset},()=>'<span class="calendar-empty"></span>');
+ for(let n=1;n<=days;n++){const date=`${month}-${String(n).padStart(2,"0")}`,count=counts[date]||0,selected=selectedLogDate===date;cells.push(`<button class="calendar-day ${count?"trained":""} ${selected?"selected":""}" data-action="logdate:${date}" aria-label="${fmtDate(date)}, ${count} Training${count===1?"":"s"}"><span>${n}</span>${count?"<i></i>":""}</button>`)}
+ return `<div class="training-calendar"><div class="calendar-weekdays">${["Mo","Di","Mi","Do","Fr","Sa","So"].map(x=>`<span>${x}</span>`).join("")}</div><div class="calendar-grid">${cells.join("")}</div></div>`;
+}
+function historySessionCard(s){
+ const sets=completedWorkSets(s),volume=sets.reduce((sum,z)=>sum+(Number(String(z.kg??"").replace(",","."))||0)*(Number(z.reps)||0),0);
+ return `<div class="history-card"><div class="history-card-top"><div><div class="history-date">${fmtDate(sessionDate(s))} · ${sessionClock(s)}</div><div class="history-title">${esc(s.title)}</div></div><strong class="history-duration">${s.durationSec?Math.round(s.durationSec/60)+" Min":"—"}</strong></div><div class="history-metrics"><span>${s.exercises?.length||0} Übungen</span><span>${sets.length} Arbeitssätze</span>${volume?`<span>${Math.round(volume).toLocaleString("de-CH")} kg Volumen</span>`:""}</div><details><summary class="link-btn">Details</summary>${(s.exercises||[]).map(e=>`<div class="history-ex"><strong>${esc(e.nameSnapshot||ex(e.exerciseId)?.name||"Übung")}</strong><br>${(e.sets||[]).filter(z=>z.completed!==false).map(z=>`${z.kg??"—"} kg × ${z.reps??"—"}`).join(" · ")}</div>`).join("")}</details></div>`;
+}
 function renderHistory(){
-  const sessions=[...db.sessions].sort((a,b)=>new Date(b.startedAt||b.localDate)-new Date(a.startedAt||a.localDate));
-  return `<div class="eyebrow">Training</div><h1 class="page-title">Historie</h1>
-  ${sessions.length?sessions.map(s=>`<div class="history-card"><div class="history-date">${fmtDate(s.startedAt||s.localDate)}</div><div class="history-title">${esc(s.title)}</div><div class="muted">${s.durationSec?Math.round(s.durationSec/60)+" Min · ":""}${s.exercises?.length||0} Übungen</div>
-  <details><summary class="link-btn">Details</summary>${(s.exercises||[]).map(e=>`<div class="history-ex"><strong>${esc(e.nameSnapshot||ex(e.exerciseId)?.name||"Übung")}</strong><br>${(e.sets||[]).filter(z=>z.completed!==false).map(z=>`${z.kg??"—"} kg × ${z.reps??"—"}`).join(" · ")}</div>`).join("")}</details></div>`).join(""):`<div class="card empty">Noch keine Trainings gespeichert.</div>`}`;
+ const all=[...db.sessions].filter(effectiveSession).sort((a,b)=>new Date(b.startedAt||b.localDate)-new Date(a.startedAt||a.localDate)),monthSessions=all.filter(s=>sessionDate(s).startsWith(logMonth)),shown=selectedLogDate?monthSessions.filter(s=>sessionDate(s)===selectedLogDate):monthSessions;
+ const label=new Intl.DateTimeFormat("de-CH",{month:"long",year:"numeric",timeZone:"UTC"}).format(new Date(logMonth+"-01T12:00:00Z"));
+ return `<div class="eyebrow">Training</div><h1 class="page-title">Trainingslog</h1><div class="card log-calendar-card"><div class="log-month-head"><button class="mini secondary" data-action="logmonth:-1">‹</button><strong>${esc(label)}</strong><button class="mini secondary" data-action="logmonth:1">›</button></div>${trainingCalendar(logMonth,monthSessions)}<div class="log-month-summary"><strong>${monthSessions.length}</strong> effektive Training${monthSessions.length===1?"":"s"} in diesem Monat</div></div>${selectedLogDate?`<div class="selected-log-head"><strong>${fmtDate(selectedLogDate)}</strong><button class="link-btn" data-action="logdate:all">Alle anzeigen</button></div>`:""}${shown.length?shown.map(historySessionCard).join(""):`<div class="card empty">${selectedLogDate?"An diesem Tag wurde kein Training gespeichert.":"In diesem Monat wurden keine effektiven Trainings gespeichert."}</div>`}`;
 }
 function renderProgress(){
  const body=latestBody(),total=db.sessions.length,recent=(db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate)>new Date(Date.now()-30*864e5)).length;
@@ -496,14 +517,9 @@ function renderProgress(){
  <p class="muted progress-note">Messungen bleiben auf diesem Gerät gespeichert. Gewicht und Körperfett können unabhängig voneinander erfasst werden. Körperfettwerte verschiedener Messmethoden sind nur eingeschränkt vergleichbar.</p>`;
 }
 
+function sessionsInRange(days){const start=rangeStart(days),end=zonedISO();return (db.sessions||[]).filter(s=>effectiveSession(s)&&sessionDate(s)>=start&&sessionDate(s)<=end)}
 function muscleScores(days){
-  const cutoff=Date.now()-days*864e5, scores={};
-  (db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate).getTime()>=cutoff).forEach(s=>(s.exercises||[]).forEach(se=>{
-    const x=ex(se.exerciseId);if(!x&&!se.musclesSnapshot)return;
-    const completed=(se.sets||[]).filter(z=>z.completed!==false&&z.kind!=="warmup").length;
-    for(const [m,w] of Object.entries(se.musclesSnapshot||x?.muscles||{}))scores[m]=(scores[m]||0)+completed*Number(w||0);
-  }));
-  return scores;
+ const scores={};sessionsInRange(days).forEach(s=>(s.exercises||[]).forEach(se=>{const x=ex(se.exerciseId);if(!x&&!se.musclesSnapshot)return;const completed=(se.sets||[]).filter(z=>z.completed!==false&&z.kind!=="warmup").length;for(const [m,w] of Object.entries(se.musclesSnapshot||x?.muscles||{}))scores[m]=(scores[m]||0)+completed*Number(w||0)}));return scores;
 }
 function anatomyView(view,scores,max){
  const label=view==="front"?"Vorderseite":"Rückseite";
@@ -538,25 +554,10 @@ async function paintHeatmaps(scores,max){
  }
 }
 
-function completedSetsInRange(days){
-  const cutoff=Date.now()-days*864e5;
-  return (db.sessions||[]).filter(s=>new Date(s.startedAt||s.localDate).getTime()>=cutoff)
-    .reduce((sum,s)=>sum+(s.exercises||[]).reduce((n,e)=>n+(e.sets||[]).filter(z=>z.kind!=="warmup"&&z.completed!==false).length,0),0);
-}
+function completedSetsInRange(days){return sessionsInRange(days).reduce((sum,s)=>sum+completedWorkSets(s).length,0)}
 function renderHeatmap(){
- const scores=muscleScores(heatRange),max=Math.max(0,...Object.values(scores)),totalSets=completedSetsInRange(heatRange);
- const ranked=Object.entries(scores).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
- return `<div class="eyebrow">Analyse</div><h1 class="page-title">Muskel-Heatmap</h1>
- <div class="range-tabs"><button data-range="30" class="${heatRange===30?"active":""}">30 Tage</button><button data-range="90" class="${heatRange===90?"active":""}">90 Tage</button><button data-range="365" class="${heatRange===365?"active":""}">12 Monate</button></div>
- <div class="heat-summary"><div><strong>${totalSets}</strong><span>Arbeitssätze</span></div><div><strong>${ranked.length}</strong><span>Muskelgruppen</span></div></div>
- <div class="heat-view-tabs" role="tablist" aria-label="Körperansicht"><button data-heat-view-tab="front" class="${heatView==="front"?"active":""}">Vorderseite</button><button data-heat-view-tab="back" class="${heatView==="back"?"active":""}">Rückseite</button></div>
- <div class="heat-layout">${anatomyView(heatView,scores,max)}</div>
- <div class="card" style="margin-top:14px"><div class="eyebrow">Deine Muskelbelastung</div>
- <p class="muted" style="margin:9px 0 15px">Relative Belastung im gewählten Zeitraum. 100 % entspricht deiner am stärksten beanspruchten Muskelgruppe.</p>
- ${ranked.length?`<div class="muscle-rank">${ranked.map(([m,v])=>{const pct=Math.round(v/max*100),level=pct>=75?"Sehr hoch":pct>=50?"Hoch":pct>=25?"Moderat":"Niedrig",cls=pct>=75?"very-high":pct>=50?"high":pct>=25?"moderate":"low";return `<div class="muscle-simple ${cls}"><div class="muscle-simple-head"><span>${esc(seed.muscleGroups[m]||m)}</span><strong>${level} <small>${pct}%</small></strong></div><div class="bar"><span style="width:${pct}%"></span></div></div>`}).join("")}</div>`:`<div class="empty">Für diesen Zeitraum liegen noch keine auswertbaren Trainings vor.</div>`}
- <div class="heat-legend-scale heat-legend-clear"><div><i></i><span>Niedrig<small>1–24 %</small></span></div><div><i></i><span>Moderat<small>25–49 %</small></span></div><div><i></i><span>Hoch<small>50–74 %</small></span></div><div><i></i><span>Sehr hoch<small>75–100 %</small></span></div></div>
- <details class="heat-method"><summary>Wie wird die Belastung berechnet?</summary><p>BodyPlan zählt absolvierte Arbeitssätze und gewichtet sie nach der Muskelbeteiligung der Übung. Ein Satz kann mehrere Muskelgruppen beanspruchen. Die Prozentwerte vergleichen die Muskelgruppen innerhalb des gewählten Zeitraums: 100 % ist die am stärksten belastete Gruppe. Sie sind keine Messung von Muskelwachstum, Erholung oder Trainingsqualität.</p><p>Beispiel: 3 Sätze Bankdrücken mit Brustgewichtung 1,0 ergeben 3 Reizpunkte. Eine sekundäre Gewichtung von 0,5 ergibt 1,5 Punkte. Historische Übungen ohne eindeutige Zuordnung werden nicht geschätzt.</p></details>
- </div>`;
+ const scores=muscleScores(heatRange),scaleMax=HEAT_WEEKLY_REFERENCE*heatRange/7,totalSets=completedSetsInRange(heatRange),sessions=sessionsInRange(heatRange),ranked=Object.entries(scores).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+ return `<div class="eyebrow">Analyse</div><h1 class="page-title">Muskel-Heatmap</h1><div class="range-tabs"><button data-range="7" class="${heatRange===7?"active":""}">7 Tage</button><button data-range="30" class="${heatRange===30?"active":""}">30 Tage</button><button data-range="90" class="${heatRange===90?"active":""}">90 Tage</button></div><div class="heat-summary heat-summary-three"><div><strong>${sessions.length}</strong><span>Trainings</span></div><div><strong>${totalSets}</strong><span>Arbeitssätze</span></div><div><strong>${(sessions.length*7/heatRange).toLocaleString("de-CH",{maximumFractionDigits:1})}</strong><span>pro Woche</span></div></div><div class="heat-view-tabs" role="tablist" aria-label="Körperansicht"><button data-heat-view-tab="front" class="${heatView==="front"?"active":""}">Vorderseite</button><button data-heat-view-tab="back" class="${heatView==="back"?"active":""}">Rückseite</button></div><div class="heat-layout">${anatomyView(heatView,scores,scaleMax)}</div><div class="card" style="margin-top:14px"><div class="eyebrow">Effektive Muskelbelastung</div><p class="muted" style="margin:9px 0 15px">Durchschnittliche Belastung pro Woche aus tatsächlich abgeschlossenen Arbeitssätzen.</p>${ranked.length?`<div class="muscle-rank">${ranked.map(([m,v])=>{const weekly=v*7/heatRange,pct=Math.min(100,Math.round(weekly/HEAT_WEEKLY_REFERENCE*100)),level=pct>=75?"Sehr hoch":pct>=50?"Hoch":pct>=25?"Moderat":"Niedrig",cls=pct>=75?"very-high":pct>=50?"high":pct>=25?"moderate":"low";return `<div class="muscle-simple ${cls}"><div class="muscle-simple-head"><span>${esc(seed.muscleGroups[m]||m)}</span><strong>${level} <small>${weekly.toLocaleString("de-CH",{maximumFractionDigits:1})} Punkte/Woche</small></strong></div><div class="bar"><span style="width:${pct}%"></span></div></div>`}).join("")}</div>`:`<div class="empty">In diesem Zeitraum wurden keine effektiven Arbeitssätze gespeichert.</div>`}<details class="heat-method"><summary>Wie wird die Belastung berechnet?</summary><p>BodyPlan berücksichtigt ausschließlich gespeicherte Arbeitssätze, gewichtet sie nach Muskelbeteiligung und rechnet sie auf einen Wochendurchschnitt um. So bleiben 7, 30 und 90 Tage vergleichbar. Ohne Arbeitssätze bleibt die Heatmap leer.</p><p>Die Darstellung beschreibt Trainingsvolumen, nicht Muskelwachstum, Erholung oder Trainingsqualität.</p></details></div>`;
 }
 function renderSettings(){
  const opts=[["next","Nächste Einheit"],["week","Wochenfortschritt"],["last","Letztes Training"]];
@@ -571,6 +572,8 @@ function handleAction(a,el){
   if(op==="newbody")return openBodyDialog();
   if(op==="editbody")return openBodyDialog(id);
   if(op==="deletebody"){if(confirm("Diese Messung löschen?")){db.bodyEntries=db.bodyEntries.filter(e=>e.id!==id);save();render()}return}
+  if(op==="logmonth"){shiftLogMonth(Number(id));return render()}
+  if(op==="logdate"){selectedLogDate=id==="all"?null:id;return render()}
   if(op==="import")return $("#importFile").click();
   if(op==="allplans"){selectedPlan=null;selectedDay=null;window.scrollTo(0,0);return render()}
   if(op==="openplan"){selectedPlan=id;selectedDay=null;page="plans";window.scrollTo(0,0);return render()}
@@ -580,7 +583,7 @@ function handleAction(a,el){
   if(op==="toggleex"){let e=day()?.exercises.find(x=>x.id===id);if(e)e._open=!e._open;return render()}
   if(op==="newexercise"){let n=prompt("Name der neuen Übung");if(!n?.trim())return;let e=newExercise(n.trim());e._open=true;db.exercises.push(e);query="";save();return render()}
   if(op==="newplan")return openNewPlanDialog();
-  if(op==="activate"){if(!plan()?.days?.length){alert("Füge zuerst mindestens eine Trainingseinheit hinzu.");return}if(getJSON(ACTIVE_KEY,null)){alert("Bitte beende oder verwerfe zuerst das laufende Training, bevor du den aktiven Plan wechselst.");return}db.plans.forEach(p=>{if(p.status==="active")p.status="draft"});let p=plan();p.status="active";db.activePlanId=p.id;save();return render()}
+  if(op==="activate"){if(!plan()?.days?.some(d=>d.exercises?.some(e=>e.sets?.length))){alert("Füge zuerst mindestens eine Übung mit einem Satz hinzu.");return}if(getJSON(ACTIVE_KEY,null)){alert("Bitte beende oder verwerfe zuerst das laufende Training, bevor du den aktiven Plan wechselst.");return}db.plans.forEach(p=>{if(p.status==="active")p.status="draft"});let p=plan();p.status="active";db.activePlanId=p.id;save();return render()}
   if(op==="deleteplan"){
     const target=db.plans.find(p=>p.id===id);if(!target)return;
     if(id===db.activePlanId){alert("Der aktive Plan kann nicht gelöscht werden. Aktiviere zuerst einen anderen Plan.");return}
@@ -655,14 +658,14 @@ function updateSessionProgress(active){
   if(bar)bar.style.width=(stats.total?Math.round(stats.done/stats.total*100):0)+"%";
 }
 function openSession(dayId){
-  const p=activePlan(), d=p?.days.find(x=>x.id===dayId);if(!d)return;
+  const p=activePlan(), d=p?.days.find(x=>x.id===dayId);if(!d)return;if(!d.exercises?.some(e=>e.sets?.length)){alert("Diese Einheit enthält noch keine trainierbaren Übungen.");return}
   let active=getJSON(ACTIVE_KEY,null);
   if(active&&active.dayId!==dayId){
     if(!confirm("Es läuft bereits ein anderes Training. Dieses verwerfen und die neue Einheit starten?"))return;
     localStorage.removeItem(ACTIVE_KEY);localStorage.removeItem(REST_KEY);active=null;
   }
   if(!active||active.dayId!==dayId){
-    active={id:uid(),planId:p.id,dayId:d.id,title:`${d.label||""} · ${d.name}`.replace(/^ · /,""),planName:p.name,startedAt:now(),localDate:localISO(),exercises:d.exercises.map(pe=>{
+    active={id:uid(),planId:p.id,dayId:d.id,timeZone:APP_TIME_ZONE,title:`${d.label||""} · ${d.name}`.replace(/^ · /,""),planName:p.name,startedAt:now(),localDate:localISO(),exercises:d.exercises.map(pe=>{
       const x=ex(pe.exerciseId);
       return{id:uid(),exerciseId:pe.exerciseId,nameSnapshot:x?.name||"Übung",musclesSnapshot:clone(x?.muscles||{}),permanentNote:x?.notes||"",sessionNote:"",sets:pe.sets.map(s=>({id:uid(),kind:s.kind||"working",repsMin:s.repsMin,repsMax:s.repsMax,kg:"",reps:"",completed:false}))}
     })};
@@ -745,8 +748,8 @@ function startRest(sec){
 function finishSession(){
   let a=getJSON(ACTIVE_KEY,null);if(!a)return;
   const workSets=a.exercises.flatMap(e=>e.sets).filter(s=>s.kind!=="warmup");
-  if(!workSets.some(s=>s.completed)){if(!confirm("Noch kein Satz ist als erledigt markiert. Training trotzdem speichern?"))return}
-  a.durationSec=Math.max(0,Math.round((Date.now()-new Date(a.startedAt).getTime())/1000));a.savedAt=now();a.source="bodyplan2";
+  if(!workSets.some(s=>s.completed)){alert("Markiere mindestens einen Arbeitssatz als erledigt oder verwirf das Training.");return}
+  a.durationSec=Math.max(0,Math.round((Date.now()-new Date(a.startedAt).getTime())/1000));a.savedAt=now();a.finishedAt=a.savedAt;a.timeZone=a.timeZone||APP_TIME_ZONE;a.localDate=a.localDate||sessionDate(a);a.source="bodyplan2";
   if(db.sessions.some(s=>s.id===a.id)){alert("Dieses Training wurde bereits gespeichert.");return}
   a.exercises.forEach(e=>{e.sets=e.sets.filter(z=>z.completed);});
   db.sessions.push(a);save();
@@ -770,3 +773,4 @@ async function importBackup(e){
 Promise.all(["exercise-seed.json","starter-plan.json"].map(u=>fetch(u,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(u);return r.json()})))
 .then(([s,p])=>{seed=s;starter=p;init()})
 .catch(err=>{$("#app").innerHTML=`<div class="card"><div class="eyebrow">BodyPlan</div><h1 class="page-title">Start fehlgeschlagen</h1><div class="muted">${esc(err.message)}</div></div>`});
+

@@ -1,16 +1,15 @@
-# Beta 8 – Qualitätsprüfung
+# BodyPlan 2.0 Beta 9 – QA
 
-## Geprüft
-- JavaScript-Syntaxprüfung.
-- ZIP-Integrität.
-- alle vom Service Worker referenzierten Assets vorhanden.
-- Front- und Rückseitenasset exakt 768 × 1024 Pixel.
-- transparente Außenbereiche der beiden Anatomy-PNGs geprüft.
-- Masken exakt 768 × 1024 und auf dieselbe Gruppen-ID-Reihenfolge wie die App geprüft.
-- Browser-Test der Heatmap-Navigation über Dashboard und Burgermenü.
-- Front-/Back-Switch im Browser getestet.
-- dynamische Heatmap mit Test-Trainingsdaten für Vorder- und Rückseite gerendert.
-- Einstellungen und übrige Hauptnavigation auf JavaScript-Laufzeitfehler geprüft.
+## Prüfumfang
+- Syntax und Service-Worker-Assets.
+- Migration bestehender Beta-8-Daten.
+- Monatswechsel, Trainingstage, Europe/Zurich-Uhrzeit und historische Sessions ohne Uhrzeit.
+- Heatmap mit 0, 1 und mehreren Sessions für 7, 30 und 90 Tage.
+- Blockade leerer Planaktivierung, leerer Einheit und leerer Trainingsspeicherung.
+- Wochenfortschritt bei mehrfach trainierter Einheit.
+- Unterbrechung und Wiederaufnahme eines Trainings.
+- Mobile Navigation und horizontales Overflow.
 
 ## Grenze
-Der Test erfolgt in einer Chromium-Testumgebung. Die finale visuelle Kontrolle auf der iOS-Home-Screen-PWA und der produktiven GitHub-Pages-URL muss nach dem Deployment auf dem iPhone erfolgen.
+Home-Screen-PWA und Service-Worker-Lifecycle müssen nach dem Deployment zusätzlich auf dem Ziel-iPhone geprüft werden.
+

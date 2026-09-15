@@ -494,3 +494,8 @@ body.picker-open{overflow:hidden}
 .anatomy-clean .anatomy-wrap{background:transparent!important;border-radius:16px;overflow:hidden}
 .anatomy-clean .heat-canvas{background:transparent}
 @media(max-width:430px){.anatomy-card.anatomy-clean{padding:4px}}
+
+
+/* Beta 9: calendar training log and effective-load heatmap */
+.log-calendar-card{padding:14px}.log-month-head{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;text-align:center;margin-bottom:12px}.log-month-head strong{text-transform:capitalize}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.calendar-weekdays span{text-align:center;color:#777;font-size:10px;padding:4px 0}.calendar-day{position:relative;min-height:42px;padding:7px 2px;border:0;border-radius:10px;background:transparent;color:#aaa}.calendar-day.trained{background:#d4a85322;color:#e4b75b;font-weight:800}.calendar-day.selected{background:#d4a853;color:#090909}.calendar-day i{position:absolute;left:50%;bottom:5px;width:4px;height:4px;transform:translateX(-50%);border-radius:50%;background:currentColor}.calendar-empty{min-height:42px}.log-month-summary{text-align:center;color:#888;font-size:12px;margin-top:12px}.selected-log-head,.history-card-top,.history-metrics{display:flex;align-items:center;justify-content:space-between;gap:10px}.selected-log-head{margin:18px 2px 8px}.history-duration{color:#d4a853;white-space:nowrap}.history-metrics{justify-content:flex-start;flex-wrap:wrap;color:#888;font-size:11px;margin:8px 0}.history-metrics span:not(:last-child)::after{content:" ·";margin-left:6px}.heat-summary-three{grid-template-columns:repeat(3,1fr)}
+
